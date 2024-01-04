@@ -1,0 +1,16 @@
+Package: blueskynet
+Title: Analyze Networks on then Bluesky Social Network
+Version: 0.0.0.9000
+Authors@R: 
+    person("Lasse", "Hjorth Madsen", , "lassehjorthmadsen@gmail.com", role = c("aut", "cre"))
+Description: Based on a given actor (user) on Bluesky, this will generate 
+    a network based on what users the actor followes. The output will be 
+    a graph with information on who follows who among this set of actors.
+    Also included are a few tools from other packages for network analysis.
+License: MIT + file LICENSE
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
