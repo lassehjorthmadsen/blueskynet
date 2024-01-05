@@ -1,0 +1,86 @@
+#' Get token for Bluesky api
+#'
+#' @param identifier identifier for account
+#' @param password app password
+#'
+#' @return character, token
+#' @export
+#'
+get_token <- function(identifier, password) {
+  req <-
+    httr2::request('https://bsky.social/xrpc/com.atproto.server.createSession') |>
+    httr2::req_body_json(data = list(identifier = identifier, password = password))
+
+  resp <- req |>
+    httr2::req_perform() |>
+    httr2::resp_body_json()
+
+  token <- resp$accessJwt
+}
+
+#' Get follows for an actor
+#'
+#' @param actor account identifier
+#' @param token token for api
+#'
+#' @return tibble
+#' @export
+#'
+#' @section Lexicon references:
+#' [lexicons/app/bsky/graph/getFollows.json](https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollows.json)
+#'
+get_follows <- function(actor, token) {
+
+  # Get follows (first 100)
+  req <- httr2::request('https://bsky.social/xrpc/app.bsky.graph.getFollows') |>
+    httr2::req_url_query(actor = actor, limit = 100) |>
+    httr2::req_auth_bearer_token(token = token)
+
+  resp <- req |>
+    httr2::req_perform() |>
+    httr2::resp_body_json()
+
+  # Extract the follows and store in data frame
+  df <- resp |> resp2df(element = "follows")
+
+  # Run loop until the cursor is undefined
+  while(!is.null(resp$cursor)) {
+    req <- req |> httr2::req_url_query(cursor = resp$cursor)
+
+    resp <- req |>
+      httr2::req_perform() |>
+      httr2::resp_body_json()
+
+    follows_chunk <- resp |> resp2df(element = "follows")
+
+    df <- dplyr::bind_rows(df, follows_chunk)
+  }
+
+  return(df)
+}
+
+#' Get profile for an actor/actors
+#'
+#' @param actors character, actor handle
+#' @param token character, api token
+#' @param chunksize integer, the number of actors per request;
+#'     defaults to 25, currently the maximum number allowed#'
+#' @return
+#' @export
+#'
+get_profiles <- function(actors, token, chunksize = 25) {
+
+  actors_chunks <- split(actors, ceiling(seq_along(actors) / chunksize))
+  actors_list <- actors_chunks |> purrr::map(~ purrr::set_names(as.list(.x), 'actors'))
+
+  req <- httr2::request('https://bsky.social/xrpc/app.bsky.actor.getProfiles') |>
+    httr2::req_auth_bearer_token(token = token)
+
+  resps <- actors_list |> purrr::map(~ httr2::req_url_query(req, !!!.x) |>
+                       httr2::req_perform() |>
+                       httr2::resp_body_json())
+
+  df  <- resps |> purrr::map_dfr(resp2df, element = "profiles")
+
+  return(df)
+}
