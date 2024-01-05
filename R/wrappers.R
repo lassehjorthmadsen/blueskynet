@@ -36,9 +36,13 @@ get_follows <- function(actor, token) {
     httr2::req_url_query(actor = actor, limit = 100) |>
     httr2::req_auth_bearer_token(token = token)
 
-  resp <- req |>
-    httr2::req_perform() |>
-    httr2::resp_body_json()
+  # HTTP 400 Bad Request can happen if we try to look up a non-existing (deleted) actor
+  resp <- tryCatch(
+    req |>
+      httr2::req_perform() |>
+      httr2::resp_body_json(),
+    httr2_http_400 = function(cnd) return(NULL)
+  )
 
   # Extract the follows and store in data frame
   df <- resp |> resp2df(element = "follows")
