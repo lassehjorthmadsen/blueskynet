@@ -15,7 +15,7 @@ get_token <- function(identifier, password) {
     httr2::req_perform() |>
     httr2::resp_body_json()
 
-  token <- resp$accessJwt
+  return(resp)
 }
 
 #' Get follows for an actor
@@ -68,7 +68,7 @@ get_follows <- function(actor, token) {
 #' @param actors character, actor handle
 #' @param token character, api token
 #' @param chunksize integer, the number of actors per request;
-#'     defaults to 25, currently the maximum number allowed#'
+#'     defaults to 25, currently the maximum number allowed
 #' @return
 #' @export
 #'
@@ -87,4 +87,37 @@ get_profiles <- function(actors, token, chunksize = 25) {
   df  <- resps |> purrr::map_dfr(resp2df, element = "profiles")
 
   return(df)
+}
+
+#' Follow an actor or actors
+#'
+#' @param my_did
+#' @param actor_did
+#' @param token
+#'
+#' @return
+#' @export
+#'
+
+follow_actor <- function(my_did, actor_did, token) {
+
+  record <- list(
+    "$type" = "app.bsky.graph.follow",
+    "createdAt" = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ"),
+    "subject" = actor_did
+  )
+
+  data <- list(
+    repo = my_did,
+    collection = "app.bsky.graph.follow",
+    record = record
+  )
+
+  resp <-
+    httr2::request("https://bsky.social/xrpc/com.atproto.repo.createRecord") |>
+    httr2::req_body_json(data = follow_data) |>
+    httr2::req_auth_bearer_token(token = token) |>
+    httr2::req_perform() |>
+    httr2::resp_body_json()
+
 }
