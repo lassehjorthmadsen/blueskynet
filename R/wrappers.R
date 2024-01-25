@@ -115,7 +115,7 @@ follow_actor <- function(my_did, actor_did, token) {
 
   resp <-
     httr2::request("https://bsky.social/xrpc/com.atproto.repo.createRecord") |>
-    httr2::req_body_json(data = follow_data) |>
+    httr2::req_body_json(data = data) |>
     httr2::req_auth_bearer_token(token = token) |>
     httr2::req_perform() |>
     httr2::resp_body_json()

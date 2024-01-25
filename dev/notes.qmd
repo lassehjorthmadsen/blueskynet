@@ -1,0 +1,50 @@
+---
+title: "Notes"
+author: "Lasse Hjorth Madsen"
+format: html
+editor: source
+---
+
+## How to iteratively build a network of researchers?
+
+### One way to do it
+
+1.  Start with some set of users, either from "follows" or, preferably, from a list (when I figure out how to do that)
+
+2.  Get the "big net": Everyone that is followed by someone in this set of users.
+
+3.  In the big net, find new members for inclusion in the research set: Every followed user who:
+
+    a\) Has a description that includes any keyword from our list of research-related keywords, AND
+
+    b\) Is followed by at least \[some threshold\] from the original set. We start with a threshold of 1, which by definition everyone meets.
+
+4.  From the list of new members: Find everyone this group follows
+
+5.  Repeat step 3-4 with the list of new members: Iteratively include new candidates suggested by new candidates from latest round, until the set of new members no longer grows.
+
+6.  Append the network of new members and their follows to the big net.
+
+7.  The "small net" is now just the big net, filtered so that we only consider follows that is *inside* the net. I.e. "New York Times" is not part of the network of researchers, just because it is being followed by at least one researcher.
+
+### Considerations
+
+-   Would be nice to use lists for this.
+
+-   Maybe it's simpler just to do a global search for all actors that has the required keyword in their description, if that's possible? This, then, would be the simple definition of an actor in the research network: Anyone who includes "professor ... etc." in their description.
+
+-   Should we trim the net also? If so, by excluding everyone who changed their description so it no longer has any of the required keywords? And should this include the original list? (Then we would no longer have the ability manually add some know scientist, who happen to not have the keywords in description).
+
+-   On reflection, we probably need to have that manual option for inclusion in some special cases. That means, we need to:
+
+    -   Rebuild the network starting from the initial list every time we update,
+
+    -   OR, have a way of keeping track of manual inclusions (another list?)
+
+    -   OR, never trim, i.e. never exclude anyone
+
+## Remember and to-dos
+
+Get ideas and coding practices from <https://github.com/christopherkenny/bskyr/>
+
+E.g. maybe check out his processing function, to turn responses into dfs: [bskyr/R/proc.R at main · christopherkenny/bskyr (github.com)](https://github.com/christopherkenny/bskyr/blob/main/R/proc.R)

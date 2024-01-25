@@ -37,21 +37,18 @@ profile <- get_profiles(actor, token)
 actors <- follows$handle
 profiles <- get_profiles(actors, token)
 
-# Follow some actor
+# Follow Mike
 actor_did <- get_profiles("mkeyoung.bsky.social", token)$did
 resp <- follow_actor(my_did = my_did, actor_did = actor_did, token = token)
 
-# Follow many actors
-fol_smp <- follows |> slice_sample(n = 5)
-actors_did <- fol_smp$did
-
-# Why won't this work?
-resps <- actors_did |> map(\(x) follow_actor(my_did = my_did, actor_did = x, token = token))
-
-# Or this?
-random_actor <- actors_did |> sample(1)
-resp <- follow_actor(my_did = my_did, actor_did = random_actor, token = token)
-
-# This?
+# Follow Neil Gaiman
 neil_did <- get_profiles("neilhimself.neilgaiman.com", token)$did
 resp <- follow_actor(my_did = my_did, actor_did = neil_did, token = token)
+
+# Follow many actors
+dids <- follows |> slice_sample(n = 5) |> pull(did)
+resps <- dids |> map(\(x) follow_actor(my_did = my_did, actor_did = x, token = token))
+
+# Follow all Mike's follows
+dids <- follows |> pull(did)
+resps <- dids |> map(\(x) follow_actor(my_did = my_did, actor_did = x, token = token))
