@@ -12,7 +12,7 @@ get_follows(actor, token)
 \item{token}{token for api}
 }
 \value{
-tibble
+tibble with response information
 }
 \description{
 Get follows for an actor

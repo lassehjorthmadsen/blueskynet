@@ -12,7 +12,7 @@ get_token(identifier, password)
 \item{password}{app password}
 }
 \value{
-character, token
+response body
 }
 \description{
 Get token for Bluesky api

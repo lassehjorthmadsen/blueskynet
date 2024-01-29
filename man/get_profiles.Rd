@@ -12,7 +12,10 @@ get_profiles(actors, token, chunksize = 25)
 \item{token}{character, api token}
 
 \item{chunksize}{integer, the number of actors per request;
-defaults to 25, currently the maximum number allowed#'}
+defaults to 25, currently the maximum number allowed}
+}
+\value{
+tibble with profiles
 }
 \description{
 Get profile for an actor/actors

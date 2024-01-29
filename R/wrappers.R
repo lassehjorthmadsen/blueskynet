@@ -3,7 +3,7 @@
 #' @param identifier identifier for account
 #' @param password app password
 #'
-#' @return character, token
+#' @return response body
 #' @export
 #'
 get_token <- function(identifier, password) {
@@ -18,12 +18,35 @@ get_token <- function(identifier, password) {
   return(resp)
 }
 
+
+#' Refresh token for Bluesky api
+#'
+#' @param refresh_token character, refresh token
+#'
+#' @return response body
+#' @export
+#'
+refresh_token <- function(refresh_token) {
+
+  req <-
+    httr2::request('https://bsky.social/xrpc/com.atproto.server.refreshSession') |>
+    httr2::req_auth_bearer_token(token = refresh_token) |>
+    httr2::req_method("POST")
+
+  resp <- req |> httr2::req_perform()
+  check_wait(resp)
+  resp <- resp |> httr2::resp_body_json()
+
+  return(resp)
+}
+
+
 #' Get follows for an actor
 #'
 #' @param actor account identifier
 #' @param token token for api
 #'
-#' @return tibble
+#' @return tibble with response information
 #' @export
 #'
 #' @section Lexicon references:
@@ -38,11 +61,14 @@ get_follows <- function(actor, token) {
 
   # HTTP 400 Bad Request can happen if we try to look up a non-existing (deleted) actor
   resp <- tryCatch(
-    req |>
-      httr2::req_perform() |>
-      httr2::resp_body_json(),
+    req |> httr2::req_perform() ,
     httr2_http_400 = function(cnd) return(NULL)
   )
+
+  if (!is.null(resp)) {
+    check_wait(resp)
+    resp <- resp |> httr2::resp_body_json()
+  }
 
   # Extract the follows and store in data frame
   df <- resp |> resp2df(element = "follows")
@@ -51,9 +77,9 @@ get_follows <- function(actor, token) {
   while(!is.null(resp$cursor)) {
     req <- req |> httr2::req_url_query(cursor = resp$cursor)
 
-    resp <- req |>
-      httr2::req_perform() |>
-      httr2::resp_body_json()
+    resp <- req |> httr2::req_perform()
+    check_wait(resp)
+    resp <- resp |> httr2::resp_body_json()
 
     follows_chunk <- resp |> resp2df(element = "follows")
 
@@ -69,7 +95,7 @@ get_follows <- function(actor, token) {
 #' @param token character, api token
 #' @param chunksize integer, the number of actors per request;
 #'     defaults to 25, currently the maximum number allowed
-#' @return
+#' @return tibble with profiles
 #' @export
 #'
 get_profiles <- function(actors, token, chunksize = 25) {
@@ -80,9 +106,12 @@ get_profiles <- function(actors, token, chunksize = 25) {
   req <- httr2::request('https://bsky.social/xrpc/app.bsky.actor.getProfiles') |>
     httr2::req_auth_bearer_token(token = token)
 
-  resps <- actors_list |> purrr::map(~ httr2::req_url_query(req, !!!.x) |>
-                       httr2::req_perform() |>
-                       httr2::resp_body_json())
+  resps <- actors_list |>
+    purrr::map(~ httr2::req_url_query(req, !!!.x) |>
+                 httr2::req_perform() |>
+                 check_wait() |>
+                 httr2::resp_body_json(),
+               .progress = list(name = "   Getting profiles", clear = FALSE))
 
   df  <- resps |> purrr::map_dfr(resp2df, element = "profiles")
 
@@ -91,11 +120,11 @@ get_profiles <- function(actors, token, chunksize = 25) {
 
 #' Follow an actor or actors
 #'
-#' @param my_did
-#' @param actor_did
-#' @param token
+#' @param my_did character, did-identification of the actor that wants to follow someone
+#' @param actor_did character, did-identification of the actor to be followed
+#' @param token token for api
 #'
-#' @return
+#' @return response object
 #' @export
 #'
 
@@ -115,6 +144,7 @@ follow_actor <- function(my_did, actor_did, token) {
 
   resp <-
     httr2::request("https://bsky.social/xrpc/com.atproto.repo.createRecord") |>
+    check_wait() |>
     httr2::req_body_json(data = data) |>
     httr2::req_auth_bearer_token(token = token) |>
     httr2::req_perform() |>

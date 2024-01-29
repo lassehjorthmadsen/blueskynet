@@ -1,0 +1,1244 @@
+Okay, at some point the algo adds only 6 of the found 69 candidates to the net.
+In all the following iterations, it finds the remaining 63 candidates, but adds
+none, then continues until 100 iterations.
+
+We get some duplicates; how does this funny pattern arise?
+
+> net2 |> add_count(actor_handle, follows_handle) |> count(n) |> print(n = Inf)
+Storing counts in `nn`, as `n` already present in input
+ℹ Use `name = "new_name"` to pick a new name.
+# A tibble: 26 × 2
+       n      nn
+   <int>   <int>
+ 1     1 7122041
+ 2     2     120
+ 3     3     111
+ 4     4      88
+ 5     5      65
+ 6     6      48
+ 7     7      21
+ 8     8      88
+ 9     9      63
+10    10      20
+11    11      11
+12    14      56
+13    15      15
+14    16      16
+15    18      18
+16    20      20
+17    21      21
+18    29      29
+19    33      33
+20    36      36
+21    85      85
+22    86      86
+23   103     103
+24   112     112
+25   167     167
+26   244     244
+
+
+Is this related to handle.invalid? Must be -- all duplicate cases have follows_handle == "handle.invalid",
+although an invalid handle does not always result in a duplicate.
+
+> net2 |> add_count(actor_handle, follows_handle) |> count(follows_handle == "handle.invalid", n > 1)
+# A tibble: 3 × 3
+  `follows_handle == "handle.invalid"` `n > 1`       n
+  <lgl>                                <lgl>     <int>
+1 FALSE                                FALSE   7121505
+2 TRUE                                 FALSE       536
+3 TRUE                                 TRUE       1676
+
+
+
+> net2 |> add_count(actor_handle, follows_handle) |> filter(n > 1) |> distinct(.keep_all = T) |> arrange(-n) |> print(n = Inf)
+# A tibble: 182 × 3
+    actor_handle                 follows_handle     n
+    <chr>                        <chr>          <int>
+  1 trippy.bsky.social           handle.invalid   244
+  2 dvf.bsky.social              handle.invalid   167
+  3 kaimav.bsky.social           handle.invalid   112
+  4 hmm.pics                     handle.invalid   103
+  5 lorenzolne.bsky.social       handle.invalid    86
+  6 luca.lanziani.com            handle.invalid    85
+  7 why.bsky.team                handle.invalid    36
+  8 fusco.bsky.social            handle.invalid    33
+  9 parv.skeets.blue             handle.invalid    29
+ 10 hellvetikaseraph.bsky.social handle.invalid    21
+ 11 mxvoid.com                   handle.invalid    20
+ 12 scrm.bsky.social             handle.invalid    18
+ 13 jacob.gold                   handle.invalid    16
+ 14 criticalcupcake.bsky.social  handle.invalid    15
+ 15 marcushjohnson.bsky.social   handle.invalid    14
+ 16 garchanjo.com                handle.invalid    14
+ 17 jik.wtf                      handle.invalid    14
+ 18 newmodernscience.com         handle.invalid    14
+ 19 potter.bsky.social           handle.invalid    11
+ 20 drfingerstyle.bsky.social    handle.invalid    10
+ 21 antoniojtorres.bsky.social   handle.invalid    10
+ 22 brooklynmarie.bsky.social    handle.invalid     9
+ 23 2fa.bsky.social              handle.invalid     9
+ 24 kvlly.com                    handle.invalid     9
+ 25 jonaigallery.bsky.social     handle.invalid     9
+ 26 vicvijayakumar.com           handle.invalid     9
+ 27 imaginist.bsky.social        handle.invalid     9
+ 28 manik.bsky.social            handle.invalid     9
+ 29 pariss.blacktechpipeline.com handle.invalid     8
+ 30 elsabirch.bsky.social        handle.invalid     8
+ 31 megumin.bsky.social          handle.invalid     8
+ 32 arunwadhwa.com               handle.invalid     8
+ 33 elynn.bsky.social            handle.invalid     8
+ 34 divyaswor.bsky.social        handle.invalid     8
+ 35 shaundai.com                 handle.invalid     8
+ 36 brii-toe-knee.bsky.social    handle.invalid     8
+ 37 dthompsondev.bsky.social     handle.invalid     8
+ 38 round.bsky.social            handle.invalid     8
+ 39 brandonroberts.dev           handle.invalid     8
+ 40 sarahedo.bsky.social         handle.invalid     7
+ 41 nhuntwalker.bsky.social      handle.invalid     7
+ 42 dario.cat                    handle.invalid     7
+ 43 kristianharstad.bsky.social  handle.invalid     6
+ 44 kearney.bsky.social          handle.invalid     6
+ 45 addyosmani.com               handle.invalid     6
+ 46 annabel.bsky.social          handle.invalid     6
+ 47 stu55.bsky.social            handle.invalid     6
+ 48 joelhooks.com                handle.invalid     6
+ 49 nataliabielczyk.bsky.social  handle.invalid     6
+ 50 nickyt.online                handle.invalid     6
+ 51 engineeringbae.bsky.social   handle.invalid     5
+ 52 alispit.tel                  handle.invalid     5
+ 53 davidcarryer.com             handle.invalid     5
+ 54 ironyuppie.com               handle.invalid     5
+ 55 mat-savage.bsky.social       handle.invalid     5
+ 56 markcollier.me               handle.invalid     5
+ 57 vuneo.bsky.social            handle.invalid     5
+ 58 torfinn.bsky.social          handle.invalid     5
+ 59 weirdyweirdo.bsky.social     handle.invalid     5
+ 60 dcor.dev                     handle.invalid     5
+ 61 adalundhe.dev                handle.invalid     5
+ 62 hiroko.io                    handle.invalid     5
+ 63 adamrackis.bsky.social       handle.invalid     5
+ 64 jihedncib.bsky.social        handle.invalid     4
+ 65 jasonmiklian.com             handle.invalid     4
+ 66 vickiboykis.com              handle.invalid     4
+ 67 ninaturner.bsky.social       handle.invalid     4
+ 68 aliafonzy.bsky.social        handle.invalid     4
+ 69 retr0.id                     handle.invalid     4
+ 70 gepser.com                   handle.invalid     4
+ 71 mrfresh.bsky.social          handle.invalid     4
+ 72 matty.wtf                    handle.invalid     4
+ 73 seldo.com                    handle.invalid     4
+ 74 thieflord.dev                handle.invalid     4
+ 75 simpsoka.bsky.social         handle.invalid     4
+ 76 markus.polyscopic.works      handle.invalid     4
+ 77 elizas.website               handle.invalid     4
+ 78 er1p.bsky.social             handle.invalid     4
+ 79 getwired.bsky.social         handle.invalid     4
+ 80 chris.chabot.dev             handle.invalid     4
+ 81 deirra.tech                  handle.invalid     4
+ 82 kishau.com                   handle.invalid     4
+ 83 icooper.bsky.social          handle.invalid     4
+ 84 kimberlee90.bsky.social      handle.invalid     4
+ 85 aaronw.dev                   handle.invalid     4
+ 86 conradhackett.bsky.social    handle.invalid     3
+ 87 elisabethbik.bsky.social     handle.invalid     3
+ 88 sidneyrothstein.bsky.social  handle.invalid     3
+ 89 robin.berjon.com             handle.invalid     3
+ 90 caitlinmoriah.bsky.social    handle.invalid     3
+ 91 redwoodgirl.bsky.social      handle.invalid     3
+ 92 maryscottoconnor.com         handle.invalid     3
+ 93 djcentos7.bsky.social        handle.invalid     3
+ 94 scott.hanselman.com          handle.invalid     3
+ 95 edsouthall.bsky.social       handle.invalid     3
+ 96 bongineer.cloud              handle.invalid     3
+ 97 nishio.bsky.social           handle.invalid     3
+ 98 holden.bsky.social           handle.invalid     3
+ 99 surrealentropy.bsky.social   handle.invalid     3
+100 tfa.ng                       handle.invalid     3
+101 bankrobber.bsky.social       handle.invalid     3
+102 indiegamesooc.bsky.social    handle.invalid     3
+103 khatunjessicabeki.org        handle.invalid     3
+104 samkelly.bsky.social         handle.invalid     3
+105 victoriano.bsky.social       handle.invalid     3
+106 emmabostian.bsky.social      handle.invalid     3
+107 weems.bsky.social            handle.invalid     3
+108 davidfowl.com                handle.invalid     3
+109 jonathanaldrich.bsky.social  handle.invalid     3
+110 maiasingletary.com           handle.invalid     3
+111 ashleemboyer.com             handle.invalid     3
+112 bcgraham.outgroup.social     handle.invalid     3
+113 robhaisfield.com             handle.invalid     3
+114 poisonivy.bsky.social        handle.invalid     3
+115 darrylc.bsky.social          handle.invalid     3
+116 jasonfugate.bsky.social      handle.invalid     3
+117 tuckertech.dev               handle.invalid     3
+118 roubix.co                    handle.invalid     3
+119 spencerchang.me              handle.invalid     3
+120 danascheider.bsky.social     handle.invalid     3
+121 simontomes.com               handle.invalid     3
+122 shantini.bsky.social         handle.invalid     3
+123 mpg.is                       handle.invalid     2
+124 maaikeverbruggen.bsky.social handle.invalid     2
+125 davekarpf.bsky.social        handle.invalid     2
+126 tressiemcphd.bsky.social     handle.invalid     2
+127 cameron.pfiffer.org          handle.invalid     2
+128 molly.wiki                   handle.invalid     2
+129 mariaabreu.bsky.social       handle.invalid     2
+130 jeffjarvis.bsky.social       handle.invalid     2
+131 lisaidefender.bsky.social    handle.invalid     2
+132 xychelsea.tv                 handle.invalid     2
+133 rolle.wtf                    handle.invalid     2
+134 brainnotonyet.antifa.llc     handle.invalid     2
+135 pfcdgayo.bsky.social         handle.invalid     2
+136 willpjones.bsky.social       handle.invalid     2
+137 drlarsbergmann.bsky.social   handle.invalid     2
+138 dancow.bsky.social           handle.invalid     2
+139 aendra.com                   handle.invalid     2
+140 fuckyouiquit.bsky.social     handle.invalid     2
+141 vickyveritas.bsky.social     handle.invalid     2
+142 jonthegeek.com               handle.invalid     2
+143 ericmbudd.bsky.social        handle.invalid     2
+144 jswatz.bsky.social           handle.invalid     2
+145 bnewbold.net                 handle.invalid     2
+146 cbosch.bsky.social           handle.invalid     2
+147 muellergirod.bsky.social     handle.invalid     2
+148 ikepigott.com                handle.invalid     2
+149 jftitone.bsky.social         handle.invalid     2
+150 iwritecoolstuff.bsky.social  handle.invalid     2
+151 hanacarolina.bsky.social     handle.invalid     2
+152 adriennefriend.bsky.social   handle.invalid     2
+153 barbaraorth.bsky.social      handle.invalid     2
+154 therealfitz.com              handle.invalid     2
+155 seblammers.bsky.social       handle.invalid     2
+156 aureleo.bsky.social          handle.invalid     2
+157 cyaneyed.wtf                 handle.invalid     2
+158 cjwilburn.engineering        handle.invalid     2
+159 subatomicdoc.bsky.social     handle.invalid     2
+160 elfprince13.mumak.app        handle.invalid     2
+161 nori.gay                     handle.invalid     2
+162 jesopo.bsky.social           handle.invalid     2
+163 byronwoodfork.bsky.social    handle.invalid     2
+164 gilderthorpe.bsky.social     handle.invalid     2
+165 chrisward.de                 handle.invalid     2
+166 aaronjackphoto.bsky.social   handle.invalid     2
+167 politicalpunk.com            handle.invalid     2
+168 sarahndipity.bsky.social     handle.invalid     2
+169 withenoughcoffee.com         handle.invalid     2
+170 ricgrego.me                  handle.invalid     2
+171 nesslabs.com                 handle.invalid     2
+172 oggata.bsky.social           handle.invalid     2
+173 girltwink.faggot.expert      handle.invalid     2
+174 travelista.bsky.social       handle.invalid     2
+175 micahsch.bsky.social         handle.invalid     2
+176 rosew.bsky.social            handle.invalid     2
+177 merzmensch.bsky.social       handle.invalid     2
+178 axelgarciak.bsky.social      handle.invalid     2
+179 naut.haha.computer           handle.invalid     2
+180 techbychoice.org             handle.invalid     2
+181 paulbiggar.com               handle.invalid     2
+182 xirclebox.com                handle.invalid     2
+
+
+
+
+
+Expanding the network, iteration : 10
+   No. of actors meeting the followers threshold of 30: 19771
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 81
+
+Updated network:
+   Number of actors: 27573
+   Number of connections: 7123091
+
+Time difference of 4.530819 mins
+
+Expanding the network, iteration : 11
+   No. of actors meeting the followers threshold of 30: 19773
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 69
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.222293 mins
+
+Expanding the network, iteration : 12
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.110691 mins
+
+Expanding the network, iteration : 13
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.252119 mins
+
+Expanding the network, iteration : 14
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.112871 mins
+
+Expanding the network, iteration : 15
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.233208 mins
+
+Expanding the network, iteration : 16
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.151834 mins
+
+Expanding the network, iteration : 17
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.013511 mins
+
+Expanding the network, iteration : 18
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.037373 mins
+
+Expanding the network, iteration : 19
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.080313 mins
+
+Expanding the network, iteration : 20
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.13156 mins
+
+Expanding the network, iteration : 21
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.045866 mins
+
+Expanding the network, iteration : 22
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.084217 mins
+
+Expanding the network, iteration : 23
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.101597 mins
+
+Expanding the network, iteration : 24
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.104703 mins
+
+Expanding the network, iteration : 25
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.157367 mins
+
+Expanding the network, iteration : 26
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.090694 mins
+
+Expanding the network, iteration : 27
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.130138 mins
+
+Expanding the network, iteration : 28
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.137925 mins
+
+Expanding the network, iteration : 29
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.129841 mins
+
+Expanding the network, iteration : 30
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.116059 mins
+
+Expanding the network, iteration : 31
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 3.985979 mins
+
+Expanding the network, iteration : 32
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.086042 mins
+
+Expanding the network, iteration : 33
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.011788 mins
+
+Expanding the network, iteration : 34
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.072681 mins
+
+Expanding the network, iteration : 35
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.091274 mins
+
+Expanding the network, iteration : 36
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.11155 mins
+
+Expanding the network, iteration : 37
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.106562 mins
+
+Expanding the network, iteration : 38
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.103729 mins
+
+Expanding the network, iteration : 39
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.086048 mins
+
+Expanding the network, iteration : 40
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.100091 mins
+
+Expanding the network, iteration : 41
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.185275 mins
+
+Expanding the network, iteration : 42
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.190023 mins
+
+Expanding the network, iteration : 43
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.181016 mins
+
+Expanding the network, iteration : 44
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.08129 mins
+
+Expanding the network, iteration : 45
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.05243 mins
+
+Expanding the network, iteration : 46
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 3.968192 mins
+
+Expanding the network, iteration : 47
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 3.831166 mins
+
+Expanding the network, iteration : 48
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.01901 mins
+
+Expanding the network, iteration : 49
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.160101 mins
+
+Expanding the network, iteration : 50
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.156266 mins
+
+Expanding the network, iteration : 51
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.123347 mins
+
+Expanding the network, iteration : 52
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.032113 mins
+
+Expanding the network, iteration : 53
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.156303 mins
+
+Expanding the network, iteration : 54
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.182599 mins
+
+Expanding the network, iteration : 55
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.1393 mins
+
+Expanding the network, iteration : 56
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.066979 mins
+
+Expanding the network, iteration : 57
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.077949 mins
+
+Expanding the network, iteration : 58
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.111415 mins
+
+Expanding the network, iteration : 59
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.180705 mins
+
+Expanding the network, iteration : 60
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.002548 mins
+
+Expanding the network, iteration : 61
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 3.95543 mins
+
+Expanding the network, iteration : 62
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 3.995815 mins
+
+Expanding the network, iteration : 63
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.096985 mins
+
+Expanding the network, iteration : 64
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.108257 mins
+
+Expanding the network, iteration : 65
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.112779 mins
+
+Expanding the network, iteration : 66
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.171558 mins
+
+Expanding the network, iteration : 67
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.174514 mins
+
+Expanding the network, iteration : 68
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.16 mins
+
+Expanding the network, iteration : 69
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.136807 mins
+
+Expanding the network, iteration : 70
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.183444 mins
+
+Expanding the network, iteration : 71
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.162339 mins
+
+Expanding the network, iteration : 72
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.255434 mins
+
+Expanding the network, iteration : 73
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.114487 mins
+
+Expanding the network, iteration : 74
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.002771 mins
+
+Expanding the network, iteration : 75
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.012522 mins
+
+Expanding the network, iteration : 76
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.020152 mins
+
+Expanding the network, iteration : 77
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.139171 mins
+
+Expanding the network, iteration : 78
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.279989 mins
+
+Expanding the network, iteration : 79
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.147608 mins
+
+Expanding the network, iteration : 80
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.071428 mins
+
+Expanding the network, iteration : 81
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.103051 mins
+
+Expanding the network, iteration : 82
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.225394 mins
+
+Expanding the network, iteration : 83
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.129084 mins
+
+Expanding the network, iteration : 84
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.17179 mins
+
+Expanding the network, iteration : 85
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.165026 mins
+
+Expanding the network, iteration : 86
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.05305 mins
+
+Expanding the network, iteration : 87
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27579
+   Number of connections: 7123520
+
+Time difference of 4.04625 mins
+
+Expanding the network, iteration : 88
+   No. of actors meeting the followers threshold of 30: 19769
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 64
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 3.994745 mins
+
+Expanding the network, iteration : 89
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.038185 mins
+
+Expanding the network, iteration : 90
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 3.979259 mins
+
+Expanding the network, iteration : 91
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 3.975991 mins
+
+Expanding the network, iteration : 92
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.172861 mins
+
+Expanding the network, iteration : 93
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.045378 mins
+
+Expanding the network, iteration : 94
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.054699 mins
+
+Expanding the network, iteration : 95
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.080461 mins
+
+Expanding the network, iteration : 96
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.085293 mins
+
+Expanding the network, iteration : 97
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.102296 mins
+
+Expanding the network, iteration : 98
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.077302 mins
+
+Expanding the network, iteration : 99
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.130063 mins
+
+Expanding the network, iteration : 100
+   No. of actors meeting the followers threshold of 30: 19768
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   No. of actors also matching the provided keywords: 63
+
+Updated network:
+   Number of actors: 27580
+   Number of connections: 7123717
+
+Time difference of 4.120805 mins

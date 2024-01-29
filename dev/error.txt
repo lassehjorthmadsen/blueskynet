@@ -1,0 +1,31 @@
+Expanding the network, iteration no.: 4
+   No. of members meeting the followers threshold of 30: 1435
+   No. of members also matching the provided keywords: 978
+
+Error in `map()`:ns ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     92% |  ETA:  2m
+ℹ In index: 899.
+ℹ With name: drfingerstyle.bsky.social.
+Caused by error in `httr2::req_perform()` at blueskynet/R/wrappers.R:54:4:
+! HTTP 400 Bad Request.
+Run `rlang::last_trace()` to see where the error occurred.
+Warning message:
+The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is
+omitted as of tibble 2.0.0.
+ℹ Using compatibility `.name_repair`.
+ℹ The deprecated feature was likely used in the purrr package.
+  Please report the issue at <https://github.com/tidyverse/purrr/issues>.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+
+
+
+
+
+
+Error in `map()`:ns ■■■■■■■■                          24% |  ETA:  1h
+ℹ In index: 769.
+ℹ With name: ericmbudd.bsky.social.
+Caused by error in `httr2::req_perform()` at blueskynet/R/wrappers.R:54:4:
+! HTTP 400 Bad Request.
+Run `rlang::last_trace()` to see where the error occurred.
+Get new connections ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s

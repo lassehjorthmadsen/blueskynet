@@ -52,3 +52,8 @@ resps <- dids |> map(\(x) follow_actor(my_did = my_did, actor_did = x, token = t
 # Follow all Mike's follows
 dids <- follows |> pull(did)
 resps <- dids |> map(\(x) follow_actor(my_did = my_did, actor_did = x, token = token))
+
+# Check an actor that caused my script to break, hmm appears to work?
+actor <- "drfingerstyle.bsky.social"
+profile <- get_profiles(actor, token)
+follows <- get_follows(actor, token)
