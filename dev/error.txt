@@ -1,31 +1,411 @@
-Expanding the network, iteration no.: 4
-   No. of members meeting the followers threshold of 30: 1435
-   No. of members also matching the provided keywords: 978
+> expnet <- expand_net(net = net,
++                      keywords = keywords,
++                      token = token,
++                      refresh_tok = refresh_tok,
++                      save_net = TRUE,
++                      file_name = file_name,
++                      threshold = 30,
++                      max_iterations = 50,
++                      sample_size = Inf)
+Initial network:
+   Number of actors: 8494
+   Number of connections: 1796574
 
-Error in `map()`:ns ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     92% |  ETA:  2m
-ℹ In index: 899.
-ℹ With name: drfingerstyle.bsky.social.
-Caused by error in `httr2::req_perform()` at blueskynet/R/wrappers.R:54:4:
-! HTTP 400 Bad Request.
-Run `rlang::last_trace()` to see where the error occurred.
-Warning message:
-The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is
+Expanding the network, iteration number: 1
+   Number of actors meeting the followers threshold of 30: 13013
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 7736
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 7700
+
+Updated network:
+   Number of actors: 16194
+   Number of connections: 4481371
+
+Time difference of 3.098441 hours
+
+Expanding the network, iteration number: 2
+   Number of actors meeting the followers threshold of 30: 7074
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 1377
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1339
+
+Updated network:
+   Number of actors: 17533
+   Number of connections: 4742004
+
+Time difference of 20.20521 mins
+
+Expanding the network, iteration number: 3
+   Number of actors meeting the followers threshold of 30: 7429
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 1271
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1231
+
+Updated network:
+   Number of actors: 18763
+   Number of connections: 4962360
+
+Time difference of 18.08126 mins
+
+Expanding the network, iteration number: 4
+   Number of actors meeting the followers threshold of 30: 7981
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 1157
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1114
+
+Updated network:
+   Number of actors: 19876
+   Number of connections: 5180636
+
+Time difference of 17.5865 mins
+
+Expanding the network, iteration number: 5
+   Number of actors meeting the followers threshold of 30: 8482
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 1000
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 956
+
+Updated network:
+   Number of actors: 20831
+   Number of connections: 5342700
+
+Time difference of 14.05444 mins
+
+Expanding the network, iteration number: 6
+   Number of actors meeting the followers threshold of 30: 8647
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 744
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 699
+
+Updated network:
+   Number of actors: 21529
+   Number of connections: 5458759
+
+Time difference of 10.71024 mins
+
+Expanding the network, iteration number: 7
+   Number of actors meeting the followers threshold of 30: 8818
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 540
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 492
+
+Updated network:
+   Number of actors: 22020
+   Number of connections: 5581375
+
+Time difference of 10.20591 mins
+
+Expanding the network, iteration number: 8
+   Number of actors meeting the followers threshold of 30: 9150
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 407
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 358
+
+Updated network:
+   Number of actors: 22377
+   Number of connections: 5664351
+
+Time difference of 7.572859 mins
+
+Expanding the network, iteration number: 9
+   Number of actors meeting the followers threshold of 30: 9498
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 290
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 240
+
+Updated network:
+   Number of actors: 22616
+   Number of connections: 5717980
+
+Time difference of 5.737615 mins
+
+Expanding the network, iteration number: 10
+   Number of actors meeting the followers threshold of 30: 9741
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 219
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 169
+
+Updated network:
+   Number of actors: 22784
+   Number of connections: 5749217
+
+Time difference of 4.291417 mins
+
+Expanding the network, iteration number: 11
+   Number of actors meeting the followers threshold of 30: 9791
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 150
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 100
+
+Updated network:
+   Number of actors: 22883
+   Number of connections: 5772452
+
+Time difference of 3.643788 mins
+
+Expanding the network, iteration number: 12
+   Number of actors meeting the followers threshold of 30: 9865
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 129
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 78
+
+Updated network:
+   Number of actors: 22961
+   Number of connections: 5790315
+
+Time difference of 3.336178 mins
+
+Expanding the network, iteration number: 13
+   Number of actors meeting the followers threshold of 30: 9924
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 107
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 57
+
+Updated network:
+   Number of actors: 23017
+   Number of connections: 5801619
+
+Time difference of 2.876948 mins
+
+Expanding the network, iteration number: 14
+   Number of actors meeting the followers threshold of 30: 9939
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 79
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 29
+
+Updated network:
+   Number of actors: 23045
+   Number of connections: 5808486
+
+Time difference of 2.452963 mins
+
+Expanding the network, iteration number: 15
+   Number of actors meeting the followers threshold of 30: 9971
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 75
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 25
+
+Updated network:
+   Number of actors: 23069
+   Number of connections: 5814044
+
+Time difference of 2.423984 mins
+
+Expanding the network, iteration number: 16
+   Number of actors meeting the followers threshold of 30: 9980
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 70
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 20
+
+Updated network:
+   Number of actors: 23088
+   Number of connections: 5816871
+
+Time difference of 2.254056 mins
+
+Expanding the network, iteration number: 17
+   Number of actors meeting the followers threshold of 30: 9985
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 64
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 14
+
+Updated network:
+   Number of actors: 23101
+   Number of connections: 5818539
+
+Time difference of 2.22912 mins
+
+Expanding the network, iteration number: 18
+   Number of actors meeting the followers threshold of 30: 9983
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 57
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 7
+
+Updated network:
+   Number of actors: 23107
+   Number of connections: 5819455
+
+Time difference of 2.12109 mins
+
+Expanding the network, iteration number: 19
+   Number of actors meeting the followers threshold of 30: 9984
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 55
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 5
+
+Updated network:
+   Number of actors: 23111
+   Number of connections: 5819999
+
+Time difference of 2.081753 mins
+
+Expanding the network, iteration number: 20
+   Number of actors meeting the followers threshold of 30: 9987
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 56
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 6
+
+Updated network:
+   Number of actors: 23116
+   Number of connections: 5821167
+
+Time difference of 2.102726 mins
+
+Expanding the network, iteration number: 21
+   Number of actors meeting the followers threshold of 30: 9988
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 55
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 5
+
+Updated network:
+   Number of actors: 23120
+   Number of connections: 5821907
+
+Time difference of 2.17946 mins
+
+Expanding the network, iteration number: 22
+   Number of actors meeting the followers threshold of 30: 9989
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 55
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 5
+
+Updated network:
+   Number of actors: 23124
+   Number of connections: 5822529
+
+Time difference of 2.139482 mins
+
+Expanding the network, iteration number: 23
+   Number of actors meeting the followers threshold of 30: 9992
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 54
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 4
+
+Updated network:
+   Number of actors: 23127
+   Number of connections: 5823041
+
+Time difference of 2.200098 mins
+
+Expanding the network, iteration number: 24
+   Number of actors meeting the followers threshold of 30: 9996
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 55
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 5
+
+Updated network:
+   Number of actors: 23131
+   Number of connections: 5823874
+
+Time difference of 2.129464 mins
+
+Expanding the network, iteration number: 25
+   Number of actors meeting the followers threshold of 30: 9998
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 51
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1
+
+Updated network:
+   Number of actors: 23131
+   Number of connections: 5823922
+
+Time difference of 2.068996 mins
+
+Expanding the network, iteration number: 26
+   Number of actors meeting the followers threshold of 30: 9998
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 51
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1
+
+Updated network:
+   Number of actors: 23131
+   Number of connections: 5823970
+
+Time difference of 2.109978 mins
+
+Expanding the network, iteration number: 27
+   Number of actors meeting the followers threshold of 30: 9998
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 51
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1
+
+Updated network:
+   Number of actors: 23131
+   Number of connections: 5824018
+
+Time difference of 2.116013 mins
+
+Expanding the network, iteration number: 28
+   Number of actors meeting the followers threshold of 30: 9999
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 52
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 2
+
+Updated network:
+   Number of actors: 23132
+   Number of connections: 5824087
+
+Time difference of 2.185716 mins
+
+Expanding the network, iteration number: 29
+   Number of actors meeting the followers threshold of 30: 10001
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 51
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1
+
+Updated network:
+   Number of actors: 23132
+   Number of connections: 5824103
+
+Time difference of 2.06644 mins
+
+Expanding the network, iteration number: 30
+   Number of actors meeting the followers threshold of 30: 10001
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid actors also matching the provided keywords: 51
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 0
+
+Updated network:
+   Number of actors: 23132
+   Number of connections: 5824103
+
+Time difference of 2.091337 mins
+Warning messages:
+1: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is
 omitted as of tibble 2.0.0.
 ℹ Using compatibility `.name_repair`.
 ℹ The deprecated feature was likely used in the purrr package.
   Please report the issue at <https://github.com/tidyverse/purrr/issues>.
 This warning is displayed once every 8 hours.
 Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-
-
-
-
-
-
-Error in `map()`:ns ■■■■■■■■                          24% |  ETA:  1h
-ℹ In index: 769.
-ℹ With name: ericmbudd.bsky.social.
-Caused by error in `httr2::req_perform()` at blueskynet/R/wrappers.R:54:4:
-! HTTP 400 Bad Request.
-Run `rlang::last_trace()` to see where the error occurred.
-Get new connections ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+2: Unknown or uninitialised column: `actor_handle`.

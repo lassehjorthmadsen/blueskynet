@@ -116,26 +116,3 @@ expand_net <- function(net,
   }
   return(list("expanded_net" = net, "profiles" = profiles))
 }
-
-library(cli)
-for (n in 1:2) {
-  for (i in cli_progress_along(fruit, clear = F)) {
-    Sys.sleep(0.05)
-  }
-}
-
-library(progress)
-for (n in 1:2) {
-  pb <- progress_bar$new(total = length(fruit), clear = F)
-  for (i in fruit) {
-    pb$tick()
-    Sys.sleep(0.01)
-  }
-}
-
-cli_progress_bar(name = "Fetching", type = "iterator", clear = F, total = 80)
-for (i in seq_along(fruit)) {
-    Sys.sleep(0.1)
-    cli_progress_update()
-  }
-cli_progress_done()

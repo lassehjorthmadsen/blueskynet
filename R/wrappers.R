@@ -62,7 +62,8 @@ get_follows <- function(actor, token) {
   # HTTP 400 Bad Request can happen if we try to look up a non-existing (deleted) actor
   resp <- tryCatch(
     req |> httr2::req_perform() ,
-    httr2_http_400 = function(cnd) return(NULL)
+    httr2_http_400 = function(cnd) return(NULL),
+    httr2_http_500 = function(cnd) return(NULL)
   )
 
   if (!is.null(resp)) {
@@ -77,9 +78,18 @@ get_follows <- function(actor, token) {
   while(!is.null(resp$cursor)) {
     req <- req |> httr2::req_url_query(cursor = resp$cursor)
 
-    resp <- req |> httr2::req_perform()
-    check_wait(resp)
-    resp <- resp |> httr2::resp_body_json()
+    # HTTP 400 Bad Request can happen if we try to look up a non-existing (deleted) actor
+    # HTTP 500 Internal Server Error happens annoyingly now and then for unknown reasons
+    resp <- tryCatch(
+      req |> httr2::req_perform(),
+      httr2_http_400 = function(cnd) return(NULL),
+      httr2_http_500 = function(cnd) return(NULL)
+    )
+
+    if (!is.null(resp)) {
+      check_wait(resp)
+      resp <- resp |> httr2::resp_body_json()
+    }
 
     follows_chunk <- resp |> resp2df(element = "follows")
 
@@ -144,10 +154,12 @@ follow_actor <- function(my_did, actor_did, token) {
 
   resp <-
     httr2::request("https://bsky.social/xrpc/com.atproto.repo.createRecord") |>
-    check_wait() |>
     httr2::req_body_json(data = data) |>
     httr2::req_auth_bearer_token(token = token) |>
     httr2::req_perform() |>
-    httr2::resp_body_json()
+    check_wait()
+    # httr2::resp_body_json()
+    # maybe return the whole response, so we can examine headers?
 
+  return(resp)
 }

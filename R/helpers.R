@@ -18,16 +18,18 @@ check_wait <- function(resp) {
 
   remaining <- resp |> httr2::resp_header("RateLimit-Remaining") |> as.numeric()
 
-  if (remaining == 0) {
+  if (remaining < 3) { # It looks like a follow post request uses up 3 RateLimits?
     reset_time <- resp |>
       httr2::resp_header("RateLimit-Reset") |>
       as.numeric() |>
       as.POSIXct()
 
-    wait_time <- reset_time - Sys.time() + as.difftime(1, 0, units = "secs")
+    wait_time <- difftime(reset_time, Sys.time()) + as.difftime(1/60, units = "mins")
 
-    cat("Waiting for rate limit to reset:", fill = T)
+    cat("Waiting for rate limit to reset at:", as.character(reset_time), fill = T)
     print(wait_time)
+
+    units(wait_time) <- "secs"
     Sys.sleep(wait_time)
   }
 
