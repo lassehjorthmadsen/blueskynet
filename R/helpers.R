@@ -16,19 +16,23 @@ resp2df <- function(response, element) {
 check_wait <- function(resp) {
   # Check response headers, if rate limit reached, wait until reset
 
-  remaining <- resp |> httr2::resp_header("RateLimit-Remaining") |> as.numeric()
+  if (resp |> httr2::resp_header_exists("RateLimit-Remaining")) {
 
-  if (remaining == 0) {
-    reset_time <- resp |>
-      httr2::resp_header("RateLimit-Reset") |>
-      as.numeric() |>
-      as.POSIXct()
+    remaining <- resp |> httr2::resp_header("RateLimit-Remaining") |> as.numeric()
 
-    wait_time <- reset_time - Sys.time() + as.difftime(1, 0, units = "secs")
+    if (remaining == 0) {
+      reset_time <- resp |>
+        httr2::resp_header("RateLimit-Reset") |>
+        as.numeric() |>
+        as.POSIXct()
 
-    cat("Waiting for rate limit to reset:", fill = T)
-    print(wait_time)
-    Sys.sleep(wait_time)
+      wait_time <- reset_time - Sys.time() + as.difftime(1, 0, units = "secs")
+
+      cat("Waiting for rate limit to reset:", fill = T)
+      print(wait_time)
+      Sys.sleep(wait_time)
+    }
+
   }
 
   return(resp)
