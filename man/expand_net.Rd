@@ -10,7 +10,7 @@ expand_net(
   token,
   refresh_tok,
   save_net = FALSE,
-  file_name = paste0("dev/net/bignet_", Sys.Date(), ".rds"),
+  file_name = paste0("dev/net/big_net_", Sys.Date(), ".rds"),
   threshold = 30,
   max_iterations = 50,
   sample_size = Inf
@@ -34,7 +34,7 @@ for not losing work in case of unexpected interruptions. Defaults to \code{FALSE
 \item{file_name}{character, file name of the saved net. Defaults to 'dev/net/bignet_TIMESTAMP.rds'}
 
 \item{threshold}{integer, the threshold for including actors in the expansion: How many
-followers must a prospect have, to be considered? Defaults to 30.#'}
+followers must a prospect have, to be considered? Defaults to 30.}
 
 \item{max_iterations}{integer, the maximum iterations in the network expansion. Defaults to 50}
 

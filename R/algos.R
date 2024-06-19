@@ -67,7 +67,8 @@ expand_net <- function(net,
     profiles <- dplyr::bind_rows(profiles, prospect_profiles)
 
     # Get back profile information for all prospects
-    prospect_profiles <- profiles |> filter(.data$handle %in% prospects)
+    prospect_profiles <- profiles |>
+      dplyr::filter(.data$handle %in% prospects)
 
     # Filter profiles
     if (nrow(prospect_profiles) > 0) {
@@ -145,16 +146,16 @@ trim_net <- function(net, threshold) {
 
   net <- net |>
     dplyr::distinct(.keep_all = TRUE) |>
-    na.omit()
+    stats::na.omit()
 
   while (!dplyr::setequal(net$follows_handle, net$actor_handle)) {
 
     net <- net |>
-      dplyr::add_count(follows_handle) |>
-      dplyr::filter(n >= threshold,
-             follows_handle %in% actor_handle,
-             actor_handle %in% follows_handle) |>
-      dplyr::select(-n)
+      dplyr::add_count(.data$follows_handle) |>
+      dplyr::filter(.data$n >= threshold,
+                    .data$follows_handle %in% .data$actor_handle,
+                    .data$actor_handle %in% .data$follows_handle) |>
+      dplyr::select(-.data$n)
   }
 
   return(net)
