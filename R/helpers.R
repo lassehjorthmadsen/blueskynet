@@ -18,6 +18,8 @@ check_wait <- function(resp) {
 
   if (resp |> httr2::resp_header_exists("RateLimit-Remaining")) {
 
+    remaining <- resp |> httr2::resp_header("RateLimit-Remaining") |> as.numeric()
+
     if (remaining < 3) { # It looks like a follow post request uses up 3 RateLimits?
       reset_time <- resp |>
         httr2::resp_header("RateLimit-Reset") |>
@@ -32,7 +34,7 @@ check_wait <- function(resp) {
       units(wait_time) <- "secs"
       Sys.sleep(wait_time)
     }
+  }
 
   return(resp)
-  }
 }
