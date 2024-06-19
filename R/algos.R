@@ -49,8 +49,17 @@ expand_net <- function(net,
     # Get handles for actors being followed (above threshold) by the current net
     prospects <- net |>
       dplyr::add_count(.data$follows_handle) |>
-      dplyr::filter(!.data$follows_handle %in% .data$actor_handle, n >= threshold, .data$follows_handle != "handle.invalid") |>
-      dplyr::slice_sample(n = sample_size) |>
+      dplyr::mutate(frac = .data$n / dplyr::n_distinct(.data$actor_handle)) |>
+      dplyr::filter(!.data$follows_handle %in% .data$actor_handle, .data$follows_handle != "handle.invalid") |>
+      dplyr::slice_sample(n = sample_size)
+
+    if (floor(threshold) > 0) {
+      prospects <- prospects |> dplyr::filter(.data$n >= threshold)
+      } else {
+      prospects <- prospects |> dplyr::filter(.data$frac >= threshold)
+    }
+
+    prospects <- prospects |>
       dplyr::pull(.data$follows_handle) |>
       unique()
 
