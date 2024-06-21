@@ -32,11 +32,13 @@ remotes::install_github("https://github.com/lassehjorthmadsen/blueskynet.git")
 
 ## Getting started
 
-First, create an app password here: https://bsky.app/settings/app-passwords. Then, set environment variable BLUESKY_APP_PASS to your app password, and another variable, BLUESKY_APP_USER, to your identifier (e.g. "lassehjorthmadsen.bsky.social") using file.edit("~/.Renviron")
+First, create an app password here: https://bsky.app/settings/app-passwords.
+
+Then, set environment variable BLUESKY_APP_PASS to your app password, and another variable, BLUESKY_APP_USER, to your identifier (e.g. "lassehjorthmadsen.bsky.social") using `file.edit("~/.Renviron")`
 
 Now, you can access the core function of blueskynet:
 
-```{r example}
+```{r example, echo=FALSE}
 library(blueskynet)
 
 # Authenticate yourself
@@ -47,10 +49,14 @@ token <- auth_object$accessJwt
 refresh_tok <- auth_object$refreshJwt
 
 # Establish a small net as a starting point
-key_actor <- "slooterman.bsky.social"
+key_actor <- "natalieamiri.bsky.social"
 keywords <- c("reporter", "journalist", "writer")
 small_net <- init_net(key_actor, keywords, token)
+```
 
+First few rows of a starting point initial network:
+
+```{r head}
 small_net |> head(3)
 ```
 

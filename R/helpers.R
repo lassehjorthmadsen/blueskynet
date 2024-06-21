@@ -7,11 +7,12 @@ resp2df <- function(response, element) {
     purrr::pluck(element) |>
     purrr::map(unlist) |>
     purrr::map(t) |>
-    purrr::map_dfr(dplyr::as_tibble) |>
+    purrr::map_dfr(dplyr::as_tibble, .name_repair = "unique") |>
     dplyr::select(-dplyr::starts_with(c("viewer", "labels")))
 
   return(df)
 }
+
 
 check_wait <- function(resp) {
   # Check response headers, if rate limit reached, wait until reset
