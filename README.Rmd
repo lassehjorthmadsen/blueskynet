@@ -38,8 +38,9 @@ Then, set environment variable BLUESKY_APP_PASS to your app password, and anothe
 
 Now, you can access the core function of blueskynet:
 
-```{r example, echo=FALSE}
+```{r example, message=FALSE, warning=FALSE}
 library(blueskynet)
+library(dplyr)
 
 # Authenticate yourself
 password <- Sys.getenv("BLUESKY_APP_PASS")
@@ -60,5 +61,8 @@ First few rows of a starting point initial network:
 small_net |> head(3)
 ```
 
-Then you can expand the net, using `expand_net()` which we won't run here, since it can take a lot of time build a big network.
+Then you can expand the net, using `expand_net()` which we won't run here, since it can take a lot of time to build a big network.
 
+## Example application
+
+Have a look at a network of influential scientists on Bluesky Social, generated with `blueskynet` [here](https://lassehjorthmadsen.github.io/blueskyanalyses/).

@@ -33,115 +33,22 @@ and another variable, BLUESKY_APP_USER, to your identifier
 
 Now, you can access the core function of blueskynet:
 
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> New names:
-    #> • `viewer.knownFollowers.followers.did` ->
-    #>   `viewer.knownFollowers.followers.did...12`
-    #> • `viewer.knownFollowers.followers.handle` ->
-    #>   `viewer.knownFollowers.followers.handle...13`
-    #> • `viewer.knownFollowers.followers.displayName` ->
-    #>   `viewer.knownFollowers.followers.displayName...14`
-    #> • `viewer.knownFollowers.followers.avatar` ->
-    #>   `viewer.knownFollowers.followers.avatar...15`
-    #> • `viewer.knownFollowers.followers.associated.chat.allowIncoming` ->
-    #>   `viewer.knownFollowers.followers.associated.chat.allowIncoming...16`
-    #> • `viewer.knownFollowers.followers.viewer.muted` ->
-    #>   `viewer.knownFollowers.followers.viewer.muted...17`
-    #> • `viewer.knownFollowers.followers.viewer.blockedBy` ->
-    #>   `viewer.knownFollowers.followers.viewer.blockedBy...18`
-    #> • `viewer.knownFollowers.followers.viewer.following` ->
-    #>   `viewer.knownFollowers.followers.viewer.following...19`
-    #> • `viewer.knownFollowers.followers.createdAt` ->
-    #>   `viewer.knownFollowers.followers.createdAt...21`
-    #> • `viewer.knownFollowers.followers.did` ->
-    #>   `viewer.knownFollowers.followers.did...22`
-    #> • `viewer.knownFollowers.followers.handle` ->
-    #>   `viewer.knownFollowers.followers.handle...23`
-    #> • `viewer.knownFollowers.followers.displayName` ->
-    #>   `viewer.knownFollowers.followers.displayName...24`
-    #> • `viewer.knownFollowers.followers.avatar` ->
-    #>   `viewer.knownFollowers.followers.avatar...25`
-    #> • `viewer.knownFollowers.followers.associated.chat.allowIncoming` ->
-    #>   `viewer.knownFollowers.followers.associated.chat.allowIncoming...26`
-    #> • `viewer.knownFollowers.followers.viewer.muted` ->
-    #>   `viewer.knownFollowers.followers.viewer.muted...27`
-    #> • `viewer.knownFollowers.followers.viewer.blockedBy` ->
-    #>   `viewer.knownFollowers.followers.viewer.blockedBy...28`
-    #> • `viewer.knownFollowers.followers.viewer.following` ->
-    #>   `viewer.knownFollowers.followers.viewer.following...29`
-    #> • `viewer.knownFollowers.followers.createdAt` ->
-    #>   `viewer.knownFollowers.followers.createdAt...35`
-    #> • `viewer.knownFollowers.followers.did` ->
-    #>   `viewer.knownFollowers.followers.did...36`
-    #> • `viewer.knownFollowers.followers.handle` ->
-    #>   `viewer.knownFollowers.followers.handle...37`
-    #> • `viewer.knownFollowers.followers.displayName` ->
-    #>   `viewer.knownFollowers.followers.displayName...38`
-    #> • `viewer.knownFollowers.followers.avatar` ->
-    #>   `viewer.knownFollowers.followers.avatar...39`
-    #> • `viewer.knownFollowers.followers.associated.chat.allowIncoming` ->
-    #>   `viewer.knownFollowers.followers.associated.chat.allowIncoming...40`
-    #> • `viewer.knownFollowers.followers.viewer.muted` ->
-    #>   `viewer.knownFollowers.followers.viewer.muted...41`
-    #> • `viewer.knownFollowers.followers.viewer.blockedBy` ->
-    #>   `viewer.knownFollowers.followers.viewer.blockedBy...42`
-    #> • `viewer.knownFollowers.followers.viewer.following` ->
-    #>   `viewer.knownFollowers.followers.viewer.following...43`
-    #> • `viewer.knownFollowers.followers.createdAt` ->
-    #>   `viewer.knownFollowers.followers.createdAt...44`
-    #> • `viewer.knownFollowers.followers.did` ->
-    #>   `viewer.knownFollowers.followers.did...45`
-    #> • `viewer.knownFollowers.followers.handle` ->
-    #>   `viewer.knownFollowers.followers.handle...46`
-    #> • `viewer.knownFollowers.followers.displayName` ->
-    #>   `viewer.knownFollowers.followers.displayName...47`
-    #> • `viewer.knownFollowers.followers.avatar` ->
-    #>   `viewer.knownFollowers.followers.avatar...48`
-    #> • `viewer.knownFollowers.followers.associated.chat.allowIncoming` ->
-    #>   `viewer.knownFollowers.followers.associated.chat.allowIncoming...49`
-    #> • `viewer.knownFollowers.followers.viewer.muted` ->
-    #>   `viewer.knownFollowers.followers.viewer.muted...50`
-    #> • `viewer.knownFollowers.followers.viewer.blockedBy` ->
-    #>   `viewer.knownFollowers.followers.viewer.blockedBy...51`
-    #> • `viewer.knownFollowers.followers.viewer.following` ->
-    #>   `viewer.knownFollowers.followers.viewer.following...52`
-    #> • `viewer.knownFollowers.followers.createdAt` ->
-    #>   `viewer.knownFollowers.followers.createdAt...53`
-    #> • `viewer.knownFollowers.followers.did` ->
-    #>   `viewer.knownFollowers.followers.did...54`
-    #> • `viewer.knownFollowers.followers.handle` ->
-    #>   `viewer.knownFollowers.followers.handle...55`
-    #> • `viewer.knownFollowers.followers.displayName` ->
-    #>   `viewer.knownFollowers.followers.displayName...56`
-    #> • `viewer.knownFollowers.followers.avatar` ->
-    #>   `viewer.knownFollowers.followers.avatar...57`
-    #> • `viewer.knownFollowers.followers.associated.chat.allowIncoming` ->
-    #>   `viewer.knownFollowers.followers.associated.chat.allowIncoming...58`
-    #> • `viewer.knownFollowers.followers.viewer.muted` ->
-    #>   `viewer.knownFollowers.followers.viewer.muted...59`
-    #> • `viewer.knownFollowers.followers.viewer.blockedBy` ->
-    #>   `viewer.knownFollowers.followers.viewer.blockedBy...60`
-    #> • `viewer.knownFollowers.followers.viewer.following` ->
-    #>   `viewer.knownFollowers.followers.viewer.following...61`
-    #> • `viewer.knownFollowers.followers.createdAt` ->
-    #>   `viewer.knownFollowers.followers.createdAt...62`
+``` r
+library(blueskynet)
+library(dplyr)
+
+# Authenticate yourself
+password <- Sys.getenv("BLUESKY_APP_PASS")
+identifier <- Sys.getenv("BLUESKY_APP_USER")
+auth_object <- get_token(identifier, password)
+token <- auth_object$accessJwt
+refresh_tok <- auth_object$refreshJwt
+
+# Establish a small net as a starting point
+key_actor <- "natalieamiri.bsky.social"
+keywords <- c("reporter", "journalist", "writer")
+small_net <- init_net(key_actor, keywords, token)
+```
 
 First few rows of a starting point initial network:
 
@@ -156,4 +63,10 @@ small_net |> head(3)
 ```
 
 Then you can expand the net, using `expand_net()` which we won’t run
-here, since it can take a lot of time build a big network.
+here, since it can take a lot of time to build a big network.
+
+## Example application
+
+Have a look at a network of influential scientists on Bluesky Social,
+generated with `blueskynet`
+[here](https://lassehjorthmadsen.github.io/blueskyanalyses/).
