@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/blueskynet)](https://CRAN.R-project.org/package=blueskynet)
 <!-- badges: end -->
 
-The goal of blueskynet is to generate and analyze networks from Bluesky Social
+The purpose of blueskynet is to provide tools to generate and analyze networks from Bluesky Social
 
 ## Installation
 
@@ -30,28 +30,29 @@ You can install the development version of blueskynet like so:
 remotes::install_github("https://github.com/lassehjorthmadsen/blueskynet.git")
 ```
 
-## Example
+## Getting started
 
-This is the core function of blueskynet:
+First, create an app password here: https://bsky.app/settings/app-passwords. Then, set environment variable BLUESKY_APP_PASS to your app password, and another variable, BLUESKY_APP_USER, to your identifier (e.g. "lassehjorthmadsen.bsky.social") using file.edit("~/.Renviron")
+
+Now, you can access the core function of blueskynet:
 
 ```{r example}
 library(blueskynet)
-net <- getbluenet("lassehjorthmadsen.bsky.social")
 
+# Authenticate yourself
+password <- Sys.getenv("BLUESKY_APP_PASS")
+identifier <- Sys.getenv("BLUESKY_APP_USER")
+auth_object <- get_token(identifier, password)
+token <- auth_object$accessJwt
+refresh_tok <- auth_object$refreshJwt
+
+# Establish a small net as a starting point
+key_actor <- "slooterman.bsky.social"
+keywords <- c("reporter", "journalist", "writer")
+small_net <- init_net(key_actor, keywords, token)
+
+small_net |> head(3)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Then you can expand the net, using `expand_net()` which we won't run here, since it can take a lot of time build a big network.
 
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
