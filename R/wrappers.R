@@ -78,12 +78,14 @@ get_follows <- function(actor, token) {
   while(!is.null(resp$cursor)) {
     req <- req |> httr2::req_url_query(cursor = resp$cursor)
 
-    # HTTP 400 Bad Request can happen if we try to look up a non-existing (deleted) actor
-    # HTTP 500 Internal Server Error happens annoyingly now and then for unknown reasons
+    # HTTP 400 Bad Request: can happen if we try to look up a non-existing (deleted) actor
+    # HTTP 500 Internal Server Error: happens annoyingly now and then for unknown reasons
+    # HTTP 502 Bad Gateway: also can happen
     resp <- tryCatch(
       req |> httr2::req_perform(),
       httr2_http_400 = function(cnd) return(NULL),
-      httr2_http_500 = function(cnd) return(NULL)
+      httr2_http_500 = function(cnd) return(NULL),
+      httr2_http_502 = function(cnd) return(NULL)
     )
 
     if (!is.null(resp)) {

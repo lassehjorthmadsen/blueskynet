@@ -6,7 +6,7 @@
 \alias{blueskynet-package}
 \title{blueskynet: Analyze Networks on then Bluesky Social Network}
 \description{
-Based on a given actor (user) on Bluesky, this will generate a network based on what users the actor followes. The output will be a graph with information on who follows who among this set of actors. Also included are a few tools from other packages for network analysis.
+Tools for generating and analyzing networks on Bluesky Social. Based on a given actor (user) on Bluesky, we can generate a network based on what users the actor followes. Outputs are a graph with information on who follows who among this set of actors, and a dataset with some metadata about the actors. Also included are a few tools from 'ipgraph' and 'tidygraph' for network analysis.
 }
 \author{
 \strong{Maintainer}: Lasse Hjorth Madsen \email{lassehjorthmadsen@gmail.com}

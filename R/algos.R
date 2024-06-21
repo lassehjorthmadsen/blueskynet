@@ -131,7 +131,7 @@ expand_net <- function(net,
     if (save_net) net |> saveRDS(file = file_name)
 
   }
-  return(list("expanded_net" = net, "profiles" = profiles))
+  return(net)
 }
 
 
@@ -155,17 +155,173 @@ trim_net <- function(net, threshold) {
 
   net <- net |>
     dplyr::distinct(.keep_all = TRUE) |>
+    dplyr::filter(.data$follows_handle != "handle.invalid") |>
     stats::na.omit()
 
-  while (!dplyr::setequal(net$follows_handle, net$actor_handle)) {
+  i <- 0
+  while (i == 0 || !dplyr::setequal(net$follows_handle, net$actor_handle)) {
+    i <- i + 1
 
     net <- net |>
       dplyr::add_count(.data$follows_handle) |>
-      dplyr::filter(.data$n >= threshold,
-                    .data$follows_handle %in% .data$actor_handle,
+      dplyr::mutate(frac = .data$n / dplyr::n_distinct(.data$actor_handle))
+
+    if (floor(threshold) > 0) {
+      net <- net |> dplyr::filter(.data$n >= threshold)
+    } else {
+      net <- net |> dplyr::filter(.data$frac >= threshold)
+    }
+
+    net <- net |>
+      dplyr::filter(.data$follows_handle %in% .data$actor_handle,
                     .data$actor_handle %in% .data$follows_handle) |>
       dplyr::select(-.data$n)
   }
 
   return(net)
+}
+
+#' Create initial network
+#'
+#' Get all follows for a single actor, and use that to
+#' form a minimal, initial network that can be expanded
+#' later
+#'
+#' @param actor account identifier
+#' @param keywords character vector with keywords that we check for in actors' description
+#' @param token token for api
+#' @return tibble with two columns, two columns: `actor_handle`
+#' (the Blue Sky Social actor who is followING another) and `follows_handle`
+#' (the actor being followed).
+#' @export
+#'
+init_net <- function(actor, keywords, token) {
+
+  keywords <- paste(keywords, collapse = "|")
+
+  net <- actor  |>
+    get_follows(token) |>
+    dplyr::mutate(actor_handle = actor) |>
+    dplyr::select(.data$actor_handle, follows_handle = .data$handle)
+
+  profiles <- net$follows_handle |>
+    get_profiles(token) |>
+    dplyr::filter(stringr::str_detect(tolower(.data$description), keywords))
+
+  net <- net |>
+    dplyr::filter(.data$follows_handle %in% profiles$handle)
+
+  return(net)
+}
+
+
+#' Add selected network metrics to actors
+#'
+#' @param profiles tibble with list of actors in net
+#' @param net tibble with two columns, two columns: `actor_handle`
+#' (the Blue Sky Social actor who is followING another) and `follows_handle`
+#' (the actor being followed).
+#'
+#' @return tibble with profiles and extra columns for metrics
+#' @export
+#'
+add_metrics <- function(profiles, net) {
+
+  # Compute centrality metrics
+  # 1. graph object
+  graph <- net |>
+    tidygraph::as_tbl_graph() |>
+    tidygraph::activate(.data$nodes)
+
+  # 2. compute centrality
+  centrality <- igraph::centr_betw(graph)
+  igraph::V(graph)$centrality <- centrality$res
+
+  # 3. Identify high density subgraphs, "communities"
+  community <- igraph::cluster_walktrap(graph)
+  igraph::V(graph)$community <- community$membership
+
+  # 4. compute page rank
+  prank <- igraph::page.rank(graph)
+  igraph::V(graph)$pageRank <- prank$vector
+
+  # 5. Join profiles with metrics
+  followers <- net |>
+    dplyr::count(.data$follows_handle, name = "insideFollowers")
+
+  metrics <- graph |>
+    dplyr::as_tibble() |>
+    dplyr::rename(handle = .data$name)
+
+  profiles <- profiles |>
+    dplyr::left_join(metrics, by = "handle") |>
+    dplyr::left_join(followers, by = c("handle" = "follows_handle"))
+
+  return(profiles)
+}
+
+
+#' Create a 3d-widget
+#'
+#' @param net tibble with two columns, two columns: `actor_handle`
+#' (the Blue Sky Social actor who is followING another) and `follows_handle`
+#' (the actor being followed).
+#' @param profiles tibble with list of actors in net
+#'
+#' @return html widget
+#' @importFrom igraph V
+#' @importFrom tidygraph activate as_tbl_graph
+#' @export
+#'
+create_widget <- function(net, profiles) {
+
+  # Create graph object
+  graph <- net |> tidygraph::as_tbl_graph()
+
+  # Identify high density subgraphs, "communities"
+  community <- igraph::cluster_walktrap(graph)
+  igraph::V(graph)$community <- community$membership
+
+  # Edges and nodes as tibbles
+  edges <- graph |>
+    tidygraph::activate(edges) |>
+    dplyr::as_tibble()
+
+  nodes <- graph |>
+    tidygraph::activate(nodes) |>
+    dplyr::mutate(id = dplyr::row_number()) |> dplyr::as_tibble()
+
+  # Make labels for nodes
+  nodes <- nodes |>
+    dplyr::mutate(com_label = forcats::fct_infreq(as.character(community)),
+                  com_label = forcats::fct_lump(.data$com_label, n = 10)) |>
+    dplyr::group_by(.data$com_label) |>
+    dplyr::mutate(n = dplyr::n(),
+                  com_id = dplyr::cur_group_id()) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(com_label = ifelse(.data$com_id == max(.data$com_id), "Other",
+                              paste0(LETTERS[.data$com_id], ", n=", .data$n))) |>
+    dplyr::left_join(profiles, by = c("name" = "handle"))
+
+  # Make colors based on communities
+  community_cols <- 3 |>
+    RColorBrewer::brewer.pal("Set1") |>
+    grDevices::colorRampPalette()
+
+  use_colors <- dplyr::n_distinct(nodes$com_label) |>
+    community_cols() |>
+    sample()
+
+  nodes <- nodes |>
+    dplyr::mutate(color = use_colors[.data$com_id], groupname = .data$com_label)
+
+  # 3d plot with threejs
+  widget <- threejs::graphjs(graph, bg = "black",
+                             vertex.size = 0.2,
+                             edge.width = .3,
+                             edge.alpha = .3,
+                             vertex.color = nodes$color,
+                             vertex.label = paste(nodes$displayName, nodes$description, sep = ": "))
+
+    return(widget)
 }
