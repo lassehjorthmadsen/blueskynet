@@ -39,3 +39,31 @@ check_wait <- function(resp) {
 
   return(resp)
 }
+
+
+#' Word frequencies
+#'
+#' @param texts character. Vector of texts (like profile descriptions)
+#' @param bigrams boolean. Should we count bigrams? Default to FALSE
+#' @param top integer. The top words/bi-grams to include. Defaults to 30
+#' @param remove_stopwords boolean. Should stopwords be excluded? Defaults to TRUE
+#' @param language character. The language to use when removing stopwords. Defaults to "en"
+#'
+#' @return
+#' @export
+#'
+#' @examples
+word_freqs <- function(texts, bigrams = FALSE, top = 30, remove_stopwords = TRUE, language = "en") {
+
+  toks <- quanteda::corpus(texts) |>
+    quanteda::tokens(.data$corp, remove_punct = TRUE) |>
+    quanteda::tokens_remove(pattern = c(quanteda::stopwords(language), "|", "+"))
+
+  if (bigrams) {
+    toks <- toks |> quanteda::tokens_ngrams(n = 2, concatenator = " ")
+    }
+
+  freq <- quanteda::dfm(toks) |> quanteda.textstats::textstat_frequency(n = top)
+
+  return(freq)
+}
