@@ -4,14 +4,14 @@
 \alias{init_net}
 \title{Create initial network}
 \usage{
-init_net(actor, keywords, token)
+init_net(key_actor, keywords, token)
 }
 \arguments{
-\item{actor}{account identifier}
+\item{key_actor}{account identifier}
 
 \item{keywords}{character vector with keywords that we check for in actors' description}
 
-\item{token}{token for api}
+\item{token}{character, token for Blue Sky Social API}
 }
 \value{
 tibble with two columns, two columns: \code{actor_handle}

@@ -23,6 +23,9 @@ word_freqs(
 
 \item{language}{character. The language to use when removing stopwords. Defaults to "en"}
 }
+\value{
+dataframe with word (or bi-gram) frequencies
+}
 \description{
 Word frequencies
 }

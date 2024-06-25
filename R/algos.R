@@ -144,8 +144,9 @@ expand_net <- function(net,
 #' @param net tibble with network connections (edges). Assumed to contain two columns:
 #' `actor_handle` (the Blue Sky Social actor who is followING another) and `follows_handle`
 #' (the actor being followed).
-#' @param threshold integer, the threshold for including actors in the expansion: How many
-#' followers must a prospect have, to be considered?
+#' @param threshold the threshold for including actors in the expansion: How many
+#' followers must a prospect have, to be considered? If smaller than 1, threshold is used
+#' as a proportion: How big a proportion must a prospect have, to be considered?
 #'
 #' @return tibble with the expanded network
 #' @importFrom rlang .data
@@ -187,21 +188,21 @@ trim_net <- function(net, threshold) {
 #' form a minimal, initial network that can be expanded
 #' later
 #'
-#' @param actor account identifier
+#' @param key_actor account identifier
 #' @param keywords character vector with keywords that we check for in actors' description
-#' @param token token for api
+#' @param token character, token for Blue Sky Social API
 #' @return tibble with two columns, two columns: `actor_handle`
 #' (the Blue Sky Social actor who is followING another) and `follows_handle`
 #' (the actor being followed).
 #' @export
 #'
-init_net <- function(actor, keywords, token) {
+init_net <- function(key_actor, keywords, token) {
 
   keywords <- paste(keywords, collapse = "|")
 
-  net <- actor  |>
+  net <- key_actor  |>
     get_follows(token) |>
-    dplyr::mutate(actor_handle = actor) |>
+    dplyr::mutate(actor_handle = .data$actor) |>
     dplyr::select(.data$actor_handle, follows_handle = .data$handle)
 
   profiles <- net$follows_handle |>
@@ -324,4 +325,53 @@ create_widget <- function(net, profiles) {
                              vertex.label = paste(nodes$displayName, nodes$description, sep = ": "))
 
     return(widget)
+}
+
+#' Build a complete network and helpful artifacts
+#'
+#' @param key_actor account identifier
+#' @param keywords character vector with keywords that we check for in actors' description
+#' @param token character, token for Blue Sky Social API
+#' @param refresh_tok character, refresh token for Blue Sky Social API
+#' @param threshold the threshold for including actors in the expansion: How many
+#' followers must a prospect have, to be considered? If smaller than 1, threshold is used
+#' as a proportion: How big a proportion must a prospect have, to be considered?
+#' @param ... Parameters passed on to `expand_net()`
+#'
+#' @return list of objects generated from `expand_net()`, `trim_net()`, `get_profiles()`,
+#' `create_widget()`, and `word_freqs()`
+#' @export
+#'
+build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ...) {
+
+  keywords <- keywords |> paste0(collapse = "|")
+
+  # Get initial net based on key actor
+  key_actor <- "slooterman.bsky.social"
+  small_net <- init_net(key_actor, keywords, token)
+
+  # Expand the net
+  expnet <- expand_net(net = small_net,
+                       keywords = keywords,
+                       token = token,
+                       refresh_tok = refresh_tok,
+                       threshold = threshold,
+                       ...)
+
+  # Trim the net
+  net <- expnet |> trim_net(threshold = threshold)
+
+  # Get profiles
+  profiles <- get_profiles(unique(net$actor_handle), token)
+
+  # Add metrics
+  profiles <- profiles |> add_metrics(net)
+
+  # Word frequencies in descriptions
+  freqs <- profiles$description |> word_freqs()
+
+  # Create widget
+  widget <- create_widget(net, profiles)
+
+  return(list("net" = net, "profiles" = profiles, "widget" = widget, "freqs" = freqs))
 }

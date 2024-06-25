@@ -11,8 +11,9 @@ trim_net(net, threshold)
 \code{actor_handle} (the Blue Sky Social actor who is followING another) and \code{follows_handle}
 (the actor being followed).}
 
-\item{threshold}{integer, the threshold for including actors in the expansion: How many
-followers must a prospect have, to be considered?}
+\item{threshold}{the threshold for including actors in the expansion: How many
+followers must a prospect have, to be considered? If smaller than 1, threshold is used
+as a proportion: How big a proportion must a prospect have, to be considered?}
 }
 \value{
 tibble with the expanded network

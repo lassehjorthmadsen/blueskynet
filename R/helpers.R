@@ -7,10 +7,17 @@ resp2df <- function(response, element) {
     purrr::pluck(element) |>
     purrr::map(unlist) |>
     purrr::map(t) |>
-    purrr::map_dfr(dplyr::as_tibble, .name_repair = "unique") |>
-    dplyr::select(-dplyr::starts_with(c("viewer", "labels")))
+    purrr::map(deselect_nested_cols) |>
+    purrr::map_dfr(dplyr::as_tibble)
 
-  return(df)
+    return(df)
+}
+
+
+deselect_nested_cols <- function(mat) {
+  # Find indices of columns without a period
+  selected_indices <- which(!grepl("\\.", colnames(mat)))
+  return(mat[, selected_indices, drop = FALSE])
 }
 
 
@@ -49,10 +56,9 @@ check_wait <- function(resp) {
 #' @param remove_stopwords boolean. Should stopwords be excluded? Defaults to TRUE
 #' @param language character. The language to use when removing stopwords. Defaults to "en"
 #'
-#' @return
+#' @return dataframe with word (or bi-gram) frequencies
 #' @export
 #'
-#' @examples
 word_freqs <- function(texts, bigrams = FALSE, top = 30, remove_stopwords = TRUE, language = "en") {
 
   toks <- quanteda::corpus(texts) |>
