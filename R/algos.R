@@ -176,7 +176,7 @@ trim_net <- function(net, threshold) {
     net <- net |>
       dplyr::filter(.data$follows_handle %in% .data$actor_handle,
                     .data$actor_handle %in% .data$follows_handle) |>
-      dplyr::select(-.data$n)
+      dplyr::select(-.data$n, -.data$frac)
   }
 
   return(net)
@@ -202,7 +202,7 @@ init_net <- function(key_actor, keywords, token) {
 
   net <- key_actor  |>
     get_follows(token) |>
-    dplyr::mutate(actor_handle = .data$actor) |>
+    dplyr::mutate(actor_handle = key_actor) |>
     dplyr::select(.data$actor_handle, follows_handle = .data$handle)
 
   profiles <- net$follows_handle |>
@@ -230,9 +230,7 @@ add_metrics <- function(profiles, net) {
 
   # Compute centrality metrics
   # 1. graph object
-  graph <- net |>
-    tidygraph::as_tbl_graph() |>
-    tidygraph::activate(.data$nodes)
+  graph <- net |> tidygraph::as_tbl_graph()
 
   # 2. compute centrality
   centrality <- igraph::centr_betw(graph)
@@ -250,6 +248,7 @@ add_metrics <- function(profiles, net) {
   followers <- net |>
     dplyr::count(.data$follows_handle, name = "insideFollowers")
 
+  #browser()
   metrics <- graph |>
     dplyr::as_tibble() |>
     dplyr::rename(handle = .data$name)

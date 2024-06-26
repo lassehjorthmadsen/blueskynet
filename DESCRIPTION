@@ -1,5 +1,5 @@
 Package: blueskynet
-Title: Analyze Networks on then Bluesky Social Network
+Title: Analyze Networks on the Bluesky Social Network
 Version: 0.0.0.9000
 Authors@R: 
     person("Lasse", "Hjorth Madsen", , "lassehjorthmadsen@gmail.com", role = c("aut", "cre"))
@@ -8,7 +8,7 @@ Description: Tools for generating and analyzing networks on Bluesky
     network based on what users the actor followes. Outputs are a graph
     with information on who follows who among this set of actors, and a
     dataset with some metadata about the actors. Also included are a few
-    tools from 'ipgraph' and 'tidygraph' for network analysis.
+    tools from `igraph` and `tidygraph` for network analysis.
 License: MIT + file LICENSE
 Imports: 
     cli,

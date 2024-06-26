@@ -62,7 +62,7 @@ check_wait <- function(resp) {
 word_freqs <- function(texts, bigrams = FALSE, top = 30, remove_stopwords = TRUE, language = "en") {
 
   toks <- quanteda::corpus(texts) |>
-    quanteda::tokens(.data$corp, remove_punct = TRUE) |>
+    quanteda::tokens(remove_punct = TRUE) |>
     quanteda::tokens_remove(pattern = c(quanteda::stopwords(language), "|", "+"))
 
   if (bigrams) {
