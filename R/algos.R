@@ -10,8 +10,9 @@
 #' @param save_net boolean, should the net be saved incrementally as it is expanded? Useful
 #' for not losing work in case of unexpected interruptions. Defaults to `FALSE`
 #' @param file_name character, file name of the saved net. Defaults to 'dev/net/bignet_TIMESTAMP.rds'
-#' @param threshold integer, the threshold for including actors in the expansion: How many
-#' followers must a prospect have, to be considered? Defaults to 30.
+#' @param threshold numeric, the threshold for including actors in the expansion: How many
+#' followers must a prospect have, to be considered? If less then 1, interpreted as the *fraction*
+#' of the current net prospects must be followed by, to be considered. Defaults to 30.
 #' @param max_iterations integer, the maximum iterations in the network expansion. Defaults to 50
 #' @param sample_size integer, if we want to expand only with a sample of the prospects;
 #' can be useful for testing purposes. Defaults to `Inf´, e.g. every worthy prospect is included
@@ -30,7 +31,7 @@ expand_net <- function(net,
                        threshold = 30,
                        max_iterations = 50,
                        sample_size = Inf) {
-  #browser()
+
   keywords <- paste(keywords, collapse = "|")
   profiles <- dplyr::tibble()
   i <- 1
@@ -107,17 +108,18 @@ expand_net <- function(net,
 
         new_follows <- dplyr::bind_rows(new_follows, follows)
 
-        # Refresh the token; unclear how often we need to do this, for now once per get_follows()
-        refresh_object <- refresh_token(refresh_tok)
-        token <- refresh_object$accessJwt
-        refresh_tok <- refresh_object$refreshJwt
-
         cli::cli_progress_update()
       }
 
       cat("   Number of new actors with followers to add to network: ", nrow(new_follows), sep = "", fill = T)
 
       net <- dplyr::bind_rows(net, new_follows)   # Append the new net to the existing; do another round
+
+      # Refresh the token; unclear how often we need to do this, for now once per iteration -- earlier: get_follows()
+      refresh_object <- refresh_token(refresh_tok)
+      token <- refresh_object$accessJwt
+      refresh_tok <- refresh_object$refreshJwt
+
     }
 
     cat("\nUpdated network:", fill = T)
@@ -206,8 +208,12 @@ init_net <- function(key_actor, keywords, token) {
     dplyr::select(.data$actor_handle, follows_handle = .data$handle)
 
   profiles <- net$follows_handle |>
-    get_profiles(token) |>
+    get_profiles(token)
+
+  profiles |>
     dplyr::filter(stringr::str_detect(tolower(.data$description), keywords))
+
+  if (nrow(profiles) == 0) stop("Failed to initialize net; no follows that matches keywords")
 
   net <- net |>
     dplyr::filter(.data$follows_handle %in% profiles$handle)
@@ -253,9 +259,11 @@ add_metrics <- function(profiles, net) {
     dplyr::as_tibble() |>
     dplyr::rename(handle = .data$name)
 
-  profiles <- profiles |>
-    dplyr::left_join(metrics, by = "handle") |>
-    dplyr::left_join(followers, by = c("handle" = "follows_handle"))
+  if (!is.null(profiles)) {
+    profiles <- profiles |>
+      dplyr::left_join(metrics, by = "handle") |>
+      dplyr::left_join(followers, by = c("handle" = "follows_handle"))
+  }
 
   return(profiles)
 }
@@ -346,7 +354,6 @@ build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ..
   keywords <- keywords |> paste0(collapse = "|")
 
   # Get initial net based on key actor
-  key_actor <- "slooterman.bsky.social"
   small_net <- init_net(key_actor, keywords, token)
 
   # Expand the net

@@ -130,6 +130,7 @@ get_profiles <- function(actors, token, chunksize = 25) {
   return(df)
 }
 
+
 #' Follow an actor or actors
 #'
 #' @param my_did character, did-identification of the actor that wants to follow someone

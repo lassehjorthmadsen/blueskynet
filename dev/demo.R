@@ -25,6 +25,7 @@ identifier <- Sys.getenv("BLUESKY_APP_USER")
 auth_object <- get_token(identifier, password)
 token <- auth_object$accessJwt
 my_did <- auth_object$did
+refresh_tok <- auth_object$refreshJwt
 
 # Get all follows for an actor
 actor <- "mkeyoung.bsky.social"
