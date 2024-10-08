@@ -27,7 +27,6 @@ get_token <- function(identifier, password) {
 #' @export
 #'
 refresh_token <- function(refresh_token) {
-
   req <-
     httr2::request('https://bsky.social/xrpc/com.atproto.server.refreshSession') |>
     httr2::req_auth_bearer_token(token = refresh_token) |>
