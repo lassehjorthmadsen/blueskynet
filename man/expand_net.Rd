@@ -33,8 +33,9 @@ for not losing work in case of unexpected interruptions. Defaults to \code{FALSE
 
 \item{file_name}{character, file name of the saved net. Defaults to 'dev/net/bignet_TIMESTAMP.rds'}
 
-\item{threshold}{integer, the threshold for including actors in the expansion: How many
-followers must a prospect have, to be considered? Defaults to 30.}
+\item{threshold}{numeric, the threshold for including actors in the expansion: How many
+followers must a prospect have, to be considered? If less then 1, interpreted as the \emph{fraction}
+of the current net prospects must be followed by, to be considered. Defaults to 30.}
 
 \item{max_iterations}{integer, the maximum iterations in the network expansion. Defaults to 50}
 

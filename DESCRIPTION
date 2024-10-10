@@ -16,6 +16,7 @@ Imports:
     forcats,
     httr2,
     igraph,
+    progress,
     purrr,
     quanteda,
     quanteda.textstats,

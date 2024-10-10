@@ -115,7 +115,8 @@ expand_net <- function(net,
 
       net <- dplyr::bind_rows(net, new_follows)   # Append the new net to the existing; do another round
 
-      # Refresh the token; unclear how often we need to do this, for now once per iteration -- earlier: get_follows()
+      # Refresh the token; unclear how often we need to do this, for now once per iteration
+      # Earlier: once per get_follows() call
       refresh_object <- refresh_token(refresh_tok)
       token <- refresh_object$accessJwt
       refresh_tok <- refresh_object$refreshJwt
@@ -363,6 +364,11 @@ build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ..
                        refresh_tok = refresh_tok,
                        threshold = threshold,
                        ...)
+
+  # By now the token may be expired, so better refresh
+  refresh_object <- refresh_token(refresh_tok)
+  token <- refresh_object$accessJwt
+  refresh_tok <- refresh_object$refreshJwt
 
   # Trim the net
   net <- expnet |> trim_net(threshold = threshold)
