@@ -2,3 +2,23 @@ url: https://lassehjorthmadsen.github.io/blueskynet/
 template:
   bootstrap: 5
 
+reference:
+- title: "Wrapper functions"
+  desc: "Functions around individual endpoint in the Bluesky Social API"
+  contents:
+  - get_token
+  - refresh_token
+  - verify_token
+  - get_profiles
+  - get_follows
+  - follow_actor
+- title: "Network functions"
+  desc: "Functions for creating and analyzing networks."
+  contents:
+  - add_metrics
+  - build_network
+  - create_widget
+  - expand_net
+  - init_net
+  - trim_net
+  - word_freqs
