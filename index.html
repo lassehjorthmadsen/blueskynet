@@ -49,7 +49,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The purpose of blueskynet is to provide tools to generate and analyze networks from Bluesky Social</p>
+<p>The purpose of blueskynet is to provide tools to generate and analyze networks from Bluesky Social,</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -70,6 +70,8 @@
 <span><span class="co"># Authenticate yourself</span></span>
 <span><span class="va">password</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BLUESKY_APP_PASS"</span><span class="op">)</span></span>
 <span><span class="va">identifier</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BLUESKY_APP_USER"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Then get a token and a refresh token</span></span>
 <span><span class="va">auth_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_token.html">get_token</a></span><span class="op">(</span><span class="va">identifier</span>, <span class="va">password</span><span class="op">)</span></span>
 <span><span class="va">token</span> <span class="op">&lt;-</span> <span class="va">auth_object</span><span class="op">$</span><span class="va">accessJwt</span></span>
 <span><span class="va">refresh_tok</span> <span class="op">&lt;-</span> <span class="va">auth_object</span><span class="op">$</span><span class="va">refreshJwt</span></span>
@@ -82,17 +84,22 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">small_net</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
-<span><span class="co">#&gt;   actor_handle             follows_handle            </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                     </span></span>
-<span><span class="co">#&gt; 1 natalieamiri.bsky.social dunjahayali.de            </span></span>
-<span><span class="co">#&gt; 2 natalieamiri.bsky.social spiegelmagazin.bsky.social</span></span>
-<span><span class="co">#&gt; 3 natalieamiri.bsky.social gildasahebi.bsky.social</span></span></code></pre></div>
-<p>Then you can expand the net, using <code><a href="reference/expand_net.html">expand_net()</a></code> which we won’t run here, since it can take a lot of time to build a big network.</p>
+<span><span class="co">#&gt;   actor_handle             follows_handle          </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                   </span></span>
+<span><span class="co">#&gt; 1 natalieamiri.bsky.social saschalobo.bsky.social  </span></span>
+<span><span class="co">#&gt; 2 natalieamiri.bsky.social heute.nachrichten.com.de</span></span>
+<span><span class="co">#&gt; 3 natalieamiri.bsky.social iranjournal.bsky.social</span></span></code></pre></div>
+<p>When you’re ready, you can build a bigger net, with several supporting artifacts, like a 3d-widget, using <code><a href="reference/build_network.html">build_network()</a></code> which we won’t run here, since it can take a lot of time to build a big network.</p>
 </div>
 <div class="section level2">
 <h2 id="example-application">Example application<a class="anchor" aria-label="anchor" href="#example-application"></a>
 </h2>
 <p>Have a look at a network of influential scientists on Bluesky Social, generated with <code>blueskynet</code> <a href="https://lassehjorthmadsen.github.io/blueskyanalyses/" class="external-link">here</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p><code>blueskynet</code> has a <a href="https://pkgdown.r-lib.org/index.html" class="external-link">pkddown</a> website for documentation right <a href="https://lassehjorthmadsen.github.io/blueskynet/reference/index.html">here</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
