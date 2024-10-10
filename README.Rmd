@@ -71,4 +71,4 @@ Have a look at a network of influential scientists on Bluesky Social, generated 
 
 
 ## Documentation
-`blueskynet` has a [pkddown](https://pkgdown.r-lib.org/index.html) website for documentation right [here](https://lassehjorthmadsen.github.io/blueskynet/reference/index.html).
+`blueskynet` has a [pkddown](https://pkgdown.r-lib.org/index.html) website for documentation right [here](https://lassehjorthmadsen.github.io/blueskynet/index.html).
