@@ -36,7 +36,7 @@ First, create an app password here: https://bsky.app/settings/app-passwords.
 
 Then, set environment variable BLUESKY_APP_PASS to your app password, and another variable, BLUESKY_APP_USER, to your identifier (e.g. "lassehjorthmadsen.bsky.social") using `file.edit("~/.Renviron")`
 
-Now, you can access the core function of blueskynet:
+Now, you can access the core function of `blueskynet`:
 
 ```{r example, message=FALSE, warning=FALSE}
 library(blueskynet)

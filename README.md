@@ -31,7 +31,7 @@ Then, set environment variable BLUESKY_APP_PASS to your app password,
 and another variable, BLUESKY_APP_USER, to your identifier
 (e.g. “lassehjorthmadsen.bsky.social”) using `file.edit("~/.Renviron")`
 
-Now, you can access the core function of blueskynet:
+Now, you can access the core function of `blueskynet`:
 
 ``` r
 library(blueskynet)
@@ -78,4 +78,4 @@ generated with `blueskynet`
 
 `blueskynet` has a [pkddown](https://pkgdown.r-lib.org/index.html)
 website for documentation right
-[here](https://lassehjorthmadsen.github.io/blueskynet/reference/index.html).
+[here](https://lassehjorthmadsen.github.io/blueskynet/index.html).
