@@ -8,6 +8,13 @@
 \description{
 Tools for generating and analyzing networks on Bluesky Social. Based on a given actor (user) on Bluesky, we can generate a network based on what users the actor followes. Outputs are a graph with information on who follows who among this set of actors, and a dataset with some metadata about the actors. Also included are a few tools from `igraph` and `tidygraph` for network analysis.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://lassehjorthmadsen.github.io/blueskynet/}
+}
+
+}
 \author{
 \strong{Maintainer}: Lasse Hjorth Madsen \email{lassehjorthmadsen@gmail.com}
 
