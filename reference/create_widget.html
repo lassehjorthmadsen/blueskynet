@@ -37,7 +37,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">create_widget</span><span class="op">(</span><span class="va">net</span>, <span class="va">profiles</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">create_widget</span><span class="op">(</span><span class="va">net</span>, <span class="va">profiles</span>, prop <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -46,12 +46,16 @@
 
 <dl><dt id="arg-net">net<a class="anchor" aria-label="anchor" href="#arg-net"></a></dt>
 <dd><p>tibble with two columns, two columns: <code>actor_handle</code>
-(the Blue Sky Social actor who is followING another) and <code>follows_handle</code>
+(the Blue Sky actor who is followING another) and <code>follows_handle</code>
 (the actor being followed).</p></dd>
 
 
 <dt id="arg-profiles">profiles<a class="anchor" aria-label="anchor" href="#arg-profiles"></a></dt>
 <dd><p>tibble with list of actors in net</p></dd>
+
+
+<dt id="arg-prop">prop<a class="anchor" aria-label="anchor" href="#arg-prop"></a></dt>
+<dd><p>proportion of the actors sampled for visualization</p></dd>
 
 </dl></div>
     <div class="section level2">
