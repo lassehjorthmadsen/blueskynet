@@ -12,6 +12,8 @@ reference:
   - get_profiles
   - get_follows
   - follow_actor
+  - get_follows_old
+  - get_profiles_old
 - title: "Network functions"
   desc: "Functions for creating and analyzing networks."
   contents:
