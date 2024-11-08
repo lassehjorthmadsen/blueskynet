@@ -1,0 +1,419 @@
+LAST RUN OF build_research_network.R script
+
+Observations:
+
+1. This ends with an error after a long time.
+2. For many iterations (8-24) about 26.000 followers meet the threshold of 40
+3. ... but after iteration 12 few (<200) also match the keywords.
+4. These iterations are also fast, to the storing of already fetch profiles seem to work
+5. We may need a mechanism for stopping when not much changes
+6. The net gets ~40.000 members (2024-10-31) as opposed to ~39.000 (2024-10-24) so likely similar.
+
+
+R version 4.3.1 (2023-06-16 ucrt) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package to force all conflicts to become errors
+Warning messages:
+1: package ‘ggplot2’ was built under R version 4.3.3 
+2: package ‘tidyr’ was built under R version 4.3.3 
+3: package ‘dplyr’ was built under R version 4.3.3 
+4: package ‘stringr’ was built under R version 4.3.2 
+> library(htmlwidgets)
+Warning message:
+package ‘htmlwidgets’ was built under R version 4.3.3 
+> devtools::load_all("../blueskynet")
+ℹ Loading blueskynet
+Warning messages:
+1: In .recacheSubclasses(def@className, def, env) :
+  undefined subclass "ndiMatrix" of class "replValueSp"; definition not updated
+2: In .recacheSubclasses(def@className, def, env) :
+  undefined subclass "pcorMatrix" of class "replValueSp"; definition not updated
+3: In .recacheSubclasses(def@className, def, env) :
+  undefined subclass "ndiMatrix" of class "replValueSp"; definition not updated
+4: In .recacheSubclasses(def@className, def, env) :
+  undefined subclass "pcorMatrix" of class "replValueSp"; definition not updated
+> 
+> password <- Sys.getenv("BLUESKY_APP_PASS")
+> identifier <- Sys.getenv("BLUESKY_APP_USER")
+> auth_object <- get_token(identifier, password)
+> token <- auth_object$accessJwt
+> refresh_tok <- auth_object$refreshJwt
+> threshold    <- 40
+> 
+> ##########################
+> # BUILD RESEARCH NETWORK
+> ##########################
+> 
+> keywords_file <- "data/research_keywords.txt"
+> key_actor     <- "rossdahlke.bsky.social"
+> net_file      <- paste0("data/research_net_", Sys.Date(), ".rds")
+> profile_file  <- paste0("data/research_profiles_", Sys.Date(), ".csv")
+> widget_file   <- paste0("data/research_widget_", Sys.Date(), ".html")
+> 
+> keywords <- read_lines(file = keywords_file)
+> 
+> research_bundle <- build_network(key_actor = key_actor,
++                                  keywords = keywords,
++                                  token = token,
++                                  refresh_tok = refresh_tok,
++                                  threshold = threshold,
++                                  save_net = TRUE,
++                                  max_iterations = 30,
++                                  sample_size = Inf,
++                                  file_name = net_file)
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+Initial network:
+   Number of actors     : 1
+   Number of follows    : 2973
+   Number of connections: 3010
+
+Expanding the network, iteration number: 1
+   Number of prospects meeting the followers threshold of 40: 2971
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 2496
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1418519
+
+Updated network:
+   Number of actors     : 2497
+   Number of follows    : 223501
+   Number of connections: 1421529
+
+Time difference of 1.172212 hours
+
+Expanding the network, iteration number: 2
+   Number of prospects meeting the followers threshold of 40: 5523
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 4161
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 2435840
+
+Updated network:
+   Number of actors     : 6504
+   Number of follows    : 435201
+   Number of connections: 3857369
+
+Time difference of 2.01453 hours
+
+Expanding the network, iteration number: 3
+   Number of prospects meeting the followers threshold of 40: 13057
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 8722
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 2378504
+
+Updated network:
+   Number of actors     : 12299
+   Number of follows    : 567339
+   Number of connections: 6235873
+
+Time difference of 2.235496 hours
+
+Expanding the network, iteration number: 4
+   Number of prospects meeting the followers threshold of 40: 17440
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 9714
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 2348036
+
+Updated network:
+   Number of actors     : 19182
+   Number of follows    : 649152
+   Number of connections: 8583909
+
+Time difference of 2.210593 hours
+
+Expanding the network, iteration number: 5
+   Number of prospects meeting the followers threshold of 40: 20574
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 8924
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 2308098
+
+Updated network:
+   Number of actors     : 26698
+   Number of follows    : 763359
+   Number of connections: 10892007
+
+Time difference of 2.0969 hours
+
+Expanding the network, iteration number: 6
+   Number of prospects meeting the followers threshold of 40: 22850
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 6546
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1958648
+
+Updated network:
+   Number of actors     : 33146
+   Number of follows    : 914613
+   Number of connections: 12850655
+
+Time difference of 1.709061 hours
+
+Expanding the network, iteration number: 7
+   Number of prospects meeting the followers threshold of 40: 25313
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 4190
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1116743
+
+Updated network:
+   Number of actors     : 37227
+   Number of follows    : 959309
+   Number of connections: 13967398
+
+Time difference of 1.019433 hours
+
+Expanding the network, iteration number: 8
+   Number of prospects meeting the followers threshold of 40: 26112
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 2092
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 446605
+
+Updated network:
+   Number of actors     : 39209
+   Number of follows    : 969666
+   Number of connections: 14414003
+
+Time difference of 24.41032 mins
+
+Expanding the network, iteration number: 9
+   Number of prospects meeting the followers threshold of 40: 26154
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 800
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 149126
+
+Updated network:
+   Number of actors     : 39896
+   Number of follows    : 973718
+   Number of connections: 14563129
+
+Time difference of 9.630702 mins
+
+Expanding the network, iteration number: 10
+   Number of prospects meeting the followers threshold of 40: 26221
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 352
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 58588
+
+Updated network:
+   Number of actors     : 40135
+   Number of follows    : 975424
+   Number of connections: 14621717
+
+Time difference of 4.343464 mins
+
+Expanding the network, iteration number: 11
+   Number of prospects meeting the followers threshold of 40: 26297
+   Getting profiles ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% |  ETA:  0s
+   Number of valid prospects also matching the provided keywords: 220
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 28664
+
+Updated network:
+   Number of actors     : 40242
+   Number of follows    : 977193
+   Number of connections: 14650381
+
+Time difference of 2.213829 mins
+
+Expanding the network, iteration number: 12
+   Number of prospects meeting the followers threshold of 40: 26363
+   Number of valid prospects also matching the provided keywords: 182
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 19767
+
+Updated network:
+   Number of actors     : 40311
+   Number of follows    : 977806
+   Number of connections: 14670148
+
+Time difference of 2.182751 mins
+
+Expanding the network, iteration number: 13
+   Number of prospects meeting the followers threshold of 40: 26419
+   Number of valid prospects also matching the provided keywords: 157
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 13473
+
+Updated network:
+   Number of actors     : 40355
+   Number of follows    : 978106
+   Number of connections: 14683621
+
+Time difference of 1.382656 mins
+
+Expanding the network, iteration number: 14
+   Number of prospects meeting the followers threshold of 40: 26452
+   Number of valid prospects also matching the provided keywords: 145
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 6691
+
+Updated network:
+   Number of actors     : 40386
+   Number of follows    : 978309
+   Number of connections: 14690312
+
+Time difference of 1.10445 mins
+
+Expanding the network, iteration number: 15
+   Number of prospects meeting the followers threshold of 40: 26469
+   Number of valid prospects also matching the provided keywords: 138
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 3457
+
+Updated network:
+   Number of actors     : 40410
+   Number of follows    : 978334
+   Number of connections: 14693769
+
+Time difference of 55.84702 secs
+
+Expanding the network, iteration number: 16
+   Number of prospects meeting the followers threshold of 40: 26476
+   Number of valid prospects also matching the provided keywords: 131
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 3594
+
+Updated network:
+   Number of actors     : 40427
+   Number of follows    : 978371
+   Number of connections: 14697363
+
+Time difference of 1.354043 mins
+
+Expanding the network, iteration number: 17
+   Number of prospects meeting the followers threshold of 40: 26489
+   Number of valid prospects also matching the provided keywords: 133
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 3816
+
+Updated network:
+   Number of actors     : 40446
+   Number of follows    : 978413
+   Number of connections: 14701179
+
+Time difference of 58.19521 secs
+
+Expanding the network, iteration number: 18
+   Number of prospects meeting the followers threshold of 40: 26502
+   Number of valid prospects also matching the provided keywords: 131
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 3259
+
+Updated network:
+   Number of actors     : 40463
+   Number of follows    : 978465
+   Number of connections: 14704438
+
+Time difference of 52.71627 secs
+
+Expanding the network, iteration number: 19
+   Number of prospects meeting the followers threshold of 40: 26520
+   Number of valid prospects also matching the provided keywords: 133
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 5677
+
+Updated network:
+   Number of actors     : 40482
+   Number of follows    : 978571
+   Number of connections: 14710115
+
+Time difference of 1.23879 mins
+
+Expanding the network, iteration number: 20
+   Number of prospects meeting the followers threshold of 40: 26551
+   Number of valid prospects also matching the provided keywords: 136
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 4127
+
+Updated network:
+   Number of actors     : 40504
+   Number of follows    : 978605
+   Number of connections: 14714242
+
+Time difference of 1.120995 mins
+
+Expanding the network, iteration number: 21
+   Number of prospects meeting the followers threshold of 40: 26567
+   Number of valid prospects also matching the provided keywords: 122
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1552
+
+Updated network:
+   Number of actors     : 40512
+   Number of follows    : 978616
+   Number of connections: 14715794
+
+Time difference of 48.95755 secs
+
+Expanding the network, iteration number: 22
+   Number of prospects meeting the followers threshold of 40: 26571
+   Number of valid prospects also matching the provided keywords: 118
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 1140
+
+Updated network:
+   Number of actors     : 40516
+   Number of follows    : 978639
+   Number of connections: 14716934
+
+Time difference of 49.82977 secs
+
+Expanding the network, iteration number: 23
+   Number of prospects meeting the followers threshold of 40: 26576
+   Number of valid prospects also matching the provided keywords: 117
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 757
+
+Updated network:
+   Number of actors     : 40519
+   Number of follows    : 978658
+   Number of connections: 14717691
+
+Time difference of 52.63833 secs
+
+Expanding the network, iteration number: 24
+   Number of prospects meeting the followers threshold of 40: 26579
+   Number of valid prospects also matching the provided keywords: 114
+   Getting follows  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+   Number of new actors with followers to add to network: 0
+
+Updated network:
+   Number of actors     : 40519
+   Number of follows    : 978658
+   Number of connections: 14717691
+
+Time difference of 43.70042 secs
+Error in `httr2::req_perform()` at blueskynet/R/wrappers.R:35:3:
+! HTTP 400 Bad Request.
+Run `rlang::last_trace()` to see where the error occurred.
+There were 50 or more warnings (use warnings() to see the first 50)

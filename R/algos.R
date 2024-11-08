@@ -20,6 +20,7 @@
 #'
 #' @return tibble with the expanded network
 #' @importFrom rlang .data
+#' @importFrom cli cli_progress_bar cli_progress_update
 #' @export
 #'
 expand_net <- function(net,
@@ -27,7 +28,7 @@ expand_net <- function(net,
                        token,
                        refresh_tok,
                        save_net = FALSE,
-                       file_name = paste0("dev/net/big_net_", Sys.Date(), ".rds"),
+                       file_name,
                        threshold = 30,
                        max_iterations = 50,
                        sample_size = Inf) {
@@ -54,10 +55,11 @@ expand_net <- function(net,
       dplyr::filter(!.data$follows_handle %in% .data$actor_handle, .data$follows_handle != "handle.invalid") |>
       dplyr::slice_sample(n = sample_size)
 
+    # You're included if you're above the threshold, OR at the maximum value
     if (floor(threshold) > 0) {
-      prospects <- prospects |> dplyr::filter(.data$n >= threshold)
+      prospects <- prospects |> dplyr::filter(.data$n >= threshold | .data$n == max(.data$n))
       } else {
-      prospects <- prospects |> dplyr::filter(.data$frac >= threshold)
+      prospects <- prospects |> dplyr::filter(.data$frac >= threshold | .data$frac == max(.data$frac))
     }
 
     prospects <- prospects |>
@@ -99,8 +101,9 @@ expand_net <- function(net,
       for (n in seq(new_members)) {
 
         follows <- get_follows(new_members[n], token)
+        if (!is.data.frame(follows)) follows <- NULL
 
-        if (nrow(follows) > 0) {
+        if (!is.null(follows) && nrow(follows) > 0) {
           follows <- follows |>
             dplyr::mutate(actor_handle = new_members[n]) |>
             dplyr::select(.data$actor_handle, follows_handle = .data$handle)
@@ -273,16 +276,22 @@ add_metrics <- function(profiles, net) {
 #' Create a 3d-widget
 #'
 #' @param net tibble with two columns, two columns: `actor_handle`
-#' (the Blue Sky Social actor who is followING another) and `follows_handle`
+#' (the Blue Sky actor who is followING another) and `follows_handle`
 #' (the actor being followed).
 #' @param profiles tibble with list of actors in net
+#' @param prop proportion of the actors sampled for visualization
 #'
 #' @return html widget
 #' @importFrom igraph V
 #' @importFrom tidygraph activate as_tbl_graph
 #' @export
 #'
-create_widget <- function(net, profiles) {
+create_widget <- function(net, profiles, prop = 1) {
+
+  if (prop < 1) {
+    profiles <- profiles |> dplyr::slice_sample(prop = prop)
+    net <- net |> dplyr::filter(.data$actor_handle %in% profiles$handle, .data$follows_handle %in% profiles$handle)
+  }
 
   # Create graph object
   graph <- net |> tidygraph::as_tbl_graph()
@@ -383,7 +392,7 @@ build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ..
   freqs <- profiles$description |> word_freqs()
 
   # Create widget
-  widget <- create_widget(net, profiles)
+  widget <- create_widget(net, profiles, ...)
 
   return(list("net" = net, "profiles" = profiles, "widget" = widget, "freqs" = freqs))
 }

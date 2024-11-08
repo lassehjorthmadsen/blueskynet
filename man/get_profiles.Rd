@@ -2,21 +2,24 @@
 % Please edit documentation in R/wrappers.R
 \name{get_profiles}
 \alias{get_profiles}
-\title{Get profile for an actor/actors}
+\title{Get profile for an actor/actors with improved error handling}
 \usage{
-get_profiles(actors, token, chunksize = 25)
+get_profiles(actors, token, chunksize = 25, max_retries = 3, retry_delay = 5)
 }
 \arguments{
 \item{actors}{character, actor handle}
 
 \item{token}{character, api token}
 
-\item{chunksize}{integer, the number of actors per request;
-defaults to 25, currently the maximum number allowed}
+\item{chunksize}{integer, the number of actors per request}
+
+\item{max_retries}{number of times to retry on failure (default 3)}
+
+\item{retry_delay}{delay in seconds between retries (default 5)}
 }
 \value{
 tibble with profiles
 }
 \description{
-Get profile for an actor/actors
+Get profile for an actor/actors with improved error handling
 }

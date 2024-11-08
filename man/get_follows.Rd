@@ -2,23 +2,22 @@
 % Please edit documentation in R/wrappers.R
 \name{get_follows}
 \alias{get_follows}
-\title{Get follows for an actor}
+\title{Get follows for an actor with improved error handling}
 \usage{
-get_follows(actor, token)
+get_follows(actor, token, max_retries = 3, retry_delay = 5)
 }
 \arguments{
 \item{actor}{account identifier}
 
 \item{token}{token for api}
+
+\item{max_retries}{number of times to retry on failure (default 3)}
+
+\item{retry_delay}{delay in seconds between retries (default 5)}
 }
 \value{
 tibble with response information
 }
 \description{
-Get follows for an actor
+Get follows for an actor with improved error handling
 }
-\section{Lexicon references}{
-
-\href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollows.json}{lexicons/app/bsky/graph/getFollows.json}
-}
-

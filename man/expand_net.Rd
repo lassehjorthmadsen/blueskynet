@@ -10,7 +10,7 @@ expand_net(
   token,
   refresh_tok,
   save_net = FALSE,
-  file_name = paste0("dev/net/big_net_", Sys.Date(), ".rds"),
+  file_name,
   threshold = 30,
   max_iterations = 50,
   sample_size = Inf
