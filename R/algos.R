@@ -16,9 +16,13 @@
 #' @param max_iterations integer, the maximum iterations in the network expansion. Defaults to 50
 #' @param sample_size integer, if we want to expand only with a sample of the prospects;
 #' can be useful for testing purposes. Defaults to `Inf´, e.g. every worthy prospect is included
-#' in the expansion
+#' in the expansion.
 #'
-#' @return tibble with the expanded network
+#' @return list with a) a tibble with the expanded network: `actor_handle` contains all network member,
+#' `follows_handle` contain all relevant actors that they follow (but not necessarily meeting
+#' the `threshold`.) b) a new token, c) a new refresh token -- since the tokens might have beed
+#' refreshed while underway
+#'
 #' @importFrom rlang .data
 #' @importFrom cli cli_progress_bar cli_progress_update
 #' @export
@@ -114,7 +118,7 @@ expand_net <- function(net,
         cli::cli_progress_update()
       }
 
-      cat("   Number of new actors with followers to add to network: ", nrow(new_follows), sep = "", fill = T)
+      cat("   Number of new actors with followers to add to network: ", n_distinct(new_follows$actor_handle), sep = "", fill = T)
 
       net <- dplyr::bind_rows(net, new_follows)   # Append the new net to the existing; do another round
 
@@ -123,7 +127,6 @@ expand_net <- function(net,
       refresh_object <- refresh_token(refresh_tok)
       token <- refresh_object$accessJwt
       refresh_tok <- refresh_object$refreshJwt
-
     }
 
     cat("\nUpdated network:", fill = T)
@@ -137,15 +140,16 @@ expand_net <- function(net,
     if (save_net) net |> saveRDS(file = file_name)
 
   }
-  return(net)
+  # Return the expanded net and the new tokens we have obtained underway
+  return(list("net" = net, "token" = token, "refresh_tok" = refresh_tok))
 }
 
 
 #' Trim network
 #'
-#' Iteratively trim a network so that the set of actors and the set of follows must be identical.
-#' Also excludes rows with NA in either actors or follows columns. Finally, excludes
-#' actors with less that 30 followers.
+#' Iteratively trims a network so that the set of actors and the set of follows are identical.
+#' Also excludes rows with NA in either actors or follows columns or invalid handle. Finally,
+#' excludes actors with less that a certain number of followers within the network.
 #'
 #' @param net tibble with network connections (edges). Assumed to contain two columns:
 #' `actor_handle` (the Blue Sky Social actor who is followING another) and `follows_handle`
@@ -194,7 +198,7 @@ trim_net <- function(net, threshold) {
 #' form a minimal, initial network that can be expanded
 #' later
 #'
-#' @param key_actor account identifier
+#' @param key_actors character vector with account identifiers
 #' @param keywords character vector with keywords that we check for in actors' description
 #' @param token character, token for Blue Sky Social API
 #' @return tibble with two columns, two columns: `actor_handle`
@@ -202,16 +206,21 @@ trim_net <- function(net, threshold) {
 #' (the actor being followed).
 #' @export
 #'
-init_net <- function(key_actor, keywords, token) {
+init_net <- function(key_actors, keywords, token) {
 
   keywords <- paste(keywords, collapse = "|")
 
-  net <- key_actor  |>
-    get_follows(token) |>
-    dplyr::mutate(actor_handle = key_actor) |>
+  net <- key_actors |>
+    purrr::map(get_follows, token) |>
+    purrr::set_names(key_actors) |>
+    dplyr::bind_rows(.id = "actor_handle") |>
     dplyr::select(.data$actor_handle, follows_handle = .data$handle)
 
+  # Unsure exactly why this happens, but it can't be useful, so get rid of it
+  net <- net |> filter(.data$follows_handle != "handle.invalid")
+
   profiles <- net$follows_handle |>
+    unique() |>
     get_profiles(token)
 
   profiles |>
@@ -258,15 +267,21 @@ add_metrics <- function(profiles, net) {
   followers <- net |>
     dplyr::count(.data$follows_handle, name = "insideFollowers")
 
-  #browser()
   metrics <- graph |>
     dplyr::as_tibble() |>
     dplyr::rename(handle = .data$name)
 
   if (!is.null(profiles)) {
+
     profiles <- profiles |>
       dplyr::left_join(metrics, by = "handle") |>
       dplyr::left_join(followers, by = c("handle" = "follows_handle"))
+
+    # community_labels <- com_labels(profiles)
+
+    profiles <- profiles |>
+      dplyr::left_join(com_labels(profiles), by = "community")
+
   }
 
   return(profiles)
@@ -346,25 +361,26 @@ create_widget <- function(net, profiles, prop = 1) {
 
 #' Build a complete network and helpful artifacts
 #'
-#' @param key_actor account identifier
+#' @param key_actors character vector with account identifiers
 #' @param keywords character vector with keywords that we check for in actors' description
 #' @param token character, token for Blue Sky Social API
 #' @param refresh_tok character, refresh token for Blue Sky Social API
 #' @param threshold the threshold for including actors in the expansion: How many
 #' followers must a prospect have, to be considered? If smaller than 1, threshold is used
 #' as a proportion: How big a proportion must a prospect have, to be considered?
+#' @param prop proportion of the actors sampled for visualization, passed on to `create_widget()`
 #' @param ... Parameters passed on to `expand_net()`
 #'
 #' @return list of objects generated from `expand_net()`, `trim_net()`, `get_profiles()`,
 #' `create_widget()`, and `word_freqs()`
 #' @export
 #'
-build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ...) {
+build_network <- function(key_actors, keywords, token, refresh_tok, threshold, prop, ...) {
 
   keywords <- keywords |> paste0(collapse = "|")
 
   # Get initial net based on key actor
-  small_net <- init_net(key_actor, keywords, token)
+  small_net <- init_net(key_actors, keywords, token)
 
   # Expand the net
   expnet <- expand_net(net = small_net,
@@ -374,10 +390,9 @@ build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ..
                        threshold = threshold,
                        ...)
 
-  # By now the token may be expired, so better refresh
-  refresh_object <- refresh_token(refresh_tok)
-  token <- refresh_object$accessJwt
-  refresh_tok <- refresh_object$refreshJwt
+  # Get the expanded network and token (it might have been refreshed)
+  token <- expnet$token
+  expnet <- expnet$net
 
   # Trim the net
   net <- expnet |> trim_net(threshold = threshold)
@@ -392,7 +407,38 @@ build_network <- function(key_actor, keywords, token, refresh_tok, threshold, ..
   freqs <- profiles$description |> word_freqs()
 
   # Create widget
-  widget <- create_widget(net, profiles, ...)
+  widget <- create_widget(net, profiles, prop)
 
   return(list("net" = net, "profiles" = profiles, "widget" = widget, "freqs" = freqs))
+}
+
+
+# Get the top 3 words (tf-idf-weighted) per community, use as labels
+
+
+#' Label communities
+#'
+#' @param profiles tibble with profile information
+#' @param group field that contains grouping information, defaults to "community"
+#' @param text_field field that contains text to use for word frequencies, defaults to "description"
+#' @param top number of words to use in label, defaults to 3
+#'
+#' @return tibble with group id and label
+#' @export
+#'
+com_labels <- function(profiles, group = "community", text_field = "description", top = 3) {
+  df <-
+    quanteda::corpus(profiles, text_field = text_field, docid_field = "handle") |>
+    quanteda::tokens(remove_punct = TRUE) |>
+    quanteda::tokens_remove(pattern = c(quanteda::stopwords("en"), "|")) |>
+    quanteda::dfm() |>
+    quanteda::dfm_tfidf() |>
+    quanteda::topfeatures(n = 3, groups = community) |>
+    purrr::map(names) |>
+    purrr::map_chr(paste, collapse = " | ") |>
+    dplyr::as_tibble() |>
+    dplyr::mutate(community = dplyr::row_number()) |>
+    dplyr::rename(community_label = value)
+
+  return(df)
 }
