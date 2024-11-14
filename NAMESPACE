@@ -2,6 +2,7 @@
 
 export(add_metrics)
 export(build_network)
+export(com_labels)
 export(create_widget)
 export(expand_net)
 export(follow_actor)

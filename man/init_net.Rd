@@ -4,10 +4,10 @@
 \alias{init_net}
 \title{Create initial network}
 \usage{
-init_net(key_actor, keywords, token)
+init_net(key_actors, keywords, token)
 }
 \arguments{
-\item{key_actor}{account identifier}
+\item{key_actors}{character vector with account identifiers}
 
 \item{keywords}{character vector with keywords that we check for in actors' description}
 

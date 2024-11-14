@@ -118,7 +118,7 @@ expand_net <- function(net,
         cli::cli_progress_update()
       }
 
-      cat("   Number of new actors with followers to add to network: ", n_distinct(new_follows$actor_handle), sep = "", fill = T)
+      cat("   Number of new actors with followers to add to network: ", dplyr::n_distinct(new_follows$actor_handle), sep = "", fill = T)
 
       net <- dplyr::bind_rows(net, new_follows)   # Append the new net to the existing; do another round
 
@@ -216,8 +216,8 @@ init_net <- function(key_actors, keywords, token) {
     dplyr::bind_rows(.id = "actor_handle") |>
     dplyr::select(.data$actor_handle, follows_handle = .data$handle)
 
-  # Unsure exactly why this happens, but it can't be useful, so get rid of it
-  net <- net |> filter(.data$follows_handle != "handle.invalid")
+  # Unsure exactly why "handle.invalid" happens, but it can't be useful, so get rid of it
+  net <- net |> dplyr::filter(.data$follows_handle != "handle.invalid")
 
   profiles <- net$follows_handle |>
     unique() |>
@@ -433,12 +433,12 @@ com_labels <- function(profiles, group = "community", text_field = "description"
     quanteda::tokens_remove(pattern = c(quanteda::stopwords("en"), "|")) |>
     quanteda::dfm() |>
     quanteda::dfm_tfidf() |>
-    quanteda::topfeatures(n = 3, groups = community) |>
+    quanteda::topfeatures(n = 3, groups = .data$community) |>
     purrr::map(names) |>
     purrr::map_chr(paste, collapse = " | ") |>
     dplyr::as_tibble() |>
     dplyr::mutate(community = dplyr::row_number()) |>
-    dplyr::rename(community_label = value)
+    dplyr::rename(community_label = .data$value)
 
   return(df)
 }

@@ -19,7 +19,7 @@ as a proportion: How big a proportion must a prospect have, to be considered?}
 tibble with the expanded network
 }
 \description{
-Iteratively trim a network so that the set of actors and the set of follows must be identical.
-Also excludes rows with NA in either actors or follows columns. Finally, excludes
-actors with less that 30 followers.
+Iteratively trims a network so that the set of actors and the set of follows are identical.
+Also excludes rows with NA in either actors or follows columns or invalid handle. Finally,
+excludes actors with less that a certain number of followers within the network.
 }

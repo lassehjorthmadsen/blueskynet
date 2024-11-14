@@ -41,10 +41,13 @@ of the current net prospects must be followed by, to be considered. Defaults to 
 
 \item{sample_size}{integer, if we want to expand only with a sample of the prospects;
 can be useful for testing purposes. Defaults to `Inf´, e.g. every worthy prospect is included
-in the expansion}
+in the expansion.}
 }
 \value{
-tibble with the expanded network
+list with a) a tibble with the expanded network: \code{actor_handle} contains all network member,
+\code{follows_handle} contain all relevant actors that they follow (but not necessarily meeting
+the \code{threshold}.) b) a new token, c) a new refresh token -- since the tokens might have beed
+refreshed while underway
 }
 \description{
 Expand network

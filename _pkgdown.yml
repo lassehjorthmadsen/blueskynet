@@ -19,6 +19,7 @@ reference:
   contents:
   - add_metrics
   - build_network
+  - com_labels
   - create_widget
   - expand_net
   - init_net

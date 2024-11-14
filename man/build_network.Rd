@@ -4,10 +4,10 @@
 \alias{build_network}
 \title{Build a complete network and helpful artifacts}
 \usage{
-build_network(key_actor, keywords, token, refresh_tok, threshold, ...)
+build_network(key_actors, keywords, token, refresh_tok, threshold, prop, ...)
 }
 \arguments{
-\item{key_actor}{account identifier}
+\item{key_actors}{character vector with account identifiers}
 
 \item{keywords}{character vector with keywords that we check for in actors' description}
 
@@ -18,6 +18,8 @@ build_network(key_actor, keywords, token, refresh_tok, threshold, ...)
 \item{threshold}{the threshold for including actors in the expansion: How many
 followers must a prospect have, to be considered? If smaller than 1, threshold is used
 as a proportion: How big a proportion must a prospect have, to be considered?}
+
+\item{prop}{proportion of the actors sampled for visualization, passed on to \code{create_widget()}}
 
 \item{...}{Parameters passed on to \code{expand_net()}}
 }
