@@ -95,12 +95,15 @@ of the current net prospects must be followed by, to be considered. Defaults to 
 <dt id="arg-sample-size">sample_size<a class="anchor" aria-label="anchor" href="#arg-sample-size"></a></dt>
 <dd><p>integer, if we want to expand only with a sample of the prospects;
 can be useful for testing purposes. Defaults to `Inf´, e.g. every worthy prospect is included
-in the expansion</p></dd>
+in the expansion.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>tibble with the expanded network</p>
+    <p>list with a) a tibble with the expanded network: <code>actor_handle</code> contains all network member,
+<code>follows_handle</code> contain all relevant actors that they follow (but not necessarily meeting
+the <code>threshold</code>.) b) a new token, c) a new refresh token – since the tokens might have beed
+refreshed while underway</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
