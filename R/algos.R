@@ -33,8 +33,8 @@ expand_net <- function(net,
                        refresh_tok,
                        save_net = FALSE,
                        file_name,
-                       threshold = 30,
-                       max_iterations = 50,
+                       threshold,
+                       max_iterations,
                        sample_size = Inf) {
 
   keywords <- paste(keywords, collapse = "|")
@@ -277,11 +277,8 @@ add_metrics <- function(profiles, net) {
       dplyr::left_join(metrics, by = "handle") |>
       dplyr::left_join(followers, by = c("handle" = "follows_handle"))
 
-    # community_labels <- com_labels(profiles)
-
     profiles <- profiles |>
       dplyr::left_join(com_labels(profiles), by = "community")
-
   }
 
   return(profiles)
@@ -418,22 +415,21 @@ build_network <- function(key_actors, keywords, token, refresh_tok, threshold, p
 
 #' Label communities
 #'
-#' @param profiles tibble with profile information
-#' @param group field that contains grouping information, defaults to "community"
-#' @param text_field field that contains text to use for word frequencies, defaults to "description"
+#' @param profiles tibble with profile information, assumed to contain
+#' a column called "community" for grouping, and a column called
+#' "description" that contain the text to analyze
 #' @param top number of words to use in label, defaults to 3
 #'
 #' @return tibble with group id and label
-#' @export
 #'
-com_labels <- function(profiles, group = "community", text_field = "description", top = 3) {
+com_labels <- function(profiles, top = 3) {
   df <-
-    quanteda::corpus(profiles, text_field = text_field, docid_field = "handle") |>
+    quanteda::corpus(profiles, text_field = "description") |>
     quanteda::tokens(remove_punct = TRUE) |>
     quanteda::tokens_remove(pattern = c(quanteda::stopwords("en"), "|")) |>
     quanteda::dfm() |>
     quanteda::dfm_tfidf() |>
-    quanteda::topfeatures(n = 3, groups = .data$community) |>
+    quanteda::topfeatures(n = 3, groups = community) |>
     purrr::map(names) |>
     purrr::map_chr(paste, collapse = " | ") |>
     dplyr::as_tibble() |>
