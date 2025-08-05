@@ -11,8 +11,8 @@ expand_net(
   refresh_tok,
   save_net = FALSE,
   file_name,
-  threshold = 30,
-  max_iterations = 50,
+  threshold,
+  max_iterations,
   sample_size = Inf
 )
 }

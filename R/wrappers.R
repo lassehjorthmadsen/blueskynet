@@ -355,8 +355,9 @@ get_profiles <- function(actors, token, chunksize = 25, max_retries = 3, retry_d
 #'
 #' @param actor character, the handle or DID of the user
 #' @param token character, authentication token
+#' @param limit integer, max number of posts
 #' @return tibble with posts information
-#' @seealso [documentation](https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed)
+#' @seealso [Endpoint documentation](https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/feed/getAuthorFeed.json)
 #' @export
 get_user_posts <- function(actor, token, limit = 100) {
 

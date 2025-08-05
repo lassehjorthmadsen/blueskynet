@@ -4,14 +4,12 @@
 \alias{com_labels}
 \title{Label communities}
 \usage{
-com_labels(profiles, group = "community", text_field = "description", top = 3)
+com_labels(profiles, top = 3)
 }
 \arguments{
-\item{profiles}{tibble with profile information}
-
-\item{group}{field that contains grouping information, defaults to "community"}
-
-\item{text_field}{field that contains text to use for word frequencies, defaults to "description"}
+\item{profiles}{tibble with profile information, assumed to contain
+a column called "community" for grouping, and a column called
+"description" that contain the text to analyze}
 
 \item{top}{number of words to use in label, defaults to 3}
 }
