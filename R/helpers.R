@@ -21,6 +21,48 @@ deselect_nested_cols <- function(mat) {
 }
 
 
+post2df <- function(response, element = "feed") {
+  # Parse the response from 'getAuthorFeed' endpoint as documented
+  # here: https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed
+  # intended to be used by get_user_posts() wrapper function
+
+  df <- response |>
+    purrr::pluck(element) |>
+    purrr::map_dfr(function(item) {
+      data.frame(
+        # Post identifiers
+        uri = item$post$uri,
+        cid = item$post$cid,
+
+        # Author information
+        author_did = item$post$author$did,
+        author_handle = item$post$author$handle,
+        author_displayName = item$post$author$displayName,
+
+        # Post content
+        text = item$post$record$text,
+        created_at = item$post$record$createdAt,
+
+        # Engagement metrics
+        reply_count = item$post$replyCount,
+        repost_count = item$post$repostCount,
+        like_count = item$post$likeCount,
+        quote_count = item$post$quoteCount,
+
+        # Repost information (if applicable)
+        is_repost = !is.null(item$reason),
+        reposted_by = ifelse(!is.null(item$reason),
+                             item$reason$by$handle,
+                             NA_character_),
+
+        stringsAsFactors = FALSE
+      )
+    })
+
+  return(df)
+}
+
+
 check_wait <- function(resp) {
   # Check response headers, if rate limit reached, wait until reset
 

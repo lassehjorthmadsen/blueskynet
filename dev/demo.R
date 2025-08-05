@@ -58,3 +58,6 @@ resps <- dids |> map(\(x) follow_actor(my_did = my_did, actor_did = x, token = t
 actor <- "drfingerstyle.bsky.social"
 profile <- get_profiles(actor, token)
 follows <- get_follows(actor, token)
+
+# Get most recent posts from an actor
+posts <- get_user_posts(actor, token)

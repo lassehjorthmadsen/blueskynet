@@ -349,3 +349,44 @@ get_profiles <- function(actors, token, chunksize = 25, max_retries = 3, retry_d
 
   return(df)
 }
+
+
+#' Get posts from a specific user
+#'
+#' @param actor character, the handle or DID of the user
+#' @param token character, authentication token
+#' @return tibble with posts information
+#' @seealso [documentation](https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed)
+#' @export
+get_user_posts <- function(actor, token, limit = 100) {
+
+  # Initial request setup
+  req <- httr2::request('https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed') |>
+    httr2::req_url_query(actor = actor, limit = limit) |>
+    httr2::req_auth_bearer_token(token = token) |>
+    httr2::req_timeout(seconds = 30)
+
+  # Get first batch of posts
+  resp <- req_perform(req)
+  if (is.null(resp)) return(NULL)
+
+  resp <- resp |> httr2::resp_body_json()
+  df <- resp |> post2df(element = "feed")
+
+  # Paginate through remaining posts
+  while(!is.null(resp$cursor)) {
+    req <- req |> httr2::req_url_query(cursor = resp$cursor)
+    resp_next <- req_perform(req)
+
+    if (is.null(resp_next)) {
+      warning("Failed to get next page, returning partial results")
+      break
+    }
+
+    resp <- resp_next |> httr2::resp_body_json()
+    posts_chunk <- resp |> post2df(element = "feed")
+    df <- dplyr::bind_rows(df, posts_chunk)
+  }
+
+  return(df)
+}
