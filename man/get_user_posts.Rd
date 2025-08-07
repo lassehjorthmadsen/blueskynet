@@ -4,12 +4,16 @@
 \alias{get_user_posts}
 \title{Get posts from a specific user}
 \usage{
-get_user_posts(actor, token, limit = 100)
+get_user_posts(actor, token, filter = "posts_no_replies", limit = 100)
 }
 \arguments{
 \item{actor}{character, the handle or DID of the user}
 
 \item{token}{character, authentication token}
+
+\item{filter}{character, posts to filter for. Possible values
+"posts_with_replies", "posts_no_replies", "posts_with_media",
+"posts_and_author_threads", "posts_with_video."}
 
 \item{limit}{integer, max number of posts}
 }

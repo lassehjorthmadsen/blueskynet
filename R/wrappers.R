@@ -355,15 +355,18 @@ get_profiles <- function(actors, token, chunksize = 25, max_retries = 3, retry_d
 #'
 #' @param actor character, the handle or DID of the user
 #' @param token character, authentication token
+#' @param filter character, posts to filter for. Possible values
+#' "posts_with_replies", "posts_no_replies", "posts_with_media",
+#' "posts_and_author_threads", "posts_with_video."
 #' @param limit integer, max number of posts
 #' @return tibble with posts information
 #' @seealso [Endpoint documentation](https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/feed/getAuthorFeed.json)
 #' @export
-get_user_posts <- function(actor, token, limit = 100) {
+get_user_posts <- function(actor, token, filter = "posts_no_replies", limit = 100) {
 
   # Initial request setup
   req <- httr2::request('https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed') |>
-    httr2::req_url_query(actor = actor, limit = limit) |>
+    httr2::req_url_query(actor = actor, filter = filter, limit = limit) |>
     httr2::req_auth_bearer_token(token = token) |>
     httr2::req_timeout(seconds = 30)
 
