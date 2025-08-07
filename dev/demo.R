@@ -60,4 +60,11 @@ profile <- get_profiles(actor, token)
 follows <- get_follows(actor, token)
 
 # Get most recent posts from an actor
-posts <- get_user_posts(actor, token)
+did1 <- "did:plc:lalznr2yvov2sammblk73wx4"
+posts1 <- get_user_posts(did1, token)
+
+did2 <- "did:plc:jpyifzx6cno43ykqnhsiwv5v"
+posts2 <- get_user_posts(did2, token)
+
+my_did <- "did:plc:wy6jv7hx3cwszcyzdtkd24p4"
+my_posts <- get_user_posts(my_did, token)

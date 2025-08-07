@@ -368,26 +368,38 @@ get_user_posts <- function(actor, token, limit = 100) {
     httr2::req_timeout(seconds = 30)
 
   # Get first batch of posts
-  resp <- req_perform(req)
+  message("\rFetching page 1...", appendLF = FALSE)
+  resp <- httr2::req_perform(req)
   if (is.null(resp)) return(NULL)
 
+  # Convert to json
   resp <- resp |> httr2::resp_body_json()
-  df <- resp |> post2df(element = "feed")
+
+  # Store responses in list
+  all_resp <- list()
+  all_resp <- append(all_resp, resp)
 
   # Paginate through remaining posts
+  page_count <- 1
   while(!is.null(resp$cursor)) {
-    req <- req |> httr2::req_url_query(cursor = resp$cursor)
-    resp_next <- req_perform(req)
+    Sys.sleep(0.5)  # Half second delay between requests
+    page_count <- page_count + 1
+    message("\rFetching page ", page_count, "...", appendLF = FALSE)
 
-    if (is.null(resp_next)) {
+    req <- req |> httr2::req_url_query(cursor = resp$cursor)
+    resp <- httr2::req_perform(req)
+
+    if (is.null(resp)) {
       warning("Failed to get next page, returning partial results")
       break
     }
 
-    resp <- resp_next |> httr2::resp_body_json()
-    posts_chunk <- resp |> post2df(element = "feed")
-    df <- dplyr::bind_rows(df, posts_chunk)
+    # Convert to json and add to list
+    resp <- resp |> httr2::resp_body_json()
+    all_resp <- append(all_resp, resp)
   }
 
+  # Convert all responses to df and return
+  df <- all_resp |> post2df(element = "feed")
   return(df)
 }
