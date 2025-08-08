@@ -11,6 +11,7 @@ reference:
   - verify_token
   - get_profiles
   - get_follows
+  - get_user_posts
   - follow_actor
   - get_follows_old
   - get_profiles_old
