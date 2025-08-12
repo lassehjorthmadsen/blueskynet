@@ -362,17 +362,59 @@ get_profiles <- function(actors, token, chunksize = 25, max_retries = 3, retry_d
 #' @return tibble with posts information
 #' @seealso [Endpoint documentation](https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/feed/getAuthorFeed.json)
 #' @export
-get_user_posts <- function(actor, token, filter = "posts_no_replies", limit = 100) {
+get_user_posts <- function(actor, token, max_retries = 3, retry_delay = 5, filter = "posts_no_replies", limit = 100) {
+  attempt_request <- function(req, attempt = 1) {
+    if (attempt > max_retries) {
+      warning(sprintf("Max retries (%d) reached for actor: %s", max_retries, actor))
+      return(NULL)
+    }
 
-  # Initial request setup
+    tryCatch({
+      resp <- req |> httr2::req_perform()
+      check_wait(resp)
+      return(resp)
+    },
+    httr2_http_400 = function(cnd) {
+      warning(sprintf("Bad request for actor %s (possibly deleted)", actor))
+      return(NULL)
+    },
+    httr2_http_500 = function(cnd) {
+      warning("Server error (500), retrying...")
+      Sys.sleep(retry_delay)
+      return(attempt_request(req, attempt + 1))
+    },
+    httr2_http_502 = function(cnd) {
+      warning("Bad gateway (502), retrying...")
+      Sys.sleep(retry_delay)
+      return(attempt_request(req, attempt + 1))
+    },
+    httr2_http_504 = function(cnd) {
+      warning("Gateway timeout (504), retrying...")
+      Sys.sleep(retry_delay)
+      return(attempt_request(req, attempt + 1))
+    },
+    error = function(e) {
+      if (grepl("timeout|SSL/TLS connection timeout", e$message)) {
+        warning("Connection timeout, retrying...")
+        Sys.sleep(retry_delay)
+        return(attempt_request(req, attempt + 1))
+      }
+      warning(sprintf("Unexpected error: %s", e$message))
+      return(NULL)
+    })
+  }
+
+  # Setup request
   req <- httr2::request('https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed') |>
     httr2::req_url_query(actor = actor, filter = filter, limit = limit) |>
     httr2::req_auth_bearer_token(token = token) |>
     httr2::req_timeout(seconds = 30)
 
   # Get first batch of posts
+  message("Getting posts for actor: ", actor)
   message("\rFetching page 1...", appendLF = FALSE)
-  resp <- httr2::req_perform(req)
+  resp <- attempt_request(req)
+  check_wait(resp)  # Handle rate limits
   if (is.null(resp)) return(NULL)
 
   # Convert to json
@@ -390,7 +432,7 @@ get_user_posts <- function(actor, token, filter = "posts_no_replies", limit = 10
     message("\rFetching page ", page_count, "...", appendLF = FALSE)
 
     req <- req |> httr2::req_url_query(cursor = resp$cursor)
-    resp <- httr2::req_perform(req)
+    resp <- attempt_request(req)
 
     if (is.null(resp)) {
       warning("Failed to get next page, returning partial results")
@@ -401,6 +443,8 @@ get_user_posts <- function(actor, token, filter = "posts_no_replies", limit = 10
     resp <- resp |> httr2::resp_body_json()
     all_resp <- append(all_resp, resp)
   }
+
+  message("\nCompleted fetching ", page_count, " pages\n")
 
   # Convert all responses to df and return
   df <- all_resp |> post2df(element = "feed")

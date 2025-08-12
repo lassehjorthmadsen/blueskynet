@@ -34,29 +34,33 @@ post2df <- function(response, element = "feed") {
         uri = item$post$uri,
         cid = item$post$cid,
 
+        # Post identifiers
+        uri = item$post$uri %||% NA_character_,
+        cid = item$post$cid %||% NA_character_,
+
         # Author information
-        author_did = item$post$author$did,
-        author_handle = item$post$author$handle,
-        author_displayName = item$post$author$displayName,
+        author_did = item$post$author$did %||% NA_character_,
+        author_handle = item$post$author$handle %||% NA_character_,
+        author_displayName = item$post$author$displayName %||% NA_character_,
 
         # Post content
-        text = item$post$record$text,
-        created_at = item$post$record$createdAt,
+        text = item$post$record$text %||% NA_character_,
+        created_at = item$post$record$createdAt %||% NA_character_,
 
         # Engagement metrics
-        reply_count = item$post$replyCount,
-        repost_count = item$post$repostCount,
-        like_count = item$post$likeCount,
-        quote_count = item$post$quoteCount,
+        reply_count = item$post$replyCount %||% 0L,
+        repost_count = item$post$repostCount %||% 0L,
+        like_count = item$post$likeCount %||% 0L,
+        quote_count = item$post$quoteCount %||% 0L,
 
-        # Repost information (if applicable)
+        # Repost information
         is_repost = !is.null(item$reason),
-        reposted_by = ifelse(!is.null(item$reason),
-                             item$reason$by$handle,
-                             NA_character_),
+        reposted_by = if (!is.null(item$reason))
+          item$reason$by$handle
+        else
+          NA_character_,
 
-        stringsAsFactors = FALSE
-      )
+        stringsAsFactors = FALSE      )
     })
 
   return(df)
