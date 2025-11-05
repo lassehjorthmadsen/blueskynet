@@ -4,19 +4,21 @@
 \name{blueskynet-package}
 \alias{blueskynet}
 \alias{blueskynet-package}
-\title{blueskynet: Analyze Networks on the Bluesky Social Network}
+\title{blueskynet: Analyze and Visualize Networks on Bluesky Social}
 \description{
-Tools for generating and analyzing networks on Bluesky Social. Based on a given actor (user) on Bluesky, we can generate a network based on what users the actor followes. Outputs are a graph with information on who follows who among this set of actors, and a dataset with some metadata about the actors. Also included are a few tools from `igraph` and `tidygraph` for network analysis.
+Provides comprehensive tools for collecting, analyzing, and visualizing social networks from Bluesky Social \url{https://bsky.app}. Enables users to authenticate with the Bluesky API, collect follower networks, perform community detection, calculate network metrics, and create interactive 3D visualizations. Includes functions for network expansion algorithms, text analysis of user profiles, and follow/unfollow management. Designed for social network researchers, data scientists, and anyone interested in understanding social structures on Bluesky Social.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://lassehjorthmadsen.github.io/blueskynet/}
+  \item \url{https://github.com/lassehjorthmadsen/blueskynet}
+  \item Report bugs at \url{https://github.com/lassehjorthmadsen/blueskynet/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Lasse Hjorth Madsen \email{lassehjorthmadsen@gmail.com}
+\strong{Maintainer}: Lasse Hjorth Madsen \email{lassehjorthmadsen@gmail.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
 
 }
 \keyword{internal}

@@ -29,30 +29,27 @@ each community.
 }
 \examples{
 \dontrun{
-# Create sample profile data
-sample_profiles <- data.frame(
-  community = c(1, 1, 1, 2, 2, 2),
-  description = c(
-    "Data scientist working on machine learning projects",
-    "Machine learning researcher at university",
-    "AI and data science consultant",
-    "Climate change researcher studying ocean temperatures",
-    "Environmental scientist focusing on climate data",
-    "Oceanographer studying climate impacts"
-  )
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+
+# Build a network to get community-assigned profiles
+network_result <- build_network(
+  key_actors = c("scientist.bsky.social", "researcher.bsky.social"),
+  keywords = c("science", "research", "academic"),
+  token = auth$accessJwt,
+  refresh_tok = auth$refreshJwt,
+  threshold = 10
 )
 
-# Generate community labels
-labels <- com_labels(sample_profiles, top = 2)
-print(labels)
-}
+# Add network metrics to get community assignments
+profiles_with_communities <- add_metrics(network_result$profiles, network_result$net)
 
-\dontrun{
-# With real network data
-auth <- get_token("your.handle.bsky.social", "your-app-password")
-net <- build_network("example.bsky.social", c("science", "research"),
-                     auth$accessJwt, auth$refreshJwt, threshold = 30, prop = 0.1)
-labels <- com_labels(net$profiles, top = 3)
+# Generate descriptive labels for each community
+community_labels <- com_labels(profiles_with_communities, top = 3)
+print(community_labels)
+
+# View the most common words for each community
+head(community_labels)
 }
 
 }
