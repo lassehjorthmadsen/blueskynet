@@ -76,6 +76,46 @@ The package is organized into four main R files:
 
 ## Development Workflow
 
+### Testing Strategy
+The package includes comprehensive unit tests using `testthat`:
+
+```r
+# Run all tests
+devtools::test()
+
+# Run tests with coverage
+covr::package_coverage()
+```
+
+**Key Testing Principles:**
+- **71 comprehensive tests** covering all major functionality
+- **Mock data approach** for API functions (avoid live API calls in tests)
+- **Edge case coverage** including Unicode text, empty inputs, large datasets
+- **Input validation tests** for proper parameter checking
+- **Performance tests** for medium-sized networks
+
+**Test Organization:**
+- `tests/testthat/test-helpers.R` - Utility functions (`word_freqs`, etc.)
+- `tests/testthat/test-network-analysis.R` - Network algorithms
+- `tests/testthat/test-api-input-validation.R` - API wrapper validation
+- `tests/testthat/test-edge-cases.R` - Edge cases and performance
+
+### CRAN Preparation Checklist
+Achievement: **0 errors, 0 warnings** in R CMD check
+
+**Critical Issues to Watch:**
+1. **Documentation formatting** - Use single backslashes in roxygen (`\describe{}` not `\\describe{}`)
+2. **Examples strategy** - Wrap API-dependent examples in `\dontrun{}`
+3. **Function exports** - Ensure all documented functions are exported
+4. **Dependencies** - All used packages must be in DESCRIPTION Imports
+5. **ORCID placeholders** - Remove or replace placeholder ORCID IDs
+
+```r
+# Key CRAN checks
+devtools::check(args = "--as-cran")
+devtools::check_win_devel()  # Optional: check on Windows
+```
+
 ### Testing and Validation
 The package uses the `dev/` directory for development scripts and example data:
 - `dev/demo.R` - Complete usage examples
@@ -122,4 +162,69 @@ verify_token(token)
 # Refresh if needed
 new_auth <- refresh_token(refresh_tok)
 token <- new_auth$accessJwt
+```
+
+## Technical Insights & Code Quality
+
+### Key Function Improvements Made
+During development, several functions were enhanced for robustness:
+
+**`extract_follow_subjects()` Enhancement:**
+```r
+# Before: Used sapply() which could return different types
+sapply(follow_records, function(record) record$value$subject)
+
+# After: Use vapply() for type safety
+vapply(follow_records, function(record) record$value$subject, character(1))
+```
+
+**Input Validation Pattern:**
+```r
+# Always validate inputs early in functions
+if (is.null(follow_records)) {
+  stop("follow_records cannot be NULL")
+}
+if (length(follow_records) == 0) {
+  return(character(0))
+}
+```
+
+### Documentation Best Practices
+**Roxygen2 Guidelines:**
+- Use single backslashes: `\describe{}`, `\item{}`, `\code{}`
+- Wrap API examples in `\dontrun{}` to prevent execution during check
+- Include comprehensive parameter descriptions with type information
+- Add cross-references with `\seealso` and function families
+
+**Example Documentation Pattern:**
+```r
+#' @param handle Character vector. Bluesky handles (e.g., "user.bsky.social")
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#'
+#' @return A tibble with user profile information containing:
+#' \describe{
+#'   \item{handle}{Character. User handle}
+#'   \item{displayName}{Character. Display name}
+#'   \item{description}{Character. Profile bio}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' profiles <- get_profiles("example.bsky.social", auth$accessJwt)
+#' }
+```
+
+### Git Workflow Patterns
+**Commit Message Template:**
+```
+action: brief description
+
+- Specific change 1 with technical details
+- Specific change 2 with impact explanation
+- Achievement metrics (e.g., "Package now passes R CMD check")
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
