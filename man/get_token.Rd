@@ -46,6 +46,7 @@ verify_token(access_token)
 \code{\link{refresh_token}}, \code{\link{verify_token}}
 
 Other authentication: 
-\code{\link{refresh_token}()}
+\code{\link{refresh_token}()},
+\code{\link{verify_token}()}
 }
 \concept{authentication}

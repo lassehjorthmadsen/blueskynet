@@ -2,24 +2,59 @@
 % Please edit documentation in R/algos.R
 \name{init_net}
 \alias{init_net}
-\title{Create initial network}
+\title{Initialize a network from key actors}
 \usage{
 init_net(key_actors, keywords, token)
 }
 \arguments{
-\item{key_actors}{character vector with account identifiers}
+\item{key_actors}{Character vector. Handles (e.g., "username.bsky.social") of
+the central actors whose follows will form the initial network}
 
-\item{keywords}{character vector with keywords that we check for in actors' description}
+\item{keywords}{Character vector. Keywords to search for in user profile
+descriptions to determine if they should be included in the network}
 
-\item{token}{character, token for Blue Sky Social API}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 }
 \value{
-tibble with two columns, two columns: \code{actor_handle}
-(the Blue Sky Social actor who is followING another) and \code{follows_handle}
-(the actor being followed).
+A tibble with network edges (follow relationships):
+\describe{
+\item{actor_handle}{Character. Handle of the user doing the following}
+\item{follows_handle}{Character. Handle of the user being followed}
+}
+This represents the initial network structure where each row is a
+follow relationship between two users.
 }
 \description{
-Get all follows for a single actor, and use that to
-form a minimal, initial network that can be expanded
-later
+Creates an initial network by getting all the accounts that key actors follow,
+then filtering those accounts based on profile keywords. This forms the seed
+network that can later be expanded using \code{\link{expand_net}}.
 }
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+
+# Create initial network from science communicators
+key_scientists <- c("neilhimself.neilgaiman.com", "example.scientist.bsky.social")
+science_keywords <- c("scientist", "researcher", "academic", "PhD")
+
+initial_net <- init_net(key_scientists, science_keywords, token)
+print(paste("Initial network has", nrow(initial_net), "connections"))
+
+# Create network for journalists
+journalists <- c("reporter.bsky.social", "news.bsky.social")
+media_keywords <- c("journalist", "reporter", "news", "media")
+media_net <- init_net(journalists, media_keywords, token)
+
+# Examine the network structure
+unique_actors <- length(unique(c(initial_net$actor_handle, initial_net$follows_handle)))
+print(paste("Network contains", unique_actors, "unique users"))
+}
+
+}
+\seealso{
+\code{\link{expand_net}}, \code{\link{build_network}},
+\code{\link{get_follows}}
+}
+\concept{network-building}

@@ -41,6 +41,7 @@ profiles <- get_profiles("example.bsky.social", new_access_token)
 \code{\link{get_token}}, \code{\link{verify_token}}
 
 Other authentication: 
-\code{\link{get_token}()}
+\code{\link{get_token}()},
+\code{\link{verify_token}()}
 }
 \concept{authentication}

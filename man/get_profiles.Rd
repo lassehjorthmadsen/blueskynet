@@ -2,24 +2,73 @@
 % Please edit documentation in R/wrappers.R
 \name{get_profiles}
 \alias{get_profiles}
-\title{Get profile for an actor/actors with improved error handling}
+\title{Get profile information for Bluesky users}
 \usage{
 get_profiles(actors, token, chunksize = 25, max_retries = 3, retry_delay = 5)
 }
 \arguments{
-\item{actors}{character, actor handle}
+\item{actors}{Character vector. User handles (e.g., "username.bsky.social") or
+DIDs of users whose profiles you want to retrieve}
 
-\item{token}{character, api token}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{chunksize}{integer, the number of actors per request}
+\item{chunksize}{Integer. Number of actors per API request for batch processing
+(default 25, which is the current API maximum)}
 
-\item{max_retries}{number of times to retry on failure (default 3)}
+\item{max_retries}{Integer. Number of times to retry on failure (default 3)}
 
-\item{retry_delay}{delay in seconds between retries (default 5)}
+\item{retry_delay}{Numeric. Delay in seconds between retries (default 5)}
 }
 \value{
-tibble with profiles
+A tibble with detailed profile information:
+\describe{
+\item{handle}{Character. User's handle (e.g., "user.bsky.social")}
+\item{did}{Character. User's decentralized identifier}
+\item{displayName}{Character. User's display name}
+\item{description}{Character. User's bio/profile description}
+\item{avatar}{Character. URL to user's avatar image}
+\item{banner}{Character. URL to user's banner image}
+\item{followersCount}{Integer. Number of followers}
+\item{followsCount}{Integer. Number of accounts they follow}
+\item{postsCount}{Integer. Number of posts they've made}
+\item{createdAt}{Character. When the account was created}
+}
+Returns \code{NULL} for users that don't exist or are inaccessible.
 }
 \description{
-Get profile for an actor/actors with improved error handling
+Retrieves detailed profile information for one or more users on Bluesky Social.
+Includes robust error handling with automatic retries and efficient batch processing
+for multiple users.
 }
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+
+# Get profile for a single user
+profile <- get_profiles("neilhimself.neilgaiman.com", token)
+print(profile)
+
+# Get profiles for multiple users efficiently
+users <- c("user1.bsky.social", "user2.bsky.social", "user3.bsky.social")
+profiles <- get_profiles(users, token)
+head(profiles)
+
+# Use with network analysis
+follows <- get_follows("example.bsky.social", token)
+detailed_profiles <- get_profiles(follows$handle, token)
+
+# Filter by follower count
+popular_users <- profiles[profiles$followersCount > 1000, ]
+}
+
+}
+\seealso{
+\code{\link{get_follows}}, \code{\link{get_followers}},
+\code{\link{get_user_posts}}
+
+Other api-wrappers: 
+\code{\link{get_follows}()}
+}
+\concept{api-wrappers}

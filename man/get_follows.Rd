@@ -56,5 +56,8 @@ names(all_follows) <- users
 }
 \seealso{
 \code{\link{get_followers}}, \code{\link{get_profiles}}
+
+Other api-wrappers: 
+\code{\link{get_profiles}()}
 }
 \concept{api-wrappers}

@@ -2,20 +2,62 @@
 % Please edit documentation in R/wrappers.R
 \name{unfollow_actor}
 \alias{unfollow_actor}
-\title{Unfollow an actor using record key}
+\title{Unfollow a user on Bluesky Social}
 \usage{
 unfollow_actor(my_did, rkey, token)
 }
 \arguments{
-\item{my_did}{character, did-identification of the actor that wants to unfollow someone}
+\item{my_did}{Character. Your decentralized identifier (DID) obtained from
+\code{\link{get_token}} response}
 
-\item{rkey}{character, record key of the follow relationship to delete}
+\item{rkey}{Character. Record key of the follow relationship to delete.
+Can be obtained from \code{\link{get_all_follow_records}} or by parsing
+the URI from \code{\link{follow_actor}} response}
 
-\item{token}{character, api token}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 }
 \value{
-response object
+An httr2 response object confirming the deletion, or \code{NULL}
+if the unfollow operation fails.
 }
 \description{
-Unfollow an actor using record key
+Removes a follow relationship between your account and another user on
+Bluesky Social. This is equivalent to clicking the "Unfollow" button on
+a user's profile. Requires the record key of the follow relationship.
 }
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+my_did <- auth$did
+
+# Get all your follow records to find the one to delete
+all_follows <- get_all_follow_records(my_did, token)
+
+# Find the record for a specific user
+target_profile <- get_profiles("example.bsky.social", token)
+target_record <- find_follow_record(all_follows, target_profile$did)
+
+if (!is.null(target_record)) {
+  # Extract record key from URI (after the last slash)
+  rkey <- basename(target_record$uri)
+
+  # Unfollow the user
+  result <- unfollow_actor(my_did, rkey, token)
+
+  if (!is.null(result)) {
+    message("Successfully unfollowed user!")
+  }
+}
+}
+
+}
+\seealso{
+\code{\link{follow_actor}}, \code{\link{get_all_follow_records}},
+\code{\link{find_follow_record}}
+
+Other follow-management: 
+\code{\link{follow_actor}()}
+}
+\concept{follow-management}

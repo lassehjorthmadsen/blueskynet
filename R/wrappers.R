@@ -97,13 +97,57 @@ refresh_token <- function(refresh_token) {
 }
 
 
-#' Follow an actor or actors
+#' Follow a user on Bluesky Social
 #'
-#' @param my_did character, did-identification of the actor that wants to follow someone
-#' @param actor_did character, did-identification of the actor to be followed
-#' @param token token for api
+#' Creates a follow relationship between your account and another user on
+#' Bluesky Social. This is equivalent to clicking the "Follow" button on
+#' a user's profile.
 #'
-#' @return response object
+#' @param my_did Character. Your decentralized identifier (DID) obtained from
+#'   \code{\link{get_token}} response
+#' @param actor_did Character. The DID of the user you want to follow. Can be
+#'   obtained using \code{\link{get_profiles}}
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#'
+#' @return An httr2 response object containing:
+#' \describe{
+#'   \item{uri}{Character. URI of the created follow record}
+#'   \item{cid}{Character. Content identifier for the follow record}
+#' }
+#'   Returns \code{NULL} if the follow operation fails.
+#'
+#' @family follow-management
+#' @seealso \code{\link{unfollow_actor}}, \code{\link{get_follows}},
+#'   \code{\link{get_profiles}}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#' my_did <- auth$did
+#'
+#' # Get the DID of the user you want to follow
+#' target_profile <- get_profiles("neilhimself.neilgaiman.com", token)
+#' target_did <- target_profile$did
+#'
+#' # Follow the user
+#' result <- follow_actor(my_did, target_did, token)
+#'
+#' if (!is.null(result)) {
+#'   message("Successfully followed user!")
+#' }
+#'
+#' # Follow multiple users
+#' users_to_follow <- c("user1.bsky.social", "user2.bsky.social")
+#' profiles <- get_profiles(users_to_follow, token)
+#'
+#' for (i in 1:nrow(profiles)) {
+#'   result <- follow_actor(my_did, profiles$did[i], token)
+#'   Sys.sleep(1) # Be respectful with rate limits
+#' }
+#' }
+#'
 #' @export
 #'
 
@@ -134,13 +178,53 @@ follow_actor <- function(my_did, actor_did, token) {
 }
 
 
-#' Unfollow an actor using record key
+#' Unfollow a user on Bluesky Social
 #'
-#' @param my_did character, did-identification of the actor that wants to unfollow someone
-#' @param rkey character, record key of the follow relationship to delete
-#' @param token character, api token
+#' Removes a follow relationship between your account and another user on
+#' Bluesky Social. This is equivalent to clicking the "Unfollow" button on
+#' a user's profile. Requires the record key of the follow relationship.
 #'
-#' @return response object
+#' @param my_did Character. Your decentralized identifier (DID) obtained from
+#'   \code{\link{get_token}} response
+#' @param rkey Character. Record key of the follow relationship to delete.
+#'   Can be obtained from \code{\link{get_all_follow_records}} or by parsing
+#'   the URI from \code{\link{follow_actor}} response
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#'
+#' @return An httr2 response object confirming the deletion, or \code{NULL}
+#'   if the unfollow operation fails.
+#'
+#' @family follow-management
+#' @seealso \code{\link{follow_actor}}, \code{\link{get_all_follow_records}},
+#'   \code{\link{find_follow_record}}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#' my_did <- auth$did
+#'
+#' # Get all your follow records to find the one to delete
+#' all_follows <- get_all_follow_records(my_did, token)
+#'
+#' # Find the record for a specific user
+#' target_profile <- get_profiles("example.bsky.social", token)
+#' target_record <- find_follow_record(all_follows, target_profile$did)
+#'
+#' if (!is.null(target_record)) {
+#'   # Extract record key from URI (after the last slash)
+#'   rkey <- basename(target_record$uri)
+#'
+#'   # Unfollow the user
+#'   result <- unfollow_actor(my_did, rkey, token)
+#'
+#'   if (!is.null(result)) {
+#'     message("Successfully unfollowed user!")
+#'   }
+#' }
+#' }
+#'
 #' @export
 #'
 unfollow_actor <- function(my_did, rkey, token) {
@@ -161,11 +245,46 @@ unfollow_actor <- function(my_did, rkey, token) {
 }
 
 
-#' Verify token
+#' Verify authentication token validity
 #'
-#' @param token, character, api token
+#' Checks whether an access token is still valid by making a test API call
+#' to the Bluesky session endpoint. This is useful for checking if a token
+#' has expired before making other API calls.
 #'
-#' @return boolean, is the token valid (TRUE) or not (FALSE)?
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#'   or \code{\link{refresh_token}}
+#'
+#' @return Logical. Returns \code{TRUE} if the token is valid and active,
+#'   \code{FALSE} if the token is invalid, expired, or revoked. Also prints
+#'   a message with the associated handle if valid, or error details if invalid.
+#'
+#' @family authentication
+#' @seealso \code{\link{get_token}}, \code{\link{refresh_token}}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate and verify token
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#'
+#' # Check if token is valid
+#' is_valid <- verify_token(token)
+#'
+#' if (is_valid) {
+#'   # Token is good, proceed with API calls
+#'   profiles <- get_profiles("example.bsky.social", token)
+#' } else {
+#'   # Token expired, refresh it
+#'   new_auth <- refresh_token(auth$refreshJwt)
+#'   token <- new_auth$accessJwt
+#' }
+#'
+#' # Can also use in conditional logic
+#' if (!verify_token(token)) {
+#'   stop("Please re-authenticate - your token has expired")
+#' }
+#' }
+#'
 #' @export
 #'
 verify_token <- function(token) {
@@ -397,14 +516,62 @@ get_followers <- function(actor, token, max_retries = 3, retry_delay = 5) {
 }
 
 
-#' Get profile for an actor/actors with improved error handling
+#' Get profile information for Bluesky users
 #'
-#' @param actors character, actor handle
-#' @param token character, api token
-#' @param chunksize integer, the number of actors per request
-#' @param max_retries number of times to retry on failure (default 3)
-#' @param retry_delay delay in seconds between retries (default 5)
-#' @return tibble with profiles
+#' Retrieves detailed profile information for one or more users on Bluesky Social.
+#' Includes robust error handling with automatic retries and efficient batch processing
+#' for multiple users.
+#'
+#' @param actors Character vector. User handles (e.g., "username.bsky.social") or
+#'   DIDs of users whose profiles you want to retrieve
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param chunksize Integer. Number of actors per API request for batch processing
+#'   (default 25, which is the current API maximum)
+#' @param max_retries Integer. Number of times to retry on failure (default 3)
+#' @param retry_delay Numeric. Delay in seconds between retries (default 5)
+#'
+#' @return A tibble with detailed profile information:
+#' \describe{
+#'   \item{handle}{Character. User's handle (e.g., "user.bsky.social")}
+#'   \item{did}{Character. User's decentralized identifier}
+#'   \item{displayName}{Character. User's display name}
+#'   \item{description}{Character. User's bio/profile description}
+#'   \item{avatar}{Character. URL to user's avatar image}
+#'   \item{banner}{Character. URL to user's banner image}
+#'   \item{followersCount}{Integer. Number of followers}
+#'   \item{followsCount}{Integer. Number of accounts they follow}
+#'   \item{postsCount}{Integer. Number of posts they've made}
+#'   \item{createdAt}{Character. When the account was created}
+#' }
+#'   Returns \code{NULL} for users that don't exist or are inaccessible.
+#'
+#' @family api-wrappers
+#' @seealso \code{\link{get_follows}}, \code{\link{get_followers}},
+#'   \code{\link{get_user_posts}}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#'
+#' # Get profile for a single user
+#' profile <- get_profiles("neilhimself.neilgaiman.com", token)
+#' print(profile)
+#'
+#' # Get profiles for multiple users efficiently
+#' users <- c("user1.bsky.social", "user2.bsky.social", "user3.bsky.social")
+#' profiles <- get_profiles(users, token)
+#' head(profiles)
+#'
+#' # Use with network analysis
+#' follows <- get_follows("example.bsky.social", token)
+#' detailed_profiles <- get_profiles(follows$handle, token)
+#'
+#' # Filter by follower count
+#' popular_users <- profiles[profiles$followersCount > 1000, ]
+#' }
+#'
 #' @export
 get_profiles <- function(actors, token, chunksize = 25, max_retries = 3, retry_delay = 5) {
   actors_chunks <- split(actors, ceiling(seq_along(actors) / chunksize))
