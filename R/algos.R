@@ -421,6 +421,7 @@ build_network <- function(key_actors, keywords, token, refresh_tok, threshold, p
 #' @param top number of words to use in label, defaults to 3
 #'
 #' @return tibble with group id and label
+#' @export
 #'
 com_labels <- function(profiles, top = 3) {
   df <-
@@ -429,7 +430,7 @@ com_labels <- function(profiles, top = 3) {
     quanteda::tokens_remove(pattern = c(quanteda::stopwords("en"), "|")) |>
     quanteda::dfm() |>
     quanteda::dfm_tfidf() |>
-    quanteda::topfeatures(n = 3, groups = community) |>
+    quanteda::topfeatures(n = 3, groups = profiles$community) |>
     purrr::map(names) |>
     purrr::map_chr(paste, collapse = " | ") |>
     dplyr::as_tibble() |>

@@ -4,21 +4,35 @@
 \alias{get_user_posts}
 \title{Get posts from a specific user}
 \usage{
-get_user_posts(actor, token, filter = "posts_no_replies", limit = 100)
+get_user_posts(
+  actor,
+  token,
+  max_retries = 3,
+  retry_delay = 5,
+  filter = "posts_no_replies",
+  limit = 100,
+  return_df = TRUE
+)
 }
 \arguments{
 \item{actor}{character, the handle or DID of the user}
 
 \item{token}{character, authentication token}
 
+\item{max_retries}{integer, maximum number of retries}
+
+\item{retry_delay}{real, delay in seconds between retries}
+
 \item{filter}{character, posts to filter for. Possible values
 "posts_with_replies", "posts_no_replies", "posts_with_media",
 "posts_and_author_threads", "posts_with_video."}
 
 \item{limit}{integer, max number of posts}
+
+\item{return_df}{boolean, return responses as tibble}
 }
 \value{
-tibble with posts information
+tibble or json string with posts information
 }
 \description{
 Get posts from a specific user

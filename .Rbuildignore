@@ -11,3 +11,6 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^\.claude$
+^\.quarto$
+^CLAUDE\.md$
