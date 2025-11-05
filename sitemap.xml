@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/404.html</loc></url>
+<url><loc>https://lassehjorthmadsen.github.io/blueskynet/CLAUDE.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/LICENSE-text.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/LICENSE.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/authors.html</loc></url>
@@ -10,17 +11,20 @@
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/com_labels.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/create_widget.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/expand_net.html</loc></url>
+<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/extract_follow_subjects.html</loc></url>
+<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/find_follow_record.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/follow_actor.html</loc></url>
+<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.html</loc></url>
+<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_followers.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_follows.html</loc></url>
-<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_follows_old.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_profiles.html</loc></url>
-<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_profiles_old.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/get_user_posts.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/index.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/init_net.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/refresh_token.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/trim_net.html</loc></url>
+<url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/unfollow_actor.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/verify_token.html</loc></url>
 <url><loc>https://lassehjorthmadsen.github.io/blueskynet/reference/word_freqs.html</loc></url>
 </urlset>
