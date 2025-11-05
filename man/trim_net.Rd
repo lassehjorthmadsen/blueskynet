@@ -50,7 +50,7 @@ connections within the group, improving visualization quality and
 analytical insights.
 }
 \examples{
-\\dontrun{
+\dontrun{
 # Build an initial network
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 initial_net <- init_net(

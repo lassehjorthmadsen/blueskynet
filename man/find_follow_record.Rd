@@ -28,7 +28,7 @@ for a given user. This is essential for unfollow operations since you need
 the record key (rkey) from the original follow record to delete it.
 }
 \examples{
-\\dontrun{
+\dontrun{
 # Authenticate first
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 token <- auth$accessJwt

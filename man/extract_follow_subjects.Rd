@@ -21,7 +21,7 @@ This is useful for getting a simple list of who you follow for analysis or
 bulk operations without the full record metadata.
 }
 \examples{
-\\dontrun{
+\dontrun{
 # Authenticate first
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 token <- auth$accessJwt

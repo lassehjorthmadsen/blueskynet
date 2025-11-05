@@ -1019,7 +1019,7 @@ get_all_follow_records <- function(my_did, token, max_retries = 3, retry_delay =
 #'   \\code{\\link{get_profiles}}
 #'
 #' @examples
-#' \\dontrun{
+#' \dontrun{
 #' # Authenticate first
 #' auth <- get_token("your.handle.bsky.social", "your-app-password")
 #' token <- auth$accessJwt
@@ -1088,7 +1088,7 @@ extract_follow_subjects <- function(follow_records) {
 #'   \\code{\\link{extract_follow_subjects}}
 #'
 #' @examples
-#' \\dontrun{
+#' \dontrun{
 #' # Authenticate first
 #' auth <- get_token("your.handle.bsky.social", "your-app-password")
 #' token <- auth$accessJwt

@@ -48,7 +48,7 @@ a subset for better performance. The widget works best with networks of
 50-500 users for detailed exploration.
 }
 \examples{
-\\dontrun{
+\dontrun{
 # Build a network for visualization
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 network <- build_network(

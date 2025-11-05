@@ -44,7 +44,7 @@ The function performs several network analysis computations:
 }
 }
 \examples{
-\\dontrun{
+\dontrun{
 # Build a network first
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 network_result <- build_network(

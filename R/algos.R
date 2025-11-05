@@ -244,7 +244,7 @@ expand_net <- function(net,
 #'   \\code{\\link{add_metrics}}
 #'
 #' @examples
-#' \\dontrun{
+#' \dontrun{
 #' # Build an initial network
 #' auth <- get_token("your.handle.bsky.social", "your-app-password")
 #' initial_net <- init_net(
@@ -447,7 +447,7 @@ init_net <- function(key_actors, keywords, token) {
 #'   \\code{\\link{create_widget}}
 #'
 #' @examples
-#' \\dontrun{
+#' \dontrun{
 #' # Build a network first
 #' auth <- get_token("your.handle.bsky.social", "your-app-password")
 #' network_result <- build_network(
@@ -587,7 +587,7 @@ add_metrics <- function(profiles, net) {
 #'   \\code{\\link{trim_net}}
 #'
 #' @examples
-#' \\dontrun{
+#' \dontrun{
 #' # Build a network for visualization
 #' auth <- get_token("your.handle.bsky.social", "your-app-password")
 #' network <- build_network(
@@ -863,21 +863,37 @@ build_network <- function(key_actors, keywords, token, refresh_tok, threshold, p
 #' @export
 #'
 com_labels <- function(profiles, top = 3) {
-  corpus_obj <- quanteda::corpus(profiles, text_field = "description")
-  quanteda::docvars(corpus_obj, "community") <- profiles$community
+  # Simple approach: split by community and get top words for each
+  result_list <- list()
 
-  df <-
-    corpus_obj |>
-    quanteda::tokens(remove_punct = TRUE) |>
-    quanteda::tokens_remove(pattern = c(quanteda::stopwords("en"), "|")) |>
-    quanteda::dfm() |>
-    quanteda::dfm_tfidf() |>
-    quanteda::topfeatures(n = top, groups = community) |>
-    purrr::map(names) |>
-    purrr::map_chr(paste, collapse = " | ") |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(community = dplyr::row_number()) |>
-    dplyr::rename(community_label = .data$value)
+  for (comm in unique(profiles$community)) {
+    comm_profiles <- profiles[profiles$community == comm, ]
+
+    if (nrow(comm_profiles) > 0) {
+      # Create corpus for this community
+      corpus_obj <- quanteda::corpus(comm_profiles, text_field = "description")
+
+      # Create tokens and dfm
+      tokens_obj <- quanteda::tokens(corpus_obj, remove_punct = TRUE)
+      tokens_clean <- quanteda::tokens_remove(tokens_obj, pattern = c(quanteda::stopwords("en"), "|"))
+      dfm_obj <- quanteda::dfm(tokens_clean)
+      dfm_tfidf <- quanteda::dfm_tfidf(dfm_obj)
+
+      # Get top features for this community
+      top_features <- quanteda::topfeatures(dfm_tfidf, n = top)
+
+      # Create label
+      label <- paste(names(top_features), collapse = " | ")
+
+      result_list[[as.character(comm)]] <- label
+    }
+  }
+
+  # Convert to tibble
+  df <- dplyr::tibble(
+    community = as.integer(names(result_list)),
+    community_label = as.character(result_list)
+  )
 
   return(df)
 }
