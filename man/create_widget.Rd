@@ -8,9 +8,9 @@ create_widget(net, profiles, prop = 1)
 }
 \arguments{
 \item{net}{Tibble. Network edge list with follow relationships containing:
-\\describe{
-\\item{actor_handle}{Character. User who is following another}
-\\item{follows_handle}{Character. User being followed}
+\describe{
+\item{actor_handle}{Character. User who is following another}
+\item{follows_handle}{Character. User being followed}
 }}
 
 \item{profiles}{Tibble. User profile information from \\code{\\link{get_profiles}}

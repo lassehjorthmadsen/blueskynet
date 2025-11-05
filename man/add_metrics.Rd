@@ -11,9 +11,9 @@ add_metrics(profiles, net)
 containing at least handle and other profile details}
 
 \item{net}{Tibble. Network edge list with follow relationships containing:
-\\describe{
-\\item{actor_handle}{Character. User who is following another}
-\\item{follows_handle}{Character. User being followed}
+\describe{
+\item{actor_handle}{Character. User who is following another}
+\item{follows_handle}{Character. User being followed}
 }}
 }
 \value{

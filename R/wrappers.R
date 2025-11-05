@@ -1060,7 +1060,15 @@ get_all_follow_records <- function(my_did, token, max_retries = 3, retry_delay =
 #'
 #' @export
 extract_follow_subjects <- function(follow_records) {
-  sapply(follow_records, function(record) record$value$subject)
+  if (is.null(follow_records)) {
+    stop("follow_records cannot be NULL")
+  }
+
+  if (length(follow_records) == 0) {
+    return(character(0))
+  }
+
+  vapply(follow_records, function(record) record$value$subject, character(1))
 }
 
 

@@ -8,9 +8,9 @@ trim_net(net, threshold)
 }
 \arguments{
 \item{net}{Tibble. Network edge list with follow relationships containing:
-\\describe{
-\\item{actor_handle}{Character. User who is following another}
-\\item{follows_handle}{Character. User being followed}
+\describe{
+\item{actor_handle}{Character. User who is following another}
+\item{follows_handle}{Character. User being followed}
 }}
 
 \item{threshold}{Numeric. Inclusion threshold for users:
