@@ -123,6 +123,27 @@
 <div class="section level2">
 <h2 id="development-workflow">Development Workflow<a class="anchor" aria-label="anchor" href="#development-workflow"></a></h2>
 <div class="section level3">
+<h3 id="testing-strategy">Testing Strategy<a class="anchor" aria-label="anchor" href="#testing-strategy"></a></h3>
+<p>The package includes comprehensive unit tests using <code>testthat</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run all tests</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run tests with coverage</span></span>
+<span><span class="fu">covr</span><span class="fu">::</span><span class="fu">package_coverage</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Key Testing Principles:</strong> - <strong>71 comprehensive tests</strong> covering all major functionality - <strong>Mock data approach</strong> for API functions (avoid live API calls in tests) - <strong>Edge case coverage</strong> including Unicode text, empty inputs, large datasets - <strong>Input validation tests</strong> for proper parameter checking - <strong>Performance tests</strong> for medium-sized networks</p>
+<p><strong>Test Organization:</strong> - <code>tests/testthat/test-helpers.R</code> - Utility functions (<code>word_freqs</code>, etc.) - <code>tests/testthat/test-network-analysis.R</code> - Network algorithms - <code>tests/testthat/test-api-input-validation.R</code> - API wrapper validation - <code>tests/testthat/test-edge-cases.R</code> - Edge cases and performance</p>
+</div>
+<div class="section level3">
+<h3 id="cran-preparation-checklist">CRAN Preparation Checklist<a class="anchor" aria-label="anchor" href="#cran-preparation-checklist"></a></h3>
+<p>Achievement: <strong>0 errors, 0 warnings</strong> in R CMD check</p>
+<p><strong>Critical Issues to Watch:</strong> 1. <strong>Documentation formatting</strong> - Use single backslashes in roxygen (<code>\describe{}</code> not <code>\\describe{}</code>) 2. <strong>Examples strategy</strong> - Wrap API-dependent examples in <code>\dontrun{}</code> 3. <strong>Function exports</strong> - Ensure all documented functions are exported 4. <strong>Dependencies</strong> - All used packages must be in DESCRIPTION Imports 5. <strong>ORCID placeholders</strong> - Remove or replace placeholder ORCID IDs</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Key CRAN checks</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span>args <span class="op">=</span> <span class="st">"--as-cran"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check_win_devel</span><span class="op">(</span><span class="op">)</span>  <span class="co"># Optional: check on Windows</span></span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="testing-and-validation">Testing and Validation<a class="anchor" aria-label="anchor" href="#testing-and-validation"></a></h3>
 <p>The package uses the <code>dev/</code> directory for development scripts and example data: - <code>dev/demo.R</code> - Complete usage examples - <code>dev/net/</code> - Sample network data files - Development scripts for stress testing and error handling</p>
 </div>
@@ -142,7 +163,7 @@
 <h2 id="common-operations">Common Operations<a class="anchor" aria-label="anchor" href="#common-operations"></a></h2>
 <div class="section level3">
 <h3 id="building-a-network">Building a Network<a class="anchor" aria-label="anchor" href="#building-a-network"></a></h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Authenticate</span></span>
 <span><span class="va">auth_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_token.html">get_token</a></span><span class="op">(</span><span class="va">identifier</span>, <span class="va">password</span><span class="op">)</span></span>
 <span><span class="va">token</span> <span class="op">&lt;-</span> <span class="va">auth_object</span><span class="op">$</span><span class="va">accessJwt</span></span>
@@ -159,13 +180,70 @@
 <div class="section level3">
 <h3 id="token-management">Token Management<a class="anchor" aria-label="anchor" href="#token-management"></a></h3>
 <p>Always handle token refresh in long-running operations:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check token validity</span></span>
 <span><span class="fu"><a href="reference/verify_token.html">verify_token</a></span><span class="op">(</span><span class="va">token</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Refresh if needed</span></span>
 <span><span class="va">new_auth</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/refresh_token.html">refresh_token</a></span><span class="op">(</span><span class="va">refresh_tok</span><span class="op">)</span></span>
 <span><span class="va">token</span> <span class="op">&lt;-</span> <span class="va">new_auth</span><span class="op">$</span><span class="va">accessJwt</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="technical-insights--code-quality">Technical Insights &amp; Code Quality<a class="anchor" aria-label="anchor" href="#technical-insights--code-quality"></a></h2>
+<div class="section level3">
+<h3 id="key-function-improvements-made">Key Function Improvements Made<a class="anchor" aria-label="anchor" href="#key-function-improvements-made"></a></h3>
+<p>During development, several functions were enhanced for robustness:</p>
+<p><strong><code><a href="reference/extract_follow_subjects.html">extract_follow_subjects()</a></code> Enhancement:</strong></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Before: Used sapply() which could return different types</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">follow_records</span>, <span class="kw">function</span><span class="op">(</span><span class="va">record</span><span class="op">)</span> <span class="va">record</span><span class="op">$</span><span class="va">value</span><span class="op">$</span><span class="va">subject</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># After: Use vapply() for type safety</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">follow_records</span>, <span class="kw">function</span><span class="op">(</span><span class="va">record</span><span class="op">)</span> <span class="va">record</span><span class="op">$</span><span class="va">value</span><span class="op">$</span><span class="va">subject</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Input Validation Pattern:</strong></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Always validate inputs early in functions</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">follow_records</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"follow_records cannot be NULL"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">follow_records</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="documentation-best-practices">Documentation Best Practices<a class="anchor" aria-label="anchor" href="#documentation-best-practices"></a></h3>
+<p><strong>Roxygen2 Guidelines:</strong> - Use single backslashes: <code>\describe{}</code>, <code>\item{}</code>, <code>\code{}</code> - Wrap API examples in <code>\dontrun{}</code> to prevent execution during check - Include comprehensive parameter descriptions with type information - Add cross-references with <code>\seealso</code> and function families</p>
+<p><strong>Example Documentation Pattern:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' @param handle Character vector. Bluesky handles (e.g., "user.bsky.social")</span></span>
+<span><span class="co">#' @param token Character. Authentication token from \code{\link{get_token}}</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @return A tibble with user profile information containing:</span></span>
+<span><span class="co">#' \describe{</span></span>
+<span><span class="co">#'   \item{handle}{Character. User handle}</span></span>
+<span><span class="co">#'   \item{displayName}{Character. Display name}</span></span>
+<span><span class="co">#'   \item{description}{Character. Profile bio}</span></span>
+<span><span class="co">#' }</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @examples</span></span>
+<span><span class="co">#' \dontrun{</span></span>
+<span><span class="co">#' auth &lt;- get_token("your.handle.bsky.social", "your-app-password")</span></span>
+<span><span class="co">#' profiles &lt;- get_profiles("example.bsky.social", auth$accessJwt)</span></span>
+<span><span class="co">#' }</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="git-workflow-patterns">Git Workflow Patterns<a class="anchor" aria-label="anchor" href="#git-workflow-patterns"></a></h3>
+<p><strong>Commit Message Template:</strong></p>
+<pre><code>action: brief description
+
+- Specific change 1 with technical details
+- Specific change 2 with impact explanation
+- Achievement metrics (e.g., "Package now passes R CMD check")
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 </div>
 </div>
 </div>
