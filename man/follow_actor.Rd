@@ -62,6 +62,9 @@ for (i in 1:nrow(profiles)) {
 \code{\link{get_profiles}}
 
 Other follow-management: 
+\code{\link{extract_follow_subjects}()},
+\code{\link{find_follow_record}()},
+\code{\link{get_all_follow_records}()},
 \code{\link{unfollow_actor}()}
 }
 \concept{follow-management}

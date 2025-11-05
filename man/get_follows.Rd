@@ -58,6 +58,8 @@ names(all_follows) <- users
 \code{\link{get_followers}}, \code{\link{get_profiles}}
 
 Other api-wrappers: 
-\code{\link{get_profiles}()}
+\code{\link{get_followers}()},
+\code{\link{get_profiles}()},
+\code{\link{get_user_posts}()}
 }
 \concept{api-wrappers}

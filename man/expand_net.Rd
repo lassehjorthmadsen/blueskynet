@@ -106,6 +106,7 @@ large_expansion <- expand_net(
 
 Other network-building: 
 \code{\link{build_network}()},
-\code{\link{init_net}()}
+\code{\link{init_net}()},
+\code{\link{trim_net}()}
 }
 \concept{network-building}

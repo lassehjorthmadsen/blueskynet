@@ -86,6 +86,7 @@ print(top_central)
 
 Other network-building: 
 \code{\link{expand_net}()},
-\code{\link{init_net}()}
+\code{\link{init_net}()},
+\code{\link{trim_net}()}
 }
 \concept{network-building}

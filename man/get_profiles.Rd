@@ -69,6 +69,8 @@ popular_users <- profiles[profiles$followersCount > 1000, ]
 \code{\link{get_user_posts}}
 
 Other api-wrappers: 
-\code{\link{get_follows}()}
+\code{\link{get_followers}()},
+\code{\link{get_follows}()},
+\code{\link{get_user_posts}()}
 }
 \concept{api-wrappers}

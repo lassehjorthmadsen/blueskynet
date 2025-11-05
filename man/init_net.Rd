@@ -59,6 +59,7 @@ print(paste("Network contains", unique_actors, "unique users"))
 
 Other network-building: 
 \code{\link{build_network}()},
-\code{\link{expand_net}()}
+\code{\link{expand_net}()},
+\code{\link{trim_net}()}
 }
 \concept{network-building}

@@ -2,22 +2,83 @@
 % Please edit documentation in R/wrappers.R
 \name{get_all_follow_records}
 \alias{get_all_follow_records}
-\title{Get all follow records from user's repository}
+\title{Get complete follow records from user repository}
 \usage{
 get_all_follow_records(my_did, token, max_retries = 3, retry_delay = 5)
 }
 \arguments{
-\item{my_did}{character, did-identification of the user}
+\item{my_did}{Character. Your decentralized identifier (DID) from
+\code{\link{get_token}} response}
 
-\item{token}{character, api token}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{max_retries}{integer, maximum number of retries on failure}
+\item{max_retries}{Integer. Maximum number of retries on failure (default 3)}
 
-\item{retry_delay}{numeric, delay in seconds between retries}
+\item{retry_delay}{Numeric. Delay in seconds between retries (default 5)}
 }
 \value{
-list of all follow records with uri, cid, and value fields
+A list of follow record objects, each containing:
+\describe{
+\item{uri}{Character. Unique record identifier (contains rkey)}
+\item{cid}{Character. Content identifier}
+\item{value}{List. Record content with 'subject' (target DID) and metadata}
+}
+Each record represents one follow relationship you've created.
 }
 \description{
-Get all follow records from user's repository
+Retrieves all follow records from a user's personal repository on Bluesky.
+This provides more detailed follow relationship data than \code{\link{get_follows}},
+including record keys needed for \code{\link{unfollow_actor}} operations.
+Useful for follow/unfollow management and relationship analysis.
 }
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+my_did <- auth$did
+
+# Get all your follow records
+all_follows <- get_all_follow_records(my_did, token)
+print(paste("You are following", length(all_follows), "users"))
+
+# Extract just the DIDs of people you follow
+followed_dids <- extract_follow_subjects(all_follows)
+head(followed_dids)
+
+# Find a specific follow record
+target_profile <- get_profiles("example.bsky.social", token)
+target_record <- find_follow_record(all_follows, target_profile$did)
+
+if (!is.null(target_record)) {
+  # Unfollow using the record key
+  rkey <- basename(target_record$uri)
+  unfollow_actor(my_did, rkey, token)
+}
+
+# Bulk unfollow inactive users (example workflow)
+recent_active <- get_profiles(followed_dids[1:50], token)
+old_follows <- recent_active[recent_active$postsCount < 5, ]
+
+for (did in old_follows$did) {
+  record <- find_follow_record(all_follows, did)
+  if (!is.null(record)) {
+    rkey <- basename(record$uri)
+    unfollow_actor(my_did, rkey, token)
+    Sys.sleep(1) # Rate limiting
+  }
+}
+}
+
+}
+\seealso{
+\code{\link{unfollow_actor}}, \code{\link{find_follow_record}},
+\code{\link{extract_follow_subjects}}
+
+Other follow-management: 
+\code{\link{extract_follow_subjects}()},
+\code{\link{find_follow_record}()},
+\code{\link{follow_actor}()},
+\code{\link{unfollow_actor}()}
+}
+\concept{follow-management}

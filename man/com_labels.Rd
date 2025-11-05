@@ -58,5 +58,8 @@ labels <- com_labels(net$profiles, top = 3)
 }
 \seealso{
 \code{\link{add_metrics}}, \code{\link{word_freqs}}
+
+Other network-analysis: 
+\code{\link{add_metrics}()}
 }
 \concept{network-analysis}

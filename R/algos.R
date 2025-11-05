@@ -198,23 +198,107 @@ expand_net <- function(net,
 }
 
 
-#' Trim network
+#' Clean and trim network to create cohesive community
 #'
-#' Iteratively trims a network so that the set of actors and the set of follows are identical.
-#' Also excludes rows with NA in either actors or follows columns or invalid handle. Finally,
-#' excludes actors with less that a certain number of followers within the network.
+#' Iteratively refines a network by removing isolated users and applying follower
+#' thresholds to create a cohesive community where every user both follows and
+#' is followed by others within the network. This produces cleaner network
+#' visualizations and more meaningful community analysis.
 #'
-#' @param net tibble with network connections (edges). Assumed to contain two columns:
-#' `actor_handle` (the Blue Sky Social actor who is followING another) and `follows_handle`
-#' (the actor being followed).
-#' @param threshold the threshold for including actors in the expansion: How many
-#' followers must a prospect have, to be considered? If smaller than 1, threshold is used
-#' as a proportion: How big a proportion must a prospect have, to be considered?
+#' @param net Tibble. Network edge list with follow relationships containing:
+#' \\describe{
+#'   \\item{actor_handle}{Character. User who is following another}
+#'   \\item{follows_handle}{Character. User being followed}
+#' }
+#' @param threshold Numeric. Inclusion threshold for users:
+#' \\describe{
+#'   \\item{>= 1}{Minimum number of followers within the network required}
+#'   \\item{< 1}{Minimum proportion of network that must follow the user}
+#' }
 #'
-#' @return tibble with the expanded network
+#' @return Tibble. Cleaned network with the same structure as input but with:
+#' \\itemize{
+#'   \\item{All duplicate edges removed}
+#'   \\item{Invalid handles and NA values excluded}
+#'   \\item{Users below follower threshold removed}
+#'   \\item{Only users who both follow and are followed within the network}
+#' }
+#'   The resulting network forms a more cohesive community for analysis.
+#'
+#' @details
+#' The trimming process works iteratively:
+#' \\enumerate{
+#'   \\item{Remove duplicate connections and invalid/missing handles}
+#'   \\item{Count followers for each user within the network}
+#'   \\item{Remove users below the specified threshold}
+#'   \\item{Keep only users who appear as both followers and followed}
+#'   \\item{Repeat until the network stabilizes}
+#' }
+#'
+#' This creates a "core community" where every member has meaningful
+#' connections within the group, improving visualization quality and
+#' analytical insights.
+#'
+#' @family network-building
+#' @seealso \\code{\\link{expand_net}}, \\code{\\link{build_network}},
+#'   \\code{\\link{add_metrics}}
+#'
+#' @examples
+#' \\dontrun{
+#' # Build an initial network
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' initial_net <- init_net(
+#'   c("scientist1.bsky.social", "researcher2.bsky.social"),
+#'   c("science", "research"),
+#'   auth$accessJwt
+#' )
+#'
+#' # Expand the network
+#' expanded <- expand_net(
+#'   net = initial_net,
+#'   keywords = c("science", "research", "academic"),
+#'   token = auth$accessJwt,
+#'   refresh_tok = auth$refreshJwt,
+#'   threshold = 5,
+#'   max_iterations = 10
+#' )
+#'
+#' # Before trimming - show network size
+#' cat("Before trimming:")
+#' cat("  Unique actors:", length(unique(expanded$net$actor_handle)))
+#' cat("  Unique follows:", length(unique(expanded$net$follows_handle)))
+#' cat("  Total connections:", nrow(expanded$net))
+#'
+#' # Trim to create cohesive community (need 10+ internal followers)
+#' trimmed_net <- trim_net(expanded$net, threshold = 10)
+#'
+#' # After trimming - show the refined network
+#' cat("After trimming:")
+#' cat("  Unique users:", length(unique(trimmed_net$actor_handle)))
+#' cat("  Total connections:", nrow(trimmed_net))
+#'
+#' # Verify all users both follow and are followed
+#' actors <- unique(trimmed_net$actor_handle)
+#' follows <- unique(trimmed_net$follows_handle)
+#' cat("Network cohesion check:")
+#' cat("  All actors also appear as follows:", all(actors %in% follows))
+#' cat("  All follows also appear as actors:", all(follows %in% actors))
+#'
+#' # Compare network density before and after
+#' users_before <- length(unique(c(expanded$net$actor_handle, expanded$net$follows_handle)))
+#' users_after <- length(unique(c(trimmed_net$actor_handle, trimmed_net$follows_handle)))
+#' density_before <- nrow(expanded$net) / (users_before * (users_before - 1))
+#' density_after <- nrow(trimmed_net) / (users_after * (users_after - 1))
+#'
+#' cat("Network density improved from", round(density_before, 4), "to", round(density_after, 4))
+#'
+#' # Use proportional threshold for smaller networks
+#' # Require at least 20% of network to follow each user
+#' proportional_trim <- trim_net(initial_net, threshold = 0.2)
+#' }
+#'
 #' @importFrom rlang .data
 #' @export
-#'
 trim_net <- function(net, threshold) {
 
   net <- net |>
@@ -323,16 +407,103 @@ init_net <- function(key_actors, keywords, token) {
 }
 
 
-#' Add selected network metrics to actors
+#' Add network analysis metrics to user profiles
 #'
-#' @param profiles tibble with list of actors in net
-#' @param net tibble with two columns, two columns: `actor_handle`
-#' (the Blue Sky Social actor who is followING another) and `follows_handle`
-#' (the actor being followed).
+#' Computes and adds comprehensive network analysis metrics to user profile data.
+#' This function calculates centrality measures, community detection, and PageRank
+#' scores to identify influential users and network structure within your Bluesky
+#' social network.
 #'
-#' @return tibble with profiles and extra columns for metrics
+#' @param profiles Tibble. User profile information from \\code{\\link{get_profiles}}
+#'   containing at least handle and other profile details
+#' @param net Tibble. Network edge list with follow relationships containing:
+#' \\describe{
+#'   \\item{actor_handle}{Character. User who is following another}
+#'   \\item{follows_handle}{Character. User being followed}
+#' }
+#'
+#' @return Tibble with original profile data enhanced with network metrics:
+#' \\describe{
+#'   \\item{centrality}{Numeric. Betweenness centrality score (influence as bridge)}
+#'   \\item{community}{Integer. Community assignment from cluster analysis}
+#'   \\item{pageRank}{Numeric. PageRank score (influence based on follower quality)}
+#'   \\item{insideFollowers}{Integer. Number of followers within this network}
+#'   \\item{community_label}{Character. Descriptive label for the community}
+#' }
+#'   Plus all original profile columns (handle, displayName, description, etc.)
+#'
+#' @details
+#' The function performs several network analysis computations:
+#' \\itemize{
+#'   \\item{Betweenness centrality: Identifies users who act as bridges between communities}
+#'   \\item{Community detection: Uses random walks to find densely connected groups}
+#'   \\item{PageRank: Measures influence based on follower network quality}
+#'   \\item{Inside followers: Counts followers within the analyzed network subset}
+#'   \\item{Community labels: Generates descriptive labels using TF-IDF of user bios}
+#' }
+#'
+#' @family network-analysis
+#' @seealso \\code{\\link{build_network}}, \\code{\\link{com_labels}},
+#'   \\code{\\link{create_widget}}
+#'
+#' @examples
+#' \\dontrun{
+#' # Build a network first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' network_result <- build_network(
+#'   key_actors = c("scientist.bsky.social", "researcher.bsky.social"),
+#'   keywords = c("science", "research", "academic"),
+#'   token = auth$accessJwt,
+#'   refresh_tok = auth$refreshJwt,
+#'   threshold = 10
+#' )
+#'
+#' # Add comprehensive metrics to profiles
+#' enhanced_profiles <- add_metrics(network_result$profiles, network_result$net)
+#'
+#' # Examine the most central (influential) users
+#' top_central <- enhanced_profiles[
+#'   order(enhanced_profiles$centrality, decreasing = TRUE),
+#' ][1:10, c("displayName", "handle", "centrality", "pageRank")]
+#' print(top_central)
+#'
+#' # Find the most influential users by PageRank
+#' top_pagerank <- enhanced_profiles[
+#'   order(enhanced_profiles$pageRank, decreasing = TRUE),
+#' ][1:10, c("displayName", "handle", "pageRank", "followersCount")]
+#' print(top_pagerank)
+#'
+#' # Analyze community structure
+#' community_summary <- enhanced_profiles |>
+#'   group_by(community, community_label) |>
+#'   summarise(
+#'     members = n(),
+#'     avg_followers = mean(followersCount, na.rm = TRUE),
+#'     avg_centrality = mean(centrality, na.rm = TRUE),
+#'     .groups = "drop"
+#'   ) |>
+#'   arrange(desc(members))
+#' print(community_summary)
+#'
+#' # Find users who bridge communities (high centrality)
+#' bridge_users <- enhanced_profiles[
+#'   enhanced_profiles$centrality > quantile(enhanced_profiles$centrality, 0.9, na.rm = TRUE),
+#'   c("displayName", "handle", "centrality", "community_label")
+#' ]
+#' print(bridge_users)
+#'
+#' # Compare internal vs external influence
+#' influence_comparison <- enhanced_profiles |>
+#'   select(handle, followersCount, insideFollowers, pageRank) |>
+#'   mutate(
+#'     external_followers = followersCount - insideFollowers,
+#'     influence_ratio = insideFollowers / followersCount
+#'   ) |>
+#'   arrange(desc(influence_ratio))
+#' head(influence_comparison, 10)
+#' }
+#'
 #' @export
-#'
 add_metrics <- function(profiles, net) {
 
   # Compute centrality metrics
@@ -373,19 +544,101 @@ add_metrics <- function(profiles, net) {
 }
 
 
-#' Create a 3d-widget
+#' Create interactive 3D network visualization widget
 #'
-#' @param net tibble with two columns, two columns: `actor_handle`
-#' (the Blue Sky actor who is followING another) and `follows_handle`
-#' (the actor being followed).
-#' @param profiles tibble with list of actors in net
-#' @param prop proportion of the actors sampled for visualization
+#' Creates an interactive 3D visualization of your Bluesky social network using
+#' WebGL. The visualization shows users as nodes colored by community membership
+#' and connections as edges, allowing you to explore network structure, identify
+#' clusters, and understand relationship patterns in your social network.
 #'
-#' @return html widget
+#' @param net Tibble. Network edge list with follow relationships containing:
+#' \\describe{
+#'   \\item{actor_handle}{Character. User who is following another}
+#'   \\item{follows_handle}{Character. User being followed}
+#' }
+#' @param profiles Tibble. User profile information from \\code{\\link{get_profiles}}
+#'   containing handle, displayName, description and other profile details
+#' @param prop Numeric. Proportion of users to include in visualization (0-1).
+#'   Use smaller values for large networks to improve performance (default 1.0)
+#'
+#' @return An interactive HTML widget (threejs object) that displays:
+#' \\itemize{
+#'   \\item{Nodes representing users, colored by community}
+#'   \\item{Edges representing follow relationships}
+#'   \\item{Interactive controls for rotation, zoom, and exploration}
+#'   \\item{Hover tooltips showing user information}
+#' }
+#'
+#' @details
+#' The visualization process includes:
+#' \\enumerate{
+#'   \\item{Community detection using random walk algorithm}
+#'   \\item{Color assignment based on community membership}
+#'   \\item{Node labeling with user display names and descriptions}
+#'   \\item{3D layout generation for optimal viewing}
+#' }
+#'
+#' For large networks (1000+ users), consider using \\code{prop < 1} to sample
+#' a subset for better performance. The widget works best with networks of
+#' 50-500 users for detailed exploration.
+#'
+#' @family network-visualization
+#' @seealso \\code{\\link{build_network}}, \\code{\\link{add_metrics}},
+#'   \\code{\\link{trim_net}}
+#'
+#' @examples
+#' \\dontrun{
+#' # Build a network for visualization
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' network <- build_network(
+#'   key_actors = c("scientist.bsky.social", "researcher.bsky.social"),
+#'   keywords = c("science", "research", "academic"),
+#'   token = auth$accessJwt,
+#'   refresh_tok = auth$refreshJwt,
+#'   threshold = 15,
+#'   prop = 0.3  # Sample 30% for manageable size
+#' )
+#'
+#' # Create full network visualization
+#' full_widget <- create_widget(network$net, network$profiles, prop = 1.0)
+#'
+#' # Display the interactive visualization
+#' full_widget
+#'
+#' # Create smaller sample for performance
+#' sample_widget <- create_widget(network$net, network$profiles, prop = 0.5)
+#' sample_widget
+#'
+#' # For very large networks, use even smaller samples
+#' if (nrow(network$profiles) > 500) {
+#'   performance_widget <- create_widget(network$net, network$profiles, prop = 0.2)
+#' } else {
+#'   performance_widget <- create_widget(network$net, network$profiles, prop = 0.8)
+#' }
+#'
+#' # Save widget as HTML file for sharing
+#' if (requireNamespace("htmlwidgets", quietly = TRUE)) {
+#'   htmlwidgets::saveWidget(full_widget, "network_visualization.html")
+#'   message("Visualization saved as network_visualization.html")
+#' }
+#'
+#' # Customize for specific communities
+#' # Filter to show only the largest communities
+#' profiles_with_metrics <- add_metrics(network$profiles, network$net)
+#' large_communities <- profiles_with_metrics[
+#'   profiles_with_metrics$community %in% c(1, 2, 3),  # Top 3 communities
+#' ]
+#' filtered_net <- network$net[
+#'   network$net$actor_handle %in% large_communities$handle &
+#'   network$net$follows_handle %in% large_communities$handle,
+#' ]
+#' focused_widget <- create_widget(filtered_net, large_communities, prop = 1.0)
+#' focused_widget
+#' }
+#'
 #' @importFrom igraph V
 #' @importFrom tidygraph activate as_tbl_graph
 #' @export
-#'
 create_widget <- function(net, profiles, prop = 1) {
 
   if (prop < 1) {

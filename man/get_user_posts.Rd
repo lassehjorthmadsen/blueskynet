@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrappers.R
 \name{get_user_posts}
 \alias{get_user_posts}
-\title{Get posts from a specific user}
+\title{Retrieve posts from a Bluesky user}
 \usage{
 get_user_posts(
   actor,
@@ -15,28 +15,95 @@ get_user_posts(
 )
 }
 \arguments{
-\item{actor}{character, the handle or DID of the user}
+\item{actor}{Character. User handle (e.g., "username.bsky.social") or DID
+of the user whose posts you want to retrieve}
 
-\item{token}{character, authentication token}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{max_retries}{integer, maximum number of retries}
+\item{max_retries}{Integer. Number of times to retry on failure (default 3)}
 
-\item{retry_delay}{real, delay in seconds between retries}
+\item{retry_delay}{Numeric. Delay in seconds between retries (default 5)}
 
-\item{filter}{character, posts to filter for. Possible values
-"posts_with_replies", "posts_no_replies", "posts_with_media",
-"posts_and_author_threads", "posts_with_video."}
+\item{filter}{Character. Type of posts to retrieve (default "posts_no_replies"):
+\describe{
+\item{posts_no_replies}{Original posts only, no replies}
+\item{posts_with_replies}{All posts including replies}
+\item{posts_with_media}{Posts containing images or videos}
+\item{posts_and_author_threads}{Posts and thread continuations}
+\item{posts_with_video}{Posts containing video content}
+}}
 
-\item{limit}{integer, max number of posts}
+\item{limit}{Integer. Maximum number of posts to retrieve (default 100)}
 
-\item{return_df}{boolean, return responses as tibble}
+\item{return_df}{Logical. Return as tibble (TRUE) or raw JSON list (FALSE)}
 }
 \value{
-tibble or json string with posts information
+If \code{return_df = TRUE}, a tibble with post information:
+\describe{
+\item{actor}{Character. The user who made the post}
+\item{uri}{Character. Unique post identifier}
+\item{cid}{Character. Content identifier}
+\item{author_did}{Character. Author's DID}
+\item{author_handle}{Character. Author's handle}
+\item{author_displayName}{Character. Author's display name}
+\item{text}{Character. Post text content}
+\item{created_at}{Character. When the post was created}
+\item{reply_count}{Integer. Number of replies}
+\item{repost_count}{Integer. Number of reposts}
+\item{like_count}{Integer. Number of likes}
+\item{quote_count}{Integer. Number of quote posts}
+}
+If \code{return_df = FALSE}, returns raw JSON response list.
 }
 \description{
-Get posts from a specific user
+Fetches posts from a specific user's timeline on Bluesky Social with various
+filtering options. Useful for content analysis, engagement tracking, and
+understanding user posting patterns. Includes pagination support for large
+post histories and robust error handling for reliable data collection.
 }
-\seealso{
+\section{Endpoint documentation}{
+
 \href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/feed/getAuthorFeed.json}{Endpoint documentation}
 }
+
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+
+# Get recent posts from a user (no replies)
+posts <- get_user_posts("neilhimself.neilgaiman.com", token, limit = 50)
+head(posts[, c("text", "created_at", "like_count")])
+
+# Get posts with media content
+media_posts <- get_user_posts("photographer.bsky.social", token,
+                              filter = "posts_with_media", limit = 20)
+
+# Analyze posting patterns
+user_posts <- get_user_posts("example.bsky.social", token, limit = 200)
+
+# Most engaging posts
+top_posts <- user_posts[order(user_posts$like_count, decreasing = TRUE), ]
+head(top_posts[, c("text", "like_count", "repost_count")], 10)
+
+# Text analysis of posts
+post_words <- word_freqs(user_posts$text, top = 20)
+head(post_words)
+
+# Get raw JSON for custom processing
+raw_posts <- get_user_posts("example.bsky.social", token,
+                            return_df = FALSE, limit = 10)
+str(raw_posts[[1]]) # Examine structure
+}
+
+}
+\seealso{
+\code{\link{get_profiles}}, \code{\link{word_freqs}}
+
+Other api-wrappers: 
+\code{\link{get_followers}()},
+\code{\link{get_follows}()},
+\code{\link{get_profiles}()}
+}
+\concept{api-wrappers}

@@ -431,18 +431,66 @@ get_follows <- function(actor, token, max_retries = 3, retry_delay = 5) {
 }
 
 
-#' Get followers for an actor
+#' Get followers of a Bluesky user
 #'
-#' @param actor account identifier
-#' @param token token for api
-#' @param max_retries number of times to retry on failure (default 3)
-#' @param retry_delay delay in seconds between retries (default 5)
+#' Retrieves all users who follow a specific account on Bluesky Social.
+#' This is the inverse of \code{\link{get_follows}} - while that shows who
+#' a user follows, this shows who follows them. Includes robust error handling
+#' with automatic retries for reliable data collection.
 #'
-#' @return tibble with response information
-#' @export
+#' @param actor Character. User handle (e.g., "username.bsky.social") or DID
+#'   of the account whose followers you want to retrieve
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param max_retries Integer. Number of times to retry on failure (default 3)
+#' @param retry_delay Numeric. Delay in seconds between retries (default 5)
+#'
+#' @return A tibble with information about followers:
+#' \describe{
+#'   \item{handle}{Character. The follower's handle}
+#'   \item{did}{Character. The follower's DID}
+#'   \item{displayName}{Character. The follower's display name}
+#'   \item{description}{Character. The follower's bio}
+#'   \item{followersCount}{Integer. Number of followers the follower has}
+#'   \item{followsCount}{Integer. Number of accounts the follower follows}
+#'   \item{createdAt}{Character. When the follow relationship was created}
+#' }
+#'   Returns \code{NULL} if the user doesn't exist or is inaccessible.
+#'
+#' @family api-wrappers
+#' @seealso \code{\link{get_follows}}, \code{\link{get_profiles}}
 #'
 #' @section Lexicon references:
-#' [lexicons/app/bsky/graph/getFollowers.json](https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollowers.json)
+#' \href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollowers.json}{lexicons/app/bsky/graph/getFollowers.json}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#'
+#' # Get followers of a popular account
+#' followers <- get_followers("neilhimself.neilgaiman.com", token)
+#' print(paste("User has", nrow(followers), "followers"))
+#'
+#' # Analyze follower demographics
+#' follower_profiles <- get_profiles(followers$handle[1:100], token)
+#' print(summary(follower_profiles$followersCount))
+#'
+#' # Compare follows vs followers for reciprocity analysis
+#' user_handle <- "example.bsky.social"
+#' follows <- get_follows(user_handle, token)
+#' followers <- get_followers(user_handle, token)
+#'
+#' # Find mutual connections (people who follow each other)
+#' mutual <- intersect(follows$handle, followers$handle)
+#' print(paste("Mutual connections:", length(mutual)))
+#'
+#' # Identify influential followers (high follower count)
+#' influential <- followers[followers$followersCount > 1000, ]
+#' head(influential[, c("displayName", "handle", "followersCount")])
+#' }
+#'
+#' @export
 #'
 get_followers <- function(actor, token, max_retries = 3, retry_delay = 5) {
   attempt_request <- function(req, attempt = 1) {
@@ -633,19 +681,83 @@ get_profiles <- function(actors, token, chunksize = 25, max_retries = 3, retry_d
 }
 
 
-#' Get posts from a specific user
+#' Retrieve posts from a Bluesky user
 #'
-#' @param actor character, the handle or DID of the user
-#' @param token character, authentication token
-#' @param filter character, posts to filter for. Possible values
-#' "posts_with_replies", "posts_no_replies", "posts_with_media",
-#' "posts_and_author_threads", "posts_with_video."
-#' @param max_retries integer, maximum number of retries
-#' @param retry_delay real, delay in seconds between retries
-#' @param limit integer, max number of posts
-#' @param return_df boolean, return responses as tibble
-#' @return tibble or json string with posts information
-#' @seealso [Endpoint documentation](https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/feed/getAuthorFeed.json)
+#' Fetches posts from a specific user's timeline on Bluesky Social with various
+#' filtering options. Useful for content analysis, engagement tracking, and
+#' understanding user posting patterns. Includes pagination support for large
+#' post histories and robust error handling for reliable data collection.
+#'
+#' @param actor Character. User handle (e.g., "username.bsky.social") or DID
+#'   of the user whose posts you want to retrieve
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param max_retries Integer. Number of times to retry on failure (default 3)
+#' @param retry_delay Numeric. Delay in seconds between retries (default 5)
+#' @param filter Character. Type of posts to retrieve (default "posts_no_replies"):
+#' \describe{
+#'   \item{posts_no_replies}{Original posts only, no replies}
+#'   \item{posts_with_replies}{All posts including replies}
+#'   \item{posts_with_media}{Posts containing images or videos}
+#'   \item{posts_and_author_threads}{Posts and thread continuations}
+#'   \item{posts_with_video}{Posts containing video content}
+#' }
+#' @param limit Integer. Maximum number of posts to retrieve (default 100)
+#' @param return_df Logical. Return as tibble (TRUE) or raw JSON list (FALSE)
+#'
+#' @return If \code{return_df = TRUE}, a tibble with post information:
+#' \describe{
+#'   \item{actor}{Character. The user who made the post}
+#'   \item{uri}{Character. Unique post identifier}
+#'   \item{cid}{Character. Content identifier}
+#'   \item{author_did}{Character. Author's DID}
+#'   \item{author_handle}{Character. Author's handle}
+#'   \item{author_displayName}{Character. Author's display name}
+#'   \item{text}{Character. Post text content}
+#'   \item{created_at}{Character. When the post was created}
+#'   \item{reply_count}{Integer. Number of replies}
+#'   \item{repost_count}{Integer. Number of reposts}
+#'   \item{like_count}{Integer. Number of likes}
+#'   \item{quote_count}{Integer. Number of quote posts}
+#' }
+#'   If \code{return_df = FALSE}, returns raw JSON response list.
+#'
+#' @family api-wrappers
+#' @seealso \code{\link{get_profiles}}, \code{\link{word_freqs}}
+#'
+#' @section Endpoint documentation:
+#' \href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/feed/getAuthorFeed.json}{Endpoint documentation}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#'
+#' # Get recent posts from a user (no replies)
+#' posts <- get_user_posts("neilhimself.neilgaiman.com", token, limit = 50)
+#' head(posts[, c("text", "created_at", "like_count")])
+#'
+#' # Get posts with media content
+#' media_posts <- get_user_posts("photographer.bsky.social", token,
+#'                               filter = "posts_with_media", limit = 20)
+#'
+#' # Analyze posting patterns
+#' user_posts <- get_user_posts("example.bsky.social", token, limit = 200)
+#'
+#' # Most engaging posts
+#' top_posts <- user_posts[order(user_posts$like_count, decreasing = TRUE), ]
+#' head(top_posts[, c("text", "like_count", "repost_count")], 10)
+#'
+#' # Text analysis of posts
+#' post_words <- word_freqs(user_posts$text, top = 20)
+#' head(post_words)
+#'
+#' # Get raw JSON for custom processing
+#' raw_posts <- get_user_posts("example.bsky.social", token,
+#'                             return_df = FALSE, limit = 10)
+#' str(raw_posts[[1]]) # Examine structure
+#' }
+#'
 #' @export
 get_user_posts <- function(actor, token, max_retries = 3, retry_delay = 5, filter = "posts_no_replies", limit = 100, return_df = TRUE) {
   attempt_request <- function(req, attempt = 1) {
@@ -743,14 +855,70 @@ get_user_posts <- function(actor, token, max_retries = 3, retry_delay = 5, filte
 }
 
 
-#' Get all follow records from user's repository
+#' Get complete follow records from user repository
 #'
-#' @param my_did character, did-identification of the user
-#' @param token character, api token
-#' @param max_retries integer, maximum number of retries on failure
-#' @param retry_delay numeric, delay in seconds between retries
+#' Retrieves all follow records from a user's personal repository on Bluesky.
+#' This provides more detailed follow relationship data than \code{\link{get_follows}},
+#' including record keys needed for \code{\link{unfollow_actor}} operations.
+#' Useful for follow/unfollow management and relationship analysis.
 #'
-#' @return list of all follow records with uri, cid, and value fields
+#' @param my_did Character. Your decentralized identifier (DID) from
+#'   \code{\link{get_token}} response
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param max_retries Integer. Maximum number of retries on failure (default 3)
+#' @param retry_delay Numeric. Delay in seconds between retries (default 5)
+#'
+#' @return A list of follow record objects, each containing:
+#' \describe{
+#'   \item{uri}{Character. Unique record identifier (contains rkey)}
+#'   \item{cid}{Character. Content identifier}
+#'   \item{value}{List. Record content with 'subject' (target DID) and metadata}
+#' }
+#'   Each record represents one follow relationship you've created.
+#'
+#' @family follow-management
+#' @seealso \code{\link{unfollow_actor}}, \code{\link{find_follow_record}},
+#'   \code{\link{extract_follow_subjects}}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#' my_did <- auth$did
+#'
+#' # Get all your follow records
+#' all_follows <- get_all_follow_records(my_did, token)
+#' print(paste("You are following", length(all_follows), "users"))
+#'
+#' # Extract just the DIDs of people you follow
+#' followed_dids <- extract_follow_subjects(all_follows)
+#' head(followed_dids)
+#'
+#' # Find a specific follow record
+#' target_profile <- get_profiles("example.bsky.social", token)
+#' target_record <- find_follow_record(all_follows, target_profile$did)
+#'
+#' if (!is.null(target_record)) {
+#'   # Unfollow using the record key
+#'   rkey <- basename(target_record$uri)
+#'   unfollow_actor(my_did, rkey, token)
+#' }
+#'
+#' # Bulk unfollow inactive users (example workflow)
+#' recent_active <- get_profiles(followed_dids[1:50], token)
+#' old_follows <- recent_active[recent_active$postsCount < 5, ]
+#'
+#' for (did in old_follows$did) {
+#'   record <- find_follow_record(all_follows, did)
+#'   if (!is.null(record)) {
+#'     rkey <- basename(record$uri)
+#'     unfollow_actor(my_did, rkey, token)
+#'     Sys.sleep(1) # Rate limiting
+#'   }
+#' }
+#' }
+#'
 #' @export
 #'
 get_all_follow_records <- function(my_did, token, max_retries = 3, retry_delay = 5) {
@@ -835,11 +1003,62 @@ get_all_follow_records <- function(my_did, token, max_retries = 3, retry_delay =
 
 #' Extract subject DIDs from follow records
 #'
-#' @param follow_records list, output from get_all_follow_records()
+#' Extracts the DIDs (decentralized identifiers) of all users you are following
+#' from the complete follow records retrieved by \\code{\\link{get_all_follow_records}}.
+#' This is useful for getting a simple list of who you follow for analysis or
+#' bulk operations without the full record metadata.
 #'
-#' @return character vector of DIDs
+#' @param follow_records List. Output from \\code{\\link{get_all_follow_records}}
+#'   containing complete follow record objects
+#'
+#' @return Character vector of DIDs for all users you are following.
+#'   Each DID is a unique identifier like "did:plc:abc123xyz..."
+#'
+#' @family follow-management
+#' @seealso \\code{\\link{get_all_follow_records}}, \\code{\\link{find_follow_record}},
+#'   \\code{\\link{get_profiles}}
+#'
+#' @examples
+#' \\dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#' my_did <- auth$did
+#'
+#' # Get all your follow records
+#' all_follows <- get_all_follow_records(my_did, token)
+#' print(paste("You have", length(all_follows), "follow records"))
+#'
+#' # Extract just the DIDs of people you follow
+#' followed_dids <- extract_follow_subjects(all_follows)
+#' print(paste("You are following", length(followed_dids), "unique users"))
+#' head(followed_dids, 5)
+#'
+#' # Use DIDs to get detailed profile information
+#' sample_profiles <- get_profiles(followed_dids[1:10], token)
+#' print(sample_profiles[, c("displayName", "handle", "followersCount")])
+#'
+#' # Count follows by domain
+#' handles_from_dids <- get_profiles(followed_dids, token)$handle
+#' domains <- sapply(strsplit(handles_from_dids, "\\\\."), function(x) {
+#'   if (length(x) >= 2) paste(tail(x, 2), collapse = ".") else x[1]
+#' })
+#' domain_counts <- sort(table(domains), decreasing = TRUE)
+#' head(domain_counts, 10)
+#'
+#' # Find users you follow who follow each other (mutual connections)
+#' mutual_matrix <- matrix(FALSE, length(followed_dids), length(followed_dids))
+#' for (i in seq_along(followed_dids)) {
+#'   user_follows <- get_follows(followed_dids[i], token)
+#'   if (!is.null(user_follows)) {
+#'     user_follow_dids <- get_profiles(user_follows$handle, token)$did
+#'     mutual_matrix[i, ] <- followed_dids %in% user_follow_dids
+#'   }
+#'   Sys.sleep(1) # Rate limiting
+#' }
+#' }
+#'
 #' @export
-#'
 extract_follow_subjects <- function(follow_records) {
   sapply(follow_records, function(record) record$value$subject)
 }
@@ -847,12 +1066,91 @@ extract_follow_subjects <- function(follow_records) {
 
 #' Find follow record for specific actor
 #'
-#' @param follow_records list, output from get_all_follow_records()
-#' @param actor_did character, DID to search for
+#' Searches through your complete follow records to find the specific record
+#' for a given user. This is essential for unfollow operations since you need
+#' the record key (rkey) from the original follow record to delete it.
 #'
-#' @return single follow record or NULL if not found
+#' @param follow_records List. Output from \\code{\\link{get_all_follow_records}}
+#'   containing all your follow record objects
+#' @param actor_did Character. The DID (decentralized identifier) of the user
+#'   you want to find the follow record for
+#'
+#' @return The complete follow record object if found, \\code{NULL} if the user
+#'   is not in your follows. The record contains:
+#' \\describe{
+#'   \\item{uri}{Character. Record URI containing the rkey needed for unfollowing}
+#'   \\item{cid}{Character. Content identifier}
+#'   \\item{value}{List. Record metadata including subject DID and creation time}
+#' }
+#'
+#' @family follow-management
+#' @seealso \\code{\\link{get_all_follow_records}}, \\code{\\link{unfollow_actor}},
+#'   \\code{\\link{extract_follow_subjects}}
+#'
+#' @examples
+#' \\dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#' my_did <- auth$did
+#'
+#' # Get all your follow records
+#' all_follows <- get_all_follow_records(my_did, token)
+#'
+#' # Find a specific user's profile to get their DID
+#' target_profile <- get_profiles("example.bsky.social", token)
+#' target_did <- target_profile$did
+#'
+#' # Find the follow record for that user
+#' follow_record <- find_follow_record(all_follows, target_did)
+#'
+#' if (!is.null(follow_record)) {
+#'   message("Found follow record for user!")
+#'
+#'   # Extract the rkey needed for unfollowing
+#'   rkey <- basename(follow_record$uri)
+#'   message("Record key: ", rkey)
+#'
+#'   # Unfollow the user
+#'   result <- unfollow_actor(my_did, rkey, token)
+#'   if (!is.null(result)) {
+#'     message("Successfully unfollowed user!")
+#'   }
+#' } else {
+#'   message("You are not following this user")
+#' }
+#'
+#' # Batch processing: check if you follow multiple users
+#' users_to_check <- c("user1.bsky.social", "user2.bsky.social", "user3.bsky.social")
+#' check_profiles <- get_profiles(users_to_check, token)
+#'
+#' follow_status <- data.frame(
+#'   handle = check_profiles$handle,
+#'   following = sapply(check_profiles$did, function(did) {
+#'     !is.null(find_follow_record(all_follows, did))
+#'   })
+#' )
+#' print(follow_status)
+#'
+#' # Conditional unfollowing based on criteria
+#' followed_dids <- extract_follow_subjects(all_follows)
+#' followed_profiles <- get_profiles(followed_dids[1:50], token)  # Sample for demo
+#'
+#' # Unfollow users with very low activity (< 5 posts)
+#' inactive_users <- followed_profiles[followed_profiles$postsCount < 5, ]
+#'
+#' for (did in inactive_users$did) {
+#'   record <- find_follow_record(all_follows, did)
+#'   if (!is.null(record)) {
+#'     rkey <- basename(record$uri)
+#'     unfollow_actor(my_did, rkey, token)
+#'     message("Unfollowed inactive user: ", inactive_users$handle[inactive_users$did == did])
+#'     Sys.sleep(1) # Rate limiting
+#'   }
+#' }
+#' }
+#'
 #' @export
-#'
 find_follow_record <- function(follow_records, actor_did) {
   for (record in follow_records) {
     if (record$value$subject == actor_did) {

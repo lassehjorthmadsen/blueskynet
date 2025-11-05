@@ -2,27 +2,79 @@
 % Please edit documentation in R/wrappers.R
 \name{get_followers}
 \alias{get_followers}
-\title{Get followers for an actor}
+\title{Get followers of a Bluesky user}
 \usage{
 get_followers(actor, token, max_retries = 3, retry_delay = 5)
 }
 \arguments{
-\item{actor}{account identifier}
+\item{actor}{Character. User handle (e.g., "username.bsky.social") or DID
+of the account whose followers you want to retrieve}
 
-\item{token}{token for api}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{max_retries}{number of times to retry on failure (default 3)}
+\item{max_retries}{Integer. Number of times to retry on failure (default 3)}
 
-\item{retry_delay}{delay in seconds between retries (default 5)}
+\item{retry_delay}{Numeric. Delay in seconds between retries (default 5)}
 }
 \value{
-tibble with response information
+A tibble with information about followers:
+\describe{
+\item{handle}{Character. The follower's handle}
+\item{did}{Character. The follower's DID}
+\item{displayName}{Character. The follower's display name}
+\item{description}{Character. The follower's bio}
+\item{followersCount}{Integer. Number of followers the follower has}
+\item{followsCount}{Integer. Number of accounts the follower follows}
+\item{createdAt}{Character. When the follow relationship was created}
+}
+Returns \code{NULL} if the user doesn't exist or is inaccessible.
 }
 \description{
-Get followers for an actor
+Retrieves all users who follow a specific account on Bluesky Social.
+This is the inverse of \code{\link{get_follows}} - while that shows who
+a user follows, this shows who follows them. Includes robust error handling
+with automatic retries for reliable data collection.
 }
 \section{Lexicon references}{
 
 \href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollowers.json}{lexicons/app/bsky/graph/getFollowers.json}
 }
 
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+
+# Get followers of a popular account
+followers <- get_followers("neilhimself.neilgaiman.com", token)
+print(paste("User has", nrow(followers), "followers"))
+
+# Analyze follower demographics
+follower_profiles <- get_profiles(followers$handle[1:100], token)
+print(summary(follower_profiles$followersCount))
+
+# Compare follows vs followers for reciprocity analysis
+user_handle <- "example.bsky.social"
+follows <- get_follows(user_handle, token)
+followers <- get_followers(user_handle, token)
+
+# Find mutual connections (people who follow each other)
+mutual <- intersect(follows$handle, followers$handle)
+print(paste("Mutual connections:", length(mutual)))
+
+# Identify influential followers (high follower count)
+influential <- followers[followers$followersCount > 1000, ]
+head(influential[, c("displayName", "handle", "followersCount")])
+}
+
+}
+\seealso{
+\code{\link{get_follows}}, \code{\link{get_profiles}}
+
+Other api-wrappers: 
+\code{\link{get_follows}()},
+\code{\link{get_profiles}()},
+\code{\link{get_user_posts}()}
+}
+\concept{api-wrappers}

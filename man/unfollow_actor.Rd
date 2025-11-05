@@ -58,6 +58,9 @@ if (!is.null(target_record)) {
 \code{\link{find_follow_record}}
 
 Other follow-management: 
-\code{\link{follow_actor}()}
+\code{\link{extract_follow_subjects}()},
+\code{\link{find_follow_record}()},
+\code{\link{follow_actor}()},
+\code{\link{get_all_follow_records}()}
 }
 \concept{follow-management}

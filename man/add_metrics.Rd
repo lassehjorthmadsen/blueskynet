@@ -2,20 +2,110 @@
 % Please edit documentation in R/algos.R
 \name{add_metrics}
 \alias{add_metrics}
-\title{Add selected network metrics to actors}
+\title{Add network analysis metrics to user profiles}
 \usage{
 add_metrics(profiles, net)
 }
 \arguments{
-\item{profiles}{tibble with list of actors in net}
+\item{profiles}{Tibble. User profile information from \\code{\\link{get_profiles}}
+containing at least handle and other profile details}
 
-\item{net}{tibble with two columns, two columns: \code{actor_handle}
-(the Blue Sky Social actor who is followING another) and \code{follows_handle}
-(the actor being followed).}
+\item{net}{Tibble. Network edge list with follow relationships containing:
+\\describe{
+\\item{actor_handle}{Character. User who is following another}
+\\item{follows_handle}{Character. User being followed}
+}}
 }
 \value{
-tibble with profiles and extra columns for metrics
+Tibble with original profile data enhanced with network metrics:
+\\describe{
+\\item{centrality}{Numeric. Betweenness centrality score (influence as bridge)}
+\\item{community}{Integer. Community assignment from cluster analysis}
+\\item{pageRank}{Numeric. PageRank score (influence based on follower quality)}
+\\item{insideFollowers}{Integer. Number of followers within this network}
+\\item{community_label}{Character. Descriptive label for the community}
+}
+Plus all original profile columns (handle, displayName, description, etc.)
 }
 \description{
-Add selected network metrics to actors
+Computes and adds comprehensive network analysis metrics to user profile data.
+This function calculates centrality measures, community detection, and PageRank
+scores to identify influential users and network structure within your Bluesky
+social network.
 }
+\details{
+The function performs several network analysis computations:
+\\itemize{
+\\item{Betweenness centrality: Identifies users who act as bridges between communities}
+\\item{Community detection: Uses random walks to find densely connected groups}
+\\item{PageRank: Measures influence based on follower network quality}
+\\item{Inside followers: Counts followers within the analyzed network subset}
+\\item{Community labels: Generates descriptive labels using TF-IDF of user bios}
+}
+}
+\examples{
+\\dontrun{
+# Build a network first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+network_result <- build_network(
+  key_actors = c("scientist.bsky.social", "researcher.bsky.social"),
+  keywords = c("science", "research", "academic"),
+  token = auth$accessJwt,
+  refresh_tok = auth$refreshJwt,
+  threshold = 10
+)
+
+# Add comprehensive metrics to profiles
+enhanced_profiles <- add_metrics(network_result$profiles, network_result$net)
+
+# Examine the most central (influential) users
+top_central <- enhanced_profiles[
+  order(enhanced_profiles$centrality, decreasing = TRUE),
+][1:10, c("displayName", "handle", "centrality", "pageRank")]
+print(top_central)
+
+# Find the most influential users by PageRank
+top_pagerank <- enhanced_profiles[
+  order(enhanced_profiles$pageRank, decreasing = TRUE),
+][1:10, c("displayName", "handle", "pageRank", "followersCount")]
+print(top_pagerank)
+
+# Analyze community structure
+community_summary <- enhanced_profiles |>
+  group_by(community, community_label) |>
+  summarise(
+    members = n(),
+    avg_followers = mean(followersCount, na.rm = TRUE),
+    avg_centrality = mean(centrality, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(desc(members))
+print(community_summary)
+
+# Find users who bridge communities (high centrality)
+bridge_users <- enhanced_profiles[
+  enhanced_profiles$centrality > quantile(enhanced_profiles$centrality, 0.9, na.rm = TRUE),
+  c("displayName", "handle", "centrality", "community_label")
+]
+print(bridge_users)
+
+# Compare internal vs external influence
+influence_comparison <- enhanced_profiles |>
+  select(handle, followersCount, insideFollowers, pageRank) |>
+  mutate(
+    external_followers = followersCount - insideFollowers,
+    influence_ratio = insideFollowers / followersCount
+  ) |>
+  arrange(desc(influence_ratio))
+head(influence_comparison, 10)
+}
+
+}
+\seealso{
+\\code{\\link{build_network}}, \\code{\\link{com_labels}},
+\\code{\\link{create_widget}}
+
+Other network-analysis: 
+\code{\link{com_labels}()}
+}
+\concept{network-analysis}
