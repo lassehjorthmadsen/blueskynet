@@ -56,5 +56,9 @@ print(paste("Network contains", unique_actors, "unique users"))
 \seealso{
 \code{\link{expand_net}}, \code{\link{build_network}},
 \code{\link{get_follows}}
+
+Other network-building: 
+\code{\link{build_network}()},
+\code{\link{expand_net}()}
 }
 \concept{network-building}

@@ -1,27 +1,80 @@
-#' Expand network
+#' Expand network through iterative growth
 #'
-#' @param net tibble with network connections (edges). Assumed to contain two columns:
-#' `actor_handle` (the Blue Sky Social actor who is followING another) and `follows_handle`
-#' (the actor being followed).
-#' @param keywords character vector with keywords that we check for in actors' description
-#' to determine if they belong in the expanded network
-#' @param token character, token for Blue Sky Social API
-#' @param refresh_tok character, refresh token for Blue Sky Social API
-#' @param save_net boolean, should the net be saved incrementally as it is expanded? Useful
-#' for not losing work in case of unexpected interruptions. Defaults to `FALSE`
-#' @param file_name character, file name of the saved net. Defaults to 'dev/net/bignet_TIMESTAMP.rds'
-#' @param threshold numeric, the threshold for including actors in the expansion: How many
-#' followers must a prospect have, to be considered? If less then 1, interpreted as the *fraction*
-#' of the current net prospects must be followed by, to be considered. Defaults to 30.
-#' @param max_iterations integer, the maximum iterations in the network expansion. Defaults to 50
-#' @param sample_size integer, if we want to expand only with a sample of the prospects;
-#' can be useful for testing purposes. Defaults to `Inf´, e.g. every worthy prospect is included
-#' in the expansion.
+#' Expands an initial network by iteratively finding new users who are followed
+#' by many existing network members and match specified keywords. This is the core
+#' algorithm for growing networks from a seed set of users.
 #'
-#' @return list with a) a tibble with the expanded network: `actor_handle` contains all network member,
-#' `follows_handle` contain all relevant actors that they follow (but not necessarily meeting
-#' the `threshold`.) b) a new token, c) a new refresh token -- since the tokens might have beed
-#' refreshed while underway
+#' @param net Tibble. Initial network with follow relationships, must contain:
+#' \describe{
+#'   \item{actor_handle}{Character. User who is following}
+#'   \item{follows_handle}{Character. User being followed}
+#' }
+#' @param keywords Character vector. Keywords to search for in user profile
+#'   descriptions to determine network membership eligibility
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param refresh_tok Character. Refresh token from \code{\link{get_token}} for
+#'   long-running operations
+#' @param save_net Logical. Should the network be saved incrementally during expansion
+#'   to prevent data loss? (default FALSE)
+#' @param file_name Character. File path for incremental saves. If not provided,
+#'   defaults to 'dev/net/bignet_TIMESTAMP.rds'
+#' @param threshold Numeric. Inclusion threshold for new users:
+#' \describe{
+#'   \item{>= 1}{Minimum number of existing network members who must follow a prospect}
+#'   \item{< 1}{Fraction of network members who must follow a prospect}
+#' }
+#' @param max_iterations Integer. Maximum number of expansion iterations (default 50)
+#' @param sample_size Integer. Maximum prospects to consider per iteration.
+#'   Use \code{Inf} for no limit (default), smaller values for testing
+#'
+#' @return A list containing the expanded network results:
+#' \describe{
+#'   \item{net}{Tibble. Expanded network with all follow relationships discovered}
+#'   \item{token}{Character. Updated access token (may have been refreshed)}
+#'   \item{refresh_tok}{Character. Updated refresh token}
+#'   \item{profiles}{Tibble. Profile information for all network members}
+#'   \item{iterations}{Integer. Number of iterations completed}
+#' }
+#'
+#' @family network-building
+#' @seealso \code{\link{init_net}}, \code{\link{build_network}},
+#'   \code{\link{trim_net}}
+#'
+#' @examples
+#' \dontrun{
+#' # Start with an initial network
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#' refresh_tok <- auth$refreshJwt
+#'
+#' # Create initial network
+#' initial <- init_net("example.scientist.bsky.social",
+#'                     c("research", "science"), token)
+#'
+#' # Expand the network - conservative approach
+#' expanded <- expand_net(
+#'   net = initial,
+#'   keywords = c("research", "science", "academic", "PhD"),
+#'   token = token,
+#'   refresh_tok = refresh_tok,
+#'   threshold = 5,        # Need 5+ followers from existing network
+#'   max_iterations = 10,  # Limit iterations for testing
+#'   save_net = TRUE       # Save progress incrementally
+#' )
+#'
+#' print(paste("Network grew from", nrow(initial), "to",
+#'             nrow(expanded$net), "connections"))
+#'
+#' # More aggressive expansion with lower threshold
+#' large_expansion <- expand_net(
+#'   net = expanded$net,
+#'   keywords = c("research", "science", "academic"),
+#'   token = expanded$token,
+#'   refresh_tok = expanded$refresh_tok,
+#'   threshold = 0.1,      # 10% of network must follow prospect
+#'   max_iterations = 25
+#' )
+#' }
 #'
 #' @importFrom rlang .data
 #' @importFrom cli cli_progress_bar cli_progress_update
@@ -391,20 +444,76 @@ create_widget <- function(net, profiles, prop = 1) {
     return(widget)
 }
 
-#' Build a complete network and helpful artifacts
+#' Build complete network analysis pipeline
 #'
-#' @param key_actors character vector with account identifiers
-#' @param keywords character vector with keywords that we check for in actors' description
-#' @param token character, token for Blue Sky Social API
-#' @param refresh_tok character, refresh token for Blue Sky Social API
-#' @param threshold the threshold for including actors in the expansion: How many
-#' followers must a prospect have, to be considered? If smaller than 1, threshold is used
-#' as a proportion: How big a proportion must a prospect have, to be considered?
-#' @param prop proportion of the actors sampled for visualization, passed on to `create_widget()`
-#' @param ... Parameters passed on to `expand_net()`
+#' Executes the complete network analysis workflow: initializes a network from key actors,
+#' expands it iteratively, trims to final size, gets detailed profiles, creates
+#' visualizations, and generates text analysis. This is the main high-level function
+#' for comprehensive Bluesky network analysis.
 #'
-#' @return list of objects generated from `expand_net()`, `trim_net()`, `get_profiles()`,
-#' `create_widget()`, and `word_freqs()`
+#' @param key_actors Character vector. Handles of central users to start the network from
+#' @param keywords Character vector. Keywords for filtering users into the network
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param refresh_tok Character. Refresh token for long-running operations
+#' @param threshold Numeric. Inclusion threshold for network expansion:
+#' \describe{
+#'   \item{>= 1}{Minimum followers from existing network required}
+#'   \item{< 1}{Proportion of network that must follow a prospect}
+#' }
+#' @param prop Numeric. Proportion of users to sample for 3D visualization
+#'   (0-1, where 1.0 includes all users)
+#' @param ... Additional parameters passed to \code{\link{expand_net}}
+#'   (e.g., max_iterations, sample_size, save_net)
+#'
+#' @return A comprehensive list containing all network analysis results:
+#' \describe{
+#'   \item{net}{Tibble. Final expanded network with follow relationships}
+#'   \item{profiles}{Tibble. Detailed profile information for all network members}
+#'   \item{metrics}{Tibble. Network metrics (centrality, community detection)}
+#'   \item{widget}{HTML widget. Interactive 3D network visualization}
+#'   \item{word_analysis}{Tibble. Word frequency analysis of profile descriptions}
+#'   \item{token}{Character. Updated access token}
+#'   \item{refresh_tok}{Character. Updated refresh token}
+#' }
+#'
+#' @family network-building
+#' @seealso \code{\link{init_net}}, \code{\link{expand_net}},
+#'   \code{\link{add_metrics}}, \code{\link{create_widget}}
+#'
+#' @examples
+#' \dontrun{
+#' # Complete network analysis for science communicators
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#'
+#' # Build comprehensive network
+#' science_network <- build_network(
+#'   key_actors = c("example.scientist.bsky.social", "researcher.bsky.social"),
+#'   keywords = c("research", "science", "academic", "PhD", "university"),
+#'   token = auth$accessJwt,
+#'   refresh_tok = auth$refreshJwt,
+#'   threshold = 10,      # Need 10+ mutual follows for inclusion
+#'   prop = 0.5,          # Sample 50% for visualization
+#'   max_iterations = 15, # Limit expansion iterations
+#'   save_net = TRUE      # Save progress incrementally
+#' )
+#'
+#' # Explore the results
+#' print(paste("Network has", nrow(science_network$net), "connections"))
+#' print(paste("Among", nrow(science_network$profiles), "unique users"))
+#'
+#' # View the interactive visualization
+#' science_network$widget
+#'
+#' # Examine top words in user descriptions
+#' head(science_network$word_analysis, 20)
+#'
+#' # Find most central users
+#' top_central <- science_network$profiles[
+#'   order(science_network$profiles$betweenness, decreasing = TRUE),
+#' ][1:10, c("displayName", "handle", "description")]
+#' print(top_central)
+#' }
+#'
 #' @export
 #'
 build_network <- function(key_actors, keywords, token, refresh_tok, threshold, prop, ...) {

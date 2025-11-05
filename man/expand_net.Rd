@@ -2,7 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{expand_net}
 \alias{expand_net}
-\title{Expand network}
+\title{Expand network through iterative growth}
 \usage{
 expand_net(
   net,
@@ -17,38 +17,95 @@ expand_net(
 )
 }
 \arguments{
-\item{net}{tibble with network connections (edges). Assumed to contain two columns:
-\code{actor_handle} (the Blue Sky Social actor who is followING another) and \code{follows_handle}
-(the actor being followed).}
+\item{net}{Tibble. Initial network with follow relationships, must contain:
+\describe{
+\item{actor_handle}{Character. User who is following}
+\item{follows_handle}{Character. User being followed}
+}}
 
-\item{keywords}{character vector with keywords that we check for in actors' description
-to determine if they belong in the expanded network}
+\item{keywords}{Character vector. Keywords to search for in user profile
+descriptions to determine network membership eligibility}
 
-\item{token}{character, token for Blue Sky Social API}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{refresh_tok}{character, refresh token for Blue Sky Social API}
+\item{refresh_tok}{Character. Refresh token from \code{\link{get_token}} for
+long-running operations}
 
-\item{save_net}{boolean, should the net be saved incrementally as it is expanded? Useful
-for not losing work in case of unexpected interruptions. Defaults to \code{FALSE}}
+\item{save_net}{Logical. Should the network be saved incrementally during expansion
+to prevent data loss? (default FALSE)}
 
-\item{file_name}{character, file name of the saved net. Defaults to 'dev/net/bignet_TIMESTAMP.rds'}
+\item{file_name}{Character. File path for incremental saves. If not provided,
+defaults to 'dev/net/bignet_TIMESTAMP.rds'}
 
-\item{threshold}{numeric, the threshold for including actors in the expansion: How many
-followers must a prospect have, to be considered? If less then 1, interpreted as the \emph{fraction}
-of the current net prospects must be followed by, to be considered. Defaults to 30.}
+\item{threshold}{Numeric. Inclusion threshold for new users:
+\describe{
+\item{>= 1}{Minimum number of existing network members who must follow a prospect}
+\item{< 1}{Fraction of network members who must follow a prospect}
+}}
 
-\item{max_iterations}{integer, the maximum iterations in the network expansion. Defaults to 50}
+\item{max_iterations}{Integer. Maximum number of expansion iterations (default 50)}
 
-\item{sample_size}{integer, if we want to expand only with a sample of the prospects;
-can be useful for testing purposes. Defaults to `Inf´, e.g. every worthy prospect is included
-in the expansion.}
+\item{sample_size}{Integer. Maximum prospects to consider per iteration.
+Use \code{Inf} for no limit (default), smaller values for testing}
 }
 \value{
-list with a) a tibble with the expanded network: \code{actor_handle} contains all network member,
-\code{follows_handle} contain all relevant actors that they follow (but not necessarily meeting
-the \code{threshold}.) b) a new token, c) a new refresh token -- since the tokens might have beed
-refreshed while underway
+A list containing the expanded network results:
+\describe{
+\item{net}{Tibble. Expanded network with all follow relationships discovered}
+\item{token}{Character. Updated access token (may have been refreshed)}
+\item{refresh_tok}{Character. Updated refresh token}
+\item{profiles}{Tibble. Profile information for all network members}
+\item{iterations}{Integer. Number of iterations completed}
+}
 }
 \description{
-Expand network
+Expands an initial network by iteratively finding new users who are followed
+by many existing network members and match specified keywords. This is the core
+algorithm for growing networks from a seed set of users.
 }
+\examples{
+\dontrun{
+# Start with an initial network
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+refresh_tok <- auth$refreshJwt
+
+# Create initial network
+initial <- init_net("example.scientist.bsky.social",
+                    c("research", "science"), token)
+
+# Expand the network - conservative approach
+expanded <- expand_net(
+  net = initial,
+  keywords = c("research", "science", "academic", "PhD"),
+  token = token,
+  refresh_tok = refresh_tok,
+  threshold = 5,        # Need 5+ followers from existing network
+  max_iterations = 10,  # Limit iterations for testing
+  save_net = TRUE       # Save progress incrementally
+)
+
+print(paste("Network grew from", nrow(initial), "to",
+            nrow(expanded$net), "connections"))
+
+# More aggressive expansion with lower threshold
+large_expansion <- expand_net(
+  net = expanded$net,
+  keywords = c("research", "science", "academic"),
+  token = expanded$token,
+  refresh_tok = expanded$refresh_tok,
+  threshold = 0.1,      # 10\% of network must follow prospect
+  max_iterations = 25
+)
+}
+
+}
+\seealso{
+\code{\link{init_net}}, \code{\link{build_network}},
+\code{\link{trim_net}}
+
+Other network-building: 
+\code{\link{build_network}()},
+\code{\link{init_net}()}
+}
+\concept{network-building}

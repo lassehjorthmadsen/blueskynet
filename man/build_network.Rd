@@ -2,31 +2,90 @@
 % Please edit documentation in R/algos.R
 \name{build_network}
 \alias{build_network}
-\title{Build a complete network and helpful artifacts}
+\title{Build complete network analysis pipeline}
 \usage{
 build_network(key_actors, keywords, token, refresh_tok, threshold, prop, ...)
 }
 \arguments{
-\item{key_actors}{character vector with account identifiers}
+\item{key_actors}{Character vector. Handles of central users to start the network from}
 
-\item{keywords}{character vector with keywords that we check for in actors' description}
+\item{keywords}{Character vector. Keywords for filtering users into the network}
 
-\item{token}{character, token for Blue Sky Social API}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{refresh_tok}{character, refresh token for Blue Sky Social API}
+\item{refresh_tok}{Character. Refresh token for long-running operations}
 
-\item{threshold}{the threshold for including actors in the expansion: How many
-followers must a prospect have, to be considered? If smaller than 1, threshold is used
-as a proportion: How big a proportion must a prospect have, to be considered?}
+\item{threshold}{Numeric. Inclusion threshold for network expansion:
+\describe{
+\item{>= 1}{Minimum followers from existing network required}
+\item{< 1}{Proportion of network that must follow a prospect}
+}}
 
-\item{prop}{proportion of the actors sampled for visualization, passed on to \code{create_widget()}}
+\item{prop}{Numeric. Proportion of users to sample for 3D visualization
+(0-1, where 1.0 includes all users)}
 
-\item{...}{Parameters passed on to \code{expand_net()}}
+\item{...}{Additional parameters passed to \code{\link{expand_net}}
+(e.g., max_iterations, sample_size, save_net)}
 }
 \value{
-list of objects generated from \code{expand_net()}, \code{trim_net()}, \code{get_profiles()},
-\code{create_widget()}, and \code{word_freqs()}
+A comprehensive list containing all network analysis results:
+\describe{
+\item{net}{Tibble. Final expanded network with follow relationships}
+\item{profiles}{Tibble. Detailed profile information for all network members}
+\item{metrics}{Tibble. Network metrics (centrality, community detection)}
+\item{widget}{HTML widget. Interactive 3D network visualization}
+\item{word_analysis}{Tibble. Word frequency analysis of profile descriptions}
+\item{token}{Character. Updated access token}
+\item{refresh_tok}{Character. Updated refresh token}
+}
 }
 \description{
-Build a complete network and helpful artifacts
+Executes the complete network analysis workflow: initializes a network from key actors,
+expands it iteratively, trims to final size, gets detailed profiles, creates
+visualizations, and generates text analysis. This is the main high-level function
+for comprehensive Bluesky network analysis.
 }
+\examples{
+\dontrun{
+# Complete network analysis for science communicators
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+
+# Build comprehensive network
+science_network <- build_network(
+  key_actors = c("example.scientist.bsky.social", "researcher.bsky.social"),
+  keywords = c("research", "science", "academic", "PhD", "university"),
+  token = auth$accessJwt,
+  refresh_tok = auth$refreshJwt,
+  threshold = 10,      # Need 10+ mutual follows for inclusion
+  prop = 0.5,          # Sample 50\% for visualization
+  max_iterations = 15, # Limit expansion iterations
+  save_net = TRUE      # Save progress incrementally
+)
+
+# Explore the results
+print(paste("Network has", nrow(science_network$net), "connections"))
+print(paste("Among", nrow(science_network$profiles), "unique users"))
+
+# View the interactive visualization
+science_network$widget
+
+# Examine top words in user descriptions
+head(science_network$word_analysis, 20)
+
+# Find most central users
+top_central <- science_network$profiles[
+  order(science_network$profiles$betweenness, decreasing = TRUE),
+][1:10, c("displayName", "handle", "description")]
+print(top_central)
+}
+
+}
+\seealso{
+\code{\link{init_net}}, \code{\link{expand_net}},
+\code{\link{add_metrics}}, \code{\link{create_widget}}
+
+Other network-building: 
+\code{\link{expand_net}()},
+\code{\link{init_net}()}
+}
+\concept{network-building}
