@@ -6,3 +6,6 @@ dev/net
 *.html
 *_files
 docs
+
+/.quarto/
+**/*.quarto_ipynb

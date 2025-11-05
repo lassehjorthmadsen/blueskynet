@@ -21,19 +21,19 @@ deselect_nested_cols <- function(mat) {
 }
 
 
-post2df <- function(response, element = "feed") {
+post2df <- function(actor, response, element = "feed") {
   # Parse the response from 'getAuthorFeed' endpoint as documented
   # here: https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed
   # intended to be used by get_user_posts() wrapper function
+
+  if (is.null(response)) return(NULL)
 
   df <- response |>
     purrr::pluck(element) |>
     purrr::map_dfr(function(item) {
       data.frame(
-        # Post identifiers
-        uri = item$post$uri,
-        cid = item$post$cid,
-
+        # User identifier
+        actor = actor,
         # Post identifiers
         uri = item$post$uri %||% NA_character_,
         cid = item$post$cid %||% NA_character_,
@@ -68,23 +68,31 @@ post2df <- function(response, element = "feed") {
 
 
 check_wait <- function(resp) {
-  # Check response headers, if rate limit reached, wait until reset
-
+  # Only print rate limit info if we're getting close to the limit
   if (resp |> httr2::resp_header_exists("RateLimit-Remaining")) {
-
     remaining <- resp |> httr2::resp_header("RateLimit-Remaining") |> as.numeric()
 
-    if (remaining < 3) { # It looks like a follow post request uses up 3 RateLimits?
+    # Only show rate limit warning if we're running low
+    if (remaining < 100) {  # Adjust threshold as needed
+      limit <- resp |> httr2::resp_header("RateLimit-Limit")
+      reset_time <- resp |>
+        httr2::resp_header("RateLimit-Reset") |>
+        as.numeric() |>
+        as.POSIXct(origin = "1970-01-01")
+
+      message("\n! Rate limit status: ", remaining, "/", limit)
+      message("! Reset time: ", reset_time)
+    }
+
+    # Handle rate limit pause if needed
+    if (remaining < 3) {
       reset_time <- resp |>
         httr2::resp_header("RateLimit-Reset") |>
         as.numeric() |>
         as.POSIXct()
 
       wait_time <- difftime(reset_time, Sys.time()) + as.difftime(1/60, units = "mins")
-
-      cat("Waiting for rate limit to reset at:", as.character(reset_time), fill = T)
-      print(wait_time)
-
+      message("\n! Waiting for rate limit reset at:", as.character(reset_time))
       units(wait_time) <- "secs"
       Sys.sleep(wait_time)
     }
