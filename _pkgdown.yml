@@ -11,10 +11,13 @@ reference:
   - verify_token
   - get_profiles
   - get_follows
+  - get_followers
   - get_user_posts
   - follow_actor
-  - get_follows_old
-  - get_profiles_old
+  - unfollow_actor
+  - get_all_follow_records
+  - extract_follow_subjects
+  - find_follow_record
 - title: "Network functions"
   desc: "Functions for creating and analyzing networks."
   contents:
