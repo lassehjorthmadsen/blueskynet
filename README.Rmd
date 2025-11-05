@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/blueskynet)](https://CRAN.R-project.org/package=blueskynet)
 <!-- badges: end -->
 
-The purpose of blueskynet is to provide tools to generate and analyze networks from Bluesky Social,
+The purpose of blueskynet is to provide tools to generate and analyze networks from Bluesky Social.
 
 ## Installation
 
