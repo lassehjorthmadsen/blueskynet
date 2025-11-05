@@ -206,9 +206,9 @@ expand_net <- function(net,
 #' visualizations and more meaningful community analysis.
 #'
 #' @param net Tibble. Network edge list with follow relationships containing:
-#' \\describe{
-#'   \\item{actor_handle}{Character. User who is following another}
-#'   \\item{follows_handle}{Character. User being followed}
+#' \describe{
+#'   \item{actor_handle}{Character. User who is following another}
+#'   \item{follows_handle}{Character. User being followed}
 #' }
 #' @param threshold Numeric. Inclusion threshold for users:
 #' \\describe{
@@ -417,9 +417,9 @@ init_net <- function(key_actors, keywords, token) {
 #' @param profiles Tibble. User profile information from \\code{\\link{get_profiles}}
 #'   containing at least handle and other profile details
 #' @param net Tibble. Network edge list with follow relationships containing:
-#' \\describe{
-#'   \\item{actor_handle}{Character. User who is following another}
-#'   \\item{follows_handle}{Character. User being followed}
+#' \describe{
+#'   \item{actor_handle}{Character. User who is following another}
+#'   \item{follows_handle}{Character. User being followed}
 #' }
 #'
 #' @return Tibble with original profile data enhanced with network metrics:
@@ -552,9 +552,9 @@ add_metrics <- function(profiles, net) {
 #' clusters, and understand relationship patterns in your social network.
 #'
 #' @param net Tibble. Network edge list with follow relationships containing:
-#' \\describe{
-#'   \\item{actor_handle}{Character. User who is following another}
-#'   \\item{follows_handle}{Character. User being followed}
+#' \describe{
+#'   \item{actor_handle}{Character. User who is following another}
+#'   \item{follows_handle}{Character. User being followed}
 #' }
 #' @param profiles Tibble. User profile information from \\code{\\link{get_profiles}}
 #'   containing handle, displayName, description and other profile details

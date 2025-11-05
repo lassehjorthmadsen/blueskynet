@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Lasse Hjorth Madsen \email{lassehjorthmadsen@gmail.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Lasse Hjorth Madsen \email{lassehjorthmadsen@gmail.com}
 
 }
 \keyword{internal}

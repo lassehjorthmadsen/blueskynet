@@ -2,8 +2,7 @@ Package: blueskynet
 Title: Analyze and Visualize Networks on Bluesky Social
 Version: 0.1.0
 Authors@R:
-    person("Lasse", "Hjorth Madsen", , "lassehjorthmadsen@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Lasse", "Hjorth Madsen", , "lassehjorthmadsen@gmail.com", role = c("aut", "cre"))
 Description: Provides comprehensive tools for collecting, analyzing, and
     visualizing social networks from Bluesky Social <https://bsky.app>.
     Enables users to authenticate with the Bluesky API, collect follower
