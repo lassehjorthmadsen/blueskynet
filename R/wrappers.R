@@ -1,9 +1,39 @@
-#' Get token for Bluesky api
+#' Get authentication token for Bluesky API
 #'
-#' @param identifier identifier for account
-#' @param password app password
+#' Authenticates with the Bluesky API using your handle and app password to obtain
+#' access and refresh tokens for subsequent API calls.
 #'
-#' @return response body
+#' @param identifier Character. Your Bluesky handle (e.g., "username.bsky.social")
+#'   or email address
+#' @param password Character. Your Bluesky app password (not your regular password).
+#'   Create one at https://bsky.app/settings/app-passwords
+#'
+#' @return A list containing authentication information:
+#' \describe{
+#'   \item{accessJwt}{Character. Access token for API calls}
+#'   \item{refreshJwt}{Character. Refresh token for renewing access}
+#'   \item{handle}{Character. Your verified handle}
+#'   \item{did}{Character. Your decentralized identifier (DID)}
+#'   \item{email}{Character. Your email address}
+#' }
+#'
+#' @family authentication
+#' @seealso \code{\link{refresh_token}}, \code{\link{verify_token}}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate with Bluesky (requires valid credentials)
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#'
+#' # Extract tokens for use in other functions
+#' access_token <- auth$accessJwt
+#' refresh_token <- auth$refreshJwt
+#' my_did <- auth$did
+#'
+#' # Verify the token works
+#' verify_token(access_token)
+#' }
+#'
 #' @export
 #'
 get_token <- function(identifier, password) {
@@ -19,11 +49,38 @@ get_token <- function(identifier, password) {
 }
 
 
-#' Refresh token for Bluesky api
+#' Refresh authentication token for Bluesky API
 #'
-#' @param refresh_token character, refresh token
+#' Refreshes an expired access token using a refresh token. Access tokens
+#' expire after a period of time, but refresh tokens can be used to obtain
+#' new access tokens without re-authenticating.
 #'
-#' @return response body
+#' @param refresh_token Character. The refresh token obtained from \code{\link{get_token}}
+#'
+#' @return A list containing new authentication information:
+#' \describe{
+#'   \item{accessJwt}{Character. New access token for API calls}
+#'   \item{refreshJwt}{Character. New refresh token for future renewals}
+#'   \item{handle}{Character. Your verified handle}
+#'   \item{did}{Character. Your decentralized identifier (DID)}
+#' }
+#'
+#' @family authentication
+#' @seealso \code{\link{get_token}}, \code{\link{verify_token}}
+#'
+#' @examples
+#' \dontrun{
+#' # First authenticate to get tokens
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#'
+#' # Later, when access token expires, refresh it
+#' new_auth <- refresh_token(auth$refreshJwt)
+#' new_access_token <- new_auth$accessJwt
+#'
+#' # Use the new token for API calls
+#' profiles <- get_profiles("example.bsky.social", new_access_token)
+#' }
+#'
 #' @export
 #'
 refresh_token <- function(refresh_token) {
@@ -138,14 +195,50 @@ verify_token <- function(token) {
 
 
 
-#' Get follows for an actor with improved error handling
+#' Get accounts followed by a user
 #'
-#' @param actor account identifier
-#' @param token token for api
-#' @param max_retries number of times to retry on failure (default 3)
-#' @param retry_delay delay in seconds between retries (default 5)
+#' Retrieves all accounts that a specific user follows on Bluesky Social.
+#' Includes robust error handling and automatic retry logic for network issues.
 #'
-#' @return tibble with response information
+#' @param actor Character. User handle (e.g., "username.bsky.social") or DID
+#'   of the account whose follows you want to retrieve
+#' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param max_retries Integer. Number of times to retry on failure (default 3)
+#' @param retry_delay Numeric. Delay in seconds between retries (default 5)
+#'
+#' @return A tibble with information about followed accounts:
+#' \describe{
+#'   \item{handle}{Character. The followed user's handle}
+#'   \item{did}{Character. The followed user's DID}
+#'   \item{displayName}{Character. The followed user's display name}
+#'   \item{description}{Character. The followed user's bio}
+#'   \item{followersCount}{Integer. Number of followers the followed user has}
+#'   \item{followsCount}{Integer. Number of accounts the followed user follows}
+#'   \item{createdAt}{Character. When the follow relationship was created}
+#' }
+#'
+#' @family api-wrappers
+#' @seealso \code{\link{get_followers}}, \code{\link{get_profiles}}
+#'
+#' @section Lexicon references:
+#' \href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollows.json}{lexicons/app/bsky/graph/getFollows.json}
+#'
+#' @examples
+#' \dontrun{
+#' # Authenticate first
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' token <- auth$accessJwt
+#'
+#' # Get who Neil Gaiman follows
+#' follows <- get_follows("neilhimself.neilgaiman.com", token)
+#' head(follows)
+#'
+#' # Get follows for multiple users
+#' users <- c("example1.bsky.social", "example2.bsky.social")
+#' all_follows <- lapply(users, get_follows, token = token)
+#' names(all_follows) <- users
+#' }
+#'
 #' @export
 get_follows <- function(actor, token, max_retries = 3, retry_delay = 5) {
   attempt_request <- function(req, attempt = 1) {

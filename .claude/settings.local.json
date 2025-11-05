@@ -1,11 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git pull:*)",
-      "Bash(git remote set-url:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nenhance API wrappers and add follower management functionality\n\n- Add new follower/following management functions (get_followers, unfollow_actor, get_all_follow_records)\n- Enhance error handling and retry logic for all API functions \n- Improve rate limiting with better user feedback and thresholds\n- Remove deprecated old wrapper functions (get_follows_old, get_profiles_old)\n- Add CLAUDE.md documentation for future development\n- Update .gitignore for Quarto support\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(Rscript:*)"
+      "Bash(git push)",
+      "Bash(gh run list)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

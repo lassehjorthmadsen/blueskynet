@@ -2,22 +2,59 @@
 % Please edit documentation in R/wrappers.R
 \name{get_follows}
 \alias{get_follows}
-\title{Get follows for an actor with improved error handling}
+\title{Get accounts followed by a user}
 \usage{
 get_follows(actor, token, max_retries = 3, retry_delay = 5)
 }
 \arguments{
-\item{actor}{account identifier}
+\item{actor}{Character. User handle (e.g., "username.bsky.social") or DID
+of the account whose follows you want to retrieve}
 
-\item{token}{token for api}
+\item{token}{Character. Authentication token from \code{\link{get_token}}}
 
-\item{max_retries}{number of times to retry on failure (default 3)}
+\item{max_retries}{Integer. Number of times to retry on failure (default 3)}
 
-\item{retry_delay}{delay in seconds between retries (default 5)}
+\item{retry_delay}{Numeric. Delay in seconds between retries (default 5)}
 }
 \value{
-tibble with response information
+A tibble with information about followed accounts:
+\describe{
+\item{handle}{Character. The followed user's handle}
+\item{did}{Character. The followed user's DID}
+\item{displayName}{Character. The followed user's display name}
+\item{description}{Character. The followed user's bio}
+\item{followersCount}{Integer. Number of followers the followed user has}
+\item{followsCount}{Integer. Number of accounts the followed user follows}
+\item{createdAt}{Character. When the follow relationship was created}
+}
 }
 \description{
-Get follows for an actor with improved error handling
+Retrieves all accounts that a specific user follows on Bluesky Social.
+Includes robust error handling and automatic retry logic for network issues.
 }
+\section{Lexicon references}{
+
+\href{https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/graph/getFollows.json}{lexicons/app/bsky/graph/getFollows.json}
+}
+
+\examples{
+\dontrun{
+# Authenticate first
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+
+# Get who Neil Gaiman follows
+follows <- get_follows("neilhimself.neilgaiman.com", token)
+head(follows)
+
+# Get follows for multiple users
+users <- c("example1.bsky.social", "example2.bsky.social")
+all_follows <- lapply(users, get_follows, token = token)
+names(all_follows) <- users
+}
+
+}
+\seealso{
+\code{\link{get_followers}}, \code{\link{get_profiles}}
+}
+\concept{api-wrappers}

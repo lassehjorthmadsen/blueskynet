@@ -413,24 +413,69 @@ build_network <- function(key_actors, keywords, token, refresh_tok, threshold, p
 # Get the top 3 words (tf-idf-weighted) per community, use as labels
 
 
-#' Label communities
+#' Generate labels for network communities
 #'
-#' @param profiles tibble with profile information, assumed to contain
-#' a column called "community" for grouping, and a column called
-#' "description" that contain the text to analyze
-#' @param top number of words to use in label, defaults to 3
+#' Creates descriptive labels for network communities by analyzing the most
+#' frequent words (using TF-IDF weighting) in user profile descriptions within
+#' each community.
 #'
-#' @return tibble with group id and label
+#' @param profiles Data frame or tibble with profile information, must contain:
+#' \describe{
+#'   \item{community}{Integer. Community assignment for each user}
+#'   \item{description}{Character. User profile descriptions/bios to analyze}
+#' }
+#' @param top Integer. Number of top words to include in each label (default 3)
+#'
+#' @return A tibble with community labels:
+#' \describe{
+#'   \item{community}{Integer. Community ID}
+#'   \item{community_label}{Character. Descriptive label with top keywords}
+#' }
+#'
+#' @family network-analysis
+#' @seealso \code{\link{add_metrics}}, \code{\link{word_freqs}}
+#'
+#' @examples
+#' \dontrun{
+#' # Create sample profile data
+#' sample_profiles <- data.frame(
+#'   community = c(1, 1, 1, 2, 2, 2),
+#'   description = c(
+#'     "Data scientist working on machine learning projects",
+#'     "Machine learning researcher at university",
+#'     "AI and data science consultant",
+#'     "Climate change researcher studying ocean temperatures",
+#'     "Environmental scientist focusing on climate data",
+#'     "Oceanographer studying climate impacts"
+#'   )
+#' )
+#'
+#' # Generate community labels
+#' labels <- com_labels(sample_profiles, top = 2)
+#' print(labels)
+#' }
+#'
+#' \dontrun{
+#' # With real network data
+#' auth <- get_token("your.handle.bsky.social", "your-app-password")
+#' net <- build_network("example.bsky.social", c("science", "research"),
+#'                      auth$accessJwt, auth$refreshJwt, threshold = 30, prop = 0.1)
+#' labels <- com_labels(net$profiles, top = 3)
+#' }
+#'
 #' @export
 #'
 com_labels <- function(profiles, top = 3) {
+  corpus_obj <- quanteda::corpus(profiles, text_field = "description")
+  quanteda::docvars(corpus_obj, "community") <- profiles$community
+
   df <-
-    quanteda::corpus(profiles, text_field = "description") |>
+    corpus_obj |>
     quanteda::tokens(remove_punct = TRUE) |>
     quanteda::tokens_remove(pattern = c(quanteda::stopwords("en"), "|")) |>
     quanteda::dfm() |>
     quanteda::dfm_tfidf() |>
-    quanteda::topfeatures(n = 3, groups = profiles$community) |>
+    quanteda::topfeatures(n = top, groups = community) |>
     purrr::map(names) |>
     purrr::map_chr(paste, collapse = " | ") |>
     dplyr::as_tibble() |>

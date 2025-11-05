@@ -2,16 +2,45 @@
 % Please edit documentation in R/wrappers.R
 \name{refresh_token}
 \alias{refresh_token}
-\title{Refresh token for Bluesky api}
+\title{Refresh authentication token for Bluesky API}
 \usage{
 refresh_token(refresh_token)
 }
 \arguments{
-\item{refresh_token}{character, refresh token}
+\item{refresh_token}{Character. The refresh token obtained from \code{\link{get_token}}}
 }
 \value{
-response body
+A list containing new authentication information:
+\describe{
+\item{accessJwt}{Character. New access token for API calls}
+\item{refreshJwt}{Character. New refresh token for future renewals}
+\item{handle}{Character. Your verified handle}
+\item{did}{Character. Your decentralized identifier (DID)}
+}
 }
 \description{
-Refresh token for Bluesky api
+Refreshes an expired access token using a refresh token. Access tokens
+expire after a period of time, but refresh tokens can be used to obtain
+new access tokens without re-authenticating.
 }
+\examples{
+\dontrun{
+# First authenticate to get tokens
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+
+# Later, when access token expires, refresh it
+new_auth <- refresh_token(auth$refreshJwt)
+new_access_token <- new_auth$accessJwt
+
+# Use the new token for API calls
+profiles <- get_profiles("example.bsky.social", new_access_token)
+}
+
+}
+\seealso{
+\code{\link{get_token}}, \code{\link{verify_token}}
+
+Other authentication: 
+\code{\link{get_token}()}
+}
+\concept{authentication}

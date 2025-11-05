@@ -2,20 +2,61 @@
 % Please edit documentation in R/algos.R
 \name{com_labels}
 \alias{com_labels}
-\title{Label communities}
+\title{Generate labels for network communities}
 \usage{
 com_labels(profiles, top = 3)
 }
 \arguments{
-\item{profiles}{tibble with profile information, assumed to contain
-a column called "community" for grouping, and a column called
-"description" that contain the text to analyze}
+\item{profiles}{Data frame or tibble with profile information, must contain:
+\describe{
+\item{community}{Integer. Community assignment for each user}
+\item{description}{Character. User profile descriptions/bios to analyze}
+}}
 
-\item{top}{number of words to use in label, defaults to 3}
+\item{top}{Integer. Number of top words to include in each label (default 3)}
 }
 \value{
-tibble with group id and label
+A tibble with community labels:
+\describe{
+\item{community}{Integer. Community ID}
+\item{community_label}{Character. Descriptive label with top keywords}
+}
 }
 \description{
-Label communities
+Creates descriptive labels for network communities by analyzing the most
+frequent words (using TF-IDF weighting) in user profile descriptions within
+each community.
 }
+\examples{
+\dontrun{
+# Create sample profile data
+sample_profiles <- data.frame(
+  community = c(1, 1, 1, 2, 2, 2),
+  description = c(
+    "Data scientist working on machine learning projects",
+    "Machine learning researcher at university",
+    "AI and data science consultant",
+    "Climate change researcher studying ocean temperatures",
+    "Environmental scientist focusing on climate data",
+    "Oceanographer studying climate impacts"
+  )
+)
+
+# Generate community labels
+labels <- com_labels(sample_profiles, top = 2)
+print(labels)
+}
+
+\dontrun{
+# With real network data
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+net <- build_network("example.bsky.social", c("science", "research"),
+                     auth$accessJwt, auth$refreshJwt, threshold = 30, prop = 0.1)
+labels <- com_labels(net$profiles, top = 3)
+}
+
+}
+\seealso{
+\code{\link{add_metrics}}, \code{\link{word_freqs}}
+}
+\concept{network-analysis}

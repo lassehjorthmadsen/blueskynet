@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{word_freqs}
 \alias{word_freqs}
-\title{Word frequencies}
+\title{Calculate word frequencies from text data}
 \usage{
 word_freqs(
   texts,
@@ -13,19 +13,57 @@ word_freqs(
 )
 }
 \arguments{
-\item{texts}{character. Vector of texts (like profile descriptions)}
+\item{texts}{Character vector. Texts to analyze (e.g., user profile descriptions)}
 
-\item{bigrams}{boolean. Should we count bigrams? Default to FALSE}
+\item{bigrams}{Logical. If TRUE, count word pairs instead of individual words (default FALSE)}
 
-\item{top}{integer. The top words/bi-grams to include. Defaults to 30}
+\item{top}{Integer. Number of top frequent words/bigrams to return (default 30)}
 
-\item{remove_stopwords}{boolean. Should stopwords be excluded? Defaults to TRUE}
+\item{remove_stopwords}{Logical. Remove common stopwords like "the", "and" (default TRUE)}
 
-\item{language}{character. The language to use when removing stopwords. Defaults to "en"}
+\item{language}{Character. Language for stopword removal (default "en" for English)}
 }
 \value{
-dataframe with word (or bi-gram) frequencies
+A data frame with word frequency statistics:
+\describe{
+\item{feature}{Character. The word or bigram}
+\item{frequency}{Integer. Number of occurrences}
+\item{rank}{Integer. Rank by frequency (1 = most frequent)}
+\item{docfreq}{Integer. Number of documents containing the feature}
+\item{group}{Character. Always "all" for this function}
+}
 }
 \description{
-Word frequencies
+Analyzes a collection of texts (such as user profile descriptions) to identify
+the most frequently used words or word pairs (bigrams). Useful for understanding
+the common themes and topics within network communities.
 }
+\examples{
+# Sample user descriptions
+descriptions <- c(
+  "Data scientist working on machine learning projects",
+  "Climate researcher studying global warming effects",
+  "Marine biologist researching ocean ecosystems",
+  "Environmental data scientist analyzing climate patterns"
+)
+
+# Get top words
+word_freq <- word_freqs(descriptions, top = 10)
+head(word_freq)
+
+# Get top bigrams
+bigram_freq <- word_freqs(descriptions, bigrams = TRUE, top = 5)
+head(bigram_freq)
+
+\dontrun{
+# With real profile data from network analysis
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+profiles <- get_profiles(c("user1.bsky.social", "user2.bsky.social"), auth$accessJwt)
+word_analysis <- word_freqs(profiles$description, top = 50)
+}
+
+}
+\seealso{
+\code{\link{com_labels}}
+}
+\concept{text-analysis}

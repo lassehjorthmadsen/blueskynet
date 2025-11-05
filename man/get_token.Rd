@@ -2,18 +2,50 @@
 % Please edit documentation in R/wrappers.R
 \name{get_token}
 \alias{get_token}
-\title{Get token for Bluesky api}
+\title{Get authentication token for Bluesky API}
 \usage{
 get_token(identifier, password)
 }
 \arguments{
-\item{identifier}{identifier for account}
+\item{identifier}{Character. Your Bluesky handle (e.g., "username.bsky.social")
+or email address}
 
-\item{password}{app password}
+\item{password}{Character. Your Bluesky app password (not your regular password).
+Create one at https://bsky.app/settings/app-passwords}
 }
 \value{
-response body
+A list containing authentication information:
+\describe{
+\item{accessJwt}{Character. Access token for API calls}
+\item{refreshJwt}{Character. Refresh token for renewing access}
+\item{handle}{Character. Your verified handle}
+\item{did}{Character. Your decentralized identifier (DID)}
+\item{email}{Character. Your email address}
+}
 }
 \description{
-Get token for Bluesky api
+Authenticates with the Bluesky API using your handle and app password to obtain
+access and refresh tokens for subsequent API calls.
 }
+\examples{
+\dontrun{
+# Authenticate with Bluesky (requires valid credentials)
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+
+# Extract tokens for use in other functions
+access_token <- auth$accessJwt
+refresh_token <- auth$refreshJwt
+my_did <- auth$did
+
+# Verify the token works
+verify_token(access_token)
+}
+
+}
+\seealso{
+\code{\link{refresh_token}}, \code{\link{verify_token}}
+
+Other authentication: 
+\code{\link{refresh_token}()}
+}
+\concept{authentication}
