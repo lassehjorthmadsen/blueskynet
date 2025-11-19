@@ -1,0 +1,62 @@
+# Verify authentication token validity
+
+Checks whether an access token is still valid by making a test API call
+to the Bluesky session endpoint. This is useful for checking if a token
+has expired before making other API calls.
+
+## Usage
+
+``` r
+verify_token(token)
+```
+
+## Arguments
+
+- token:
+
+  Character. Authentication token from
+  [`get_token`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.md)
+  or
+  [`refresh_token`](https://lassehjorthmadsen.github.io/blueskynet/reference/refresh_token.md)
+
+## Value
+
+Logical. Returns `TRUE` if the token is valid and active, `FALSE` if the
+token is invalid, expired, or revoked. Also prints a message with the
+associated handle if valid, or error details if invalid.
+
+## See also
+
+[`get_token`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.md),
+[`refresh_token`](https://lassehjorthmadsen.github.io/blueskynet/reference/refresh_token.md)
+
+Other authentication:
+[`get_token()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.md),
+[`refresh_token()`](https://lassehjorthmadsen.github.io/blueskynet/reference/refresh_token.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Authenticate and verify token
+auth <- get_token("your.handle.bsky.social", "your-app-password")
+token <- auth$accessJwt
+
+# Check if token is valid
+is_valid <- verify_token(token)
+
+if (is_valid) {
+  # Token is good, proceed with API calls
+  profiles <- get_profiles("example.bsky.social", token)
+} else {
+  # Token expired, refresh it
+  new_auth <- refresh_token(auth$refreshJwt)
+  token <- new_auth$accessJwt
+}
+
+# Can also use in conditional logic
+if (!verify_token(token)) {
+  stop("Please re-authenticate - your token has expired")
+}
+} # }
+```

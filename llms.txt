@@ -1,0 +1,125 @@
+# blueskynet
+
+The purpose of blueskynet is to provide tools to generate and analyze
+networks from Bluesky Social,
+
+## Installation
+
+You can install the development version of blueskynet like so:
+
+``` r
+remotes::install_github("https://github.com/lassehjorthmadsen/blueskynet.git")
+```
+
+## Getting started
+
+First, create an app password here:
+<https://bsky.app/settings/app-passwords>.
+
+Then, set environment variable BLUESKY_APP_PASS to your app password,
+and another variable, BLUESKY_APP_USER, to your identifier
+(e.g. “lassehjorthmadsen.bsky.social”) using `file.edit("~/.Renviron")`
+
+Now, you can access the core function of `blueskynet`:
+
+``` r
+library(blueskynet)
+library(dplyr)
+
+# Authenticate yourself
+password <- Sys.getenv("BLUESKY_APP_PASS")
+identifier <- Sys.getenv("BLUESKY_APP_USER")
+
+# Then get a token and a refresh token
+auth_object <- get_token(identifier, password)
+token <- auth_object$accessJwt
+refresh_tok <- auth_object$refreshJwt
+
+# Establish a small net as a starting point
+key_actor <- "natalieamiri.bsky.social"
+keywords <- c("reporter", "journalist", "writer")
+small_net <- init_net(key_actor, keywords, token)
+```
+
+First few rows of a starting point initial network:
+
+``` r
+small_net |> head(3)
+#> # A tibble: 3 × 2
+#>   actor_handle             follows_handle          
+#>   <chr>                    <chr>                   
+#> 1 natalieamiri.bsky.social saschalobo.bsky.social  
+#> 2 natalieamiri.bsky.social heute.nachrichten.com.de
+#> 3 natalieamiri.bsky.social iranjournal.bsky.social
+```
+
+When you’re ready, you can build a bigger net, with several supporting
+artifacts, like a 3d-widget, using
+[`build_network()`](https://lassehjorthmadsen.github.io/blueskynet/reference/build_network.md)
+which we won’t run here, since it can take a lot of time to build a big
+network.
+
+## Example application
+
+Have a look at a network of influential scientists on Bluesky Social,
+generated with `blueskynet`
+[here](https://lassehjorthmadsen.github.io/blueskyanalyses/).
+
+## Documentation
+
+`blueskynet` has a [pkddown](https://pkgdown.r-lib.org/index.html)
+website for documentation right
+[here](https://lassehjorthmadsen.github.io/blueskynet/index.html).
+
+# Package index
+
+## Wrapper functions
+
+Functions around individual endpoint in the Bluesky Social API
+
+- [`get_token()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.md)
+  : Get authentication token for Bluesky API
+- [`refresh_token()`](https://lassehjorthmadsen.github.io/blueskynet/reference/refresh_token.md)
+  : Refresh authentication token for Bluesky API
+- [`verify_token()`](https://lassehjorthmadsen.github.io/blueskynet/reference/verify_token.md)
+  : Verify authentication token validity
+- [`get_profiles()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_profiles.md)
+  : Get profile information for Bluesky users
+- [`get_follows()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_follows.md)
+  : Get accounts followed by a user
+- [`get_followers()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_followers.md)
+  : Get followers of a Bluesky user
+- [`get_user_posts()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_user_posts.md)
+  : Retrieve posts from a Bluesky user
+- [`follow_actor()`](https://lassehjorthmadsen.github.io/blueskynet/reference/follow_actor.md)
+  : Follow a user on Bluesky Social
+- [`unfollow_actor()`](https://lassehjorthmadsen.github.io/blueskynet/reference/unfollow_actor.md)
+  : Unfollow a user on Bluesky Social
+- [`get_all_follow_records()`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.md)
+  : Get complete follow records from user repository
+- [`extract_follow_subjects()`](https://lassehjorthmadsen.github.io/blueskynet/reference/extract_follow_subjects.md)
+  : Extract subject DIDs from follow records
+- [`find_follow_record()`](https://lassehjorthmadsen.github.io/blueskynet/reference/find_follow_record.md)
+  : Find follow record for specific actor
+
+## Network functions
+
+Functions for creating and analyzing networks.
+
+- [`add_metrics()`](https://lassehjorthmadsen.github.io/blueskynet/reference/add_metrics.md)
+  : Add network analysis metrics to user profiles
+- [`build_network()`](https://lassehjorthmadsen.github.io/blueskynet/reference/build_network.md)
+  : Build complete network analysis pipeline
+- [`com_labels()`](https://lassehjorthmadsen.github.io/blueskynet/reference/com_labels.md)
+  : Generate labels for network communities
+- [`create_widget()`](https://lassehjorthmadsen.github.io/blueskynet/reference/create_widget.md)
+  : Create interactive 3D network visualization widget
+- [`expand_net()`](https://lassehjorthmadsen.github.io/blueskynet/reference/expand_net.md)
+  : Expand network through iterative growth
+- [`init_net()`](https://lassehjorthmadsen.github.io/blueskynet/reference/init_net.md)
+  : Initialize a network from key actors
+- [`trim_net()`](https://lassehjorthmadsen.github.io/blueskynet/reference/trim_net.md)
+  : Clean and trim network to create cohesive community
+- [`word_freqs()`](https://lassehjorthmadsen.github.io/blueskynet/reference/word_freqs.md)
+  : Calculate word frequencies from text data
+
