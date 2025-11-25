@@ -255,28 +255,28 @@ expand_net <- function(
 #'   \item{follows_handle}{Character. User being followed}
 #' }
 #' @param threshold Numeric. Inclusion threshold for users:
-#' \\describe{
-#'   \\item{>= 1}{Minimum number of followers within the network required}
-#'   \\item{< 1}{Minimum proportion of network that must follow the user}
+#' \describe{
+#'   \item{>= 1}{Minimum number of followers within the network required}
+#'   \item{< 1}{Minimum proportion of network that must follow the user}
 #' }
 #'
 #' @return Tibble. Cleaned network with the same structure as input but with:
-#' \\itemize{
-#'   \\item{All duplicate edges removed}
-#'   \\item{Invalid handles and NA values excluded}
-#'   \\item{Users below follower threshold removed}
-#'   \\item{Only users who both follow and are followed within the network}
+#' \itemize{
+#'   \item{All duplicate edges removed}
+#'   \item{Invalid handles and NA values excluded}
+#'   \item{Users below follower threshold removed}
+#'   \item{Only users who both follow and are followed within the network}
 #' }
 #'   The resulting network forms a more cohesive community for analysis.
 #'
 #' @details
 #' The trimming process works iteratively:
-#' \\enumerate{
-#'   \\item{Remove duplicate connections and invalid/missing handles}
-#'   \\item{Count followers for each user within the network}
-#'   \\item{Remove users below the specified threshold}
-#'   \\item{Keep only users who appear as both followers and followed}
-#'   \\item{Repeat until the network stabilizes}
+#' \enumerate{
+#'   \item{Remove duplicate connections and invalid/missing handles}
+#'   \item{Count followers for each user within the network}
+#'   \item{Remove users below the specified threshold}
+#'   \item{Keep only users who appear as both followers and followed}
+#'   \item{Repeat until the network stabilizes}
 #' }
 #'
 #' This creates a "core community" where every member has meaningful
@@ -284,8 +284,8 @@ expand_net <- function(
 #' analytical insights.
 #'
 #' @family network-building
-#' @seealso \\code{\\link{expand_net}}, \\code{\\link{build_network}},
-#'   \\code{\\link{add_metrics}}
+#' @seealso \code{\link{expand_net}}, \code{\link{build_network}},
+#'   \code{\link{add_metrics}}
 #'
 #' @examples
 #' \dontrun{
@@ -385,8 +385,17 @@ trim_net <- function(net, threshold) {
 #' @param keywords Character vector. Keywords to search for in user profile
 #'   descriptions to determine if they should be included in the network
 #' @param token Character. Authentication token from \code{\link{get_token}}
+#' @param refresh_tok Character. Refresh token from \code{\link{get_token}} for
+#'   long-running operations. Token will be refreshed automatically during processing
+#'   to prevent expiration with large numbers of key actors.
 #'
-#' @return A tibble with network edges (follow relationships):
+#' @return A list containing the initial network results:
+#' \describe{
+#'   \item{net}{Tibble. Network edges with follow relationships}
+#'   \item{token}{Character. Updated access token (may have been refreshed)}
+#'   \item{refresh_tok}{Character. Updated refresh token}
+#' }
+#'   The net tibble contains:
 #' \describe{
 #'   \item{actor_handle}{Character. Handle of the user doing the following}
 #'   \item{follows_handle}{Character. Handle of the user being followed}
@@ -403,18 +412,18 @@ trim_net <- function(net, threshold) {
 #' # Authenticate first
 #' auth <- get_token("your.handle.bsky.social", "your-app-password")
 #' token <- auth$accessJwt
+#' refresh_tok <- auth$refreshJwt
 #'
 #' # Create initial network from science communicators
 #' key_scientists <- c("neilhimself.neilgaiman.com", "example.scientist.bsky.social")
 #' science_keywords <- c("scientist", "researcher", "academic", "PhD")
 #'
-#' initial_net <- init_net(key_scientists, science_keywords, token)
-#' print(paste("Initial network has", nrow(initial_net), "connections"))
+#' result <- init_net(key_scientists, science_keywords, token, refresh_tok)
+#' initial_net <- result$net
+#' token <- result$token  # Updated token
+#' refresh_tok <- result$refresh_tok  # Updated refresh token
 #'
-#' # Create network for journalists
-#' journalists <- c("reporter.bsky.social", "news.bsky.social")
-#' media_keywords <- c("journalist", "reporter", "news", "media")
-#' media_net <- init_net(journalists, media_keywords, token)
+#' print(paste("Initial network has", nrow(initial_net), "connections"))
 #'
 #' # Examine the network structure
 #' unique_actors <- length(unique(c(initial_net$actor_handle, initial_net$follows_handle)))
@@ -423,11 +432,33 @@ trim_net <- function(net, threshold) {
 #'
 #' @export
 #'
-init_net <- function(key_actors, keywords, token) {
+init_net <- function(key_actors, keywords, token, refresh_tok) {
   keywords <- paste(keywords, collapse = "|")
 
-  net <- key_actors |>
-    purrr::map(get_follows, token) |>
+  # Process key_actors with periodic token refresh to prevent expiration
+  follows_list <- list()
+  refresh_interval <- 100 # Refresh every 100 actors
+
+  cli::cli_progress_bar(
+    name = "   Getting follows ",
+    type = "iterator",
+    clear = F,
+    total = length(key_actors)
+  )
+
+  for (i in seq_along(key_actors)) {
+    # Refresh token at start and periodically to prevent expiration
+    if (i == 1 || i %% refresh_interval == 1) {
+      refresh_object <- refresh_token(refresh_tok)
+      token <- refresh_object$accessJwt
+      refresh_tok <- refresh_object$refreshJwt
+    }
+
+    follows_list[[i]] <- get_follows(key_actors[i], token)
+    cli::cli_progress_update()
+  }
+
+  net <- follows_list |>
     purrr::set_names(key_actors) |>
     dplyr::bind_rows(.id = "actor_handle") |>
     dplyr::select(.data$actor_handle, follows_handle = .data$handle)
@@ -435,11 +466,16 @@ init_net <- function(key_actors, keywords, token) {
   # Unsure exactly why "handle.invalid" happens, but it can't be useful, so get rid of it
   net <- net |> dplyr::filter(.data$follows_handle != "handle.invalid")
 
+  # Refresh token before profile fetching
+  refresh_object <- refresh_token(refresh_tok)
+  token <- refresh_object$accessJwt
+  refresh_tok <- refresh_object$refreshJwt
+
   profiles <- net$follows_handle |>
     unique() |>
     get_profiles(token)
 
-  profiles |>
+  profiles <- profiles |>
     dplyr::filter(stringr::str_detect(tolower(.data$description), keywords))
 
   if (nrow(profiles) == 0) {
@@ -449,7 +485,7 @@ init_net <- function(key_actors, keywords, token) {
   net <- net |>
     dplyr::filter(.data$follows_handle %in% profiles$handle)
 
-  return(net)
+  return(list("net" = net, "token" = token, "refresh_tok" = refresh_tok))
 }
 
 
@@ -460,7 +496,7 @@ init_net <- function(key_actors, keywords, token) {
 #' scores to identify influential users and network structure within your Bluesky
 #' social network.
 #'
-#' @param profiles Tibble. User profile information from \\code{\\link{get_profiles}}
+#' @param profiles Tibble. User profile information from \code{\link{get_profiles}}
 #'   containing at least handle and other profile details
 #' @param net Tibble. Network edge list with follow relationships containing:
 #' \describe{
@@ -469,28 +505,28 @@ init_net <- function(key_actors, keywords, token) {
 #' }
 #'
 #' @return Tibble with original profile data enhanced with network metrics:
-#' \\describe{
-#'   \\item{centrality}{Numeric. Betweenness centrality score (influence as bridge)}
-#'   \\item{community}{Integer. Community assignment from cluster analysis}
-#'   \\item{pageRank}{Numeric. PageRank score (influence based on follower quality)}
-#'   \\item{insideFollowers}{Integer. Number of followers within this network}
-#'   \\item{community_label}{Character. Descriptive label for the community}
+#' \describe{
+#'   \item{centrality}{Numeric. Betweenness centrality score (influence as bridge)}
+#'   \item{community}{Integer. Community assignment from cluster analysis}
+#'   \item{pageRank}{Numeric. PageRank score (influence based on follower quality)}
+#'   \item{insideFollowers}{Integer. Number of followers within this network}
+#'   \item{community_label}{Character. Descriptive label for the community}
 #' }
 #'   Plus all original profile columns (handle, displayName, description, etc.)
 #'
 #' @details
 #' The function performs several network analysis computations:
-#' \\itemize{
-#'   \\item{Betweenness centrality: Identifies users who act as bridges between communities}
-#'   \\item{Community detection: Uses random walks to find densely connected groups}
-#'   \\item{PageRank: Measures influence based on follower network quality}
-#'   \\item{Inside followers: Counts followers within the analyzed network subset}
-#'   \\item{Community labels: Generates descriptive labels using TF-IDF of user bios}
+#' \itemize{
+#'   \item{Betweenness centrality: Identifies users who act as bridges between communities}
+#'   \item{Community detection: Uses random walks to find densely connected groups}
+#'   \item{PageRank: Measures influence based on follower network quality}
+#'   \item{Inside followers: Counts followers within the analyzed network subset}
+#'   \item{Community labels: Generates descriptive labels using TF-IDF of user bios}
 #' }
 #'
 #' @family network-analysis
-#' @seealso \\code{\\link{build_network}}, \\code{\\link{com_labels}},
-#'   \\code{\\link{create_widget}}
+#' @seealso \code{\link{build_network}}, \code{\link{com_labels}},
+#'   \code{\link{create_widget}}
 #'
 #' @examples
 #' \dontrun{
@@ -582,9 +618,15 @@ add_metrics <- function(profiles, net) {
 
     profiles <- profiles |>
       dplyr::left_join(com_labels(profiles), by = "community")
-  }
 
-  return(profiles)
+    return(profiles)
+  } else {
+    # If no profiles provided, return the metrics with followers count
+    result <- metrics |>
+      dplyr::left_join(followers, by = c("handle" = "follows_handle"))
+
+    return(result)
+  }
 }
 
 
@@ -600,35 +642,35 @@ add_metrics <- function(profiles, net) {
 #'   \item{actor_handle}{Character. User who is following another}
 #'   \item{follows_handle}{Character. User being followed}
 #' }
-#' @param profiles Tibble. User profile information from \\code{\\link{get_profiles}}
+#' @param profiles Tibble. User profile information from \code{\link{get_profiles}}
 #'   containing handle, displayName, description and other profile details
 #' @param prop Numeric. Proportion of users to include in visualization (0-1).
 #'   Use smaller values for large networks to improve performance (default 1.0)
 #'
 #' @return An interactive HTML widget (threejs object) that displays:
-#' \\itemize{
-#'   \\item{Nodes representing users, colored by community}
-#'   \\item{Edges representing follow relationships}
-#'   \\item{Interactive controls for rotation, zoom, and exploration}
-#'   \\item{Hover tooltips showing user information}
+#' \itemize{
+#'   \item{Nodes representing users, colored by community}
+#'   \item{Edges representing follow relationships}
+#'   \item{Interactive controls for rotation, zoom, and exploration}
+#'   \item{Hover tooltips showing user information}
 #' }
 #'
 #' @details
 #' The visualization process includes:
-#' \\enumerate{
-#'   \\item{Community detection using random walk algorithm}
-#'   \\item{Color assignment based on community membership}
-#'   \\item{Node labeling with user display names and descriptions}
-#'   \\item{3D layout generation for optimal viewing}
+#' \enumerate{
+#'   \item{Community detection using random walk algorithm}
+#'   \item{Color assignment based on community membership}
+#'   \item{Node labeling with user display names and descriptions}
+#'   \item{3D layout generation for optimal viewing}
 #' }
 #'
-#' For large networks (1000+ users), consider using \\code{prop < 1} to sample
+#' For large networks (1000+ users), consider using \code{prop < 1} to sample
 #' a subset for better performance. The widget works best with networks of
 #' 50-500 users for detailed exploration.
 #'
 #' @family network-visualization
-#' @seealso \\code{\\link{build_network}}, \\code{\\link{add_metrics}},
-#'   \\code{\\link{trim_net}}
+#' @seealso \code{\link{build_network}}, \code{\link{add_metrics}},
+#'   \code{\link{trim_net}}
 #'
 #' @examples
 #' \dontrun{
@@ -695,6 +737,11 @@ create_widget <- function(net, profiles, prop = 1) {
         .data$actor_handle %in% profiles$handle,
         .data$follows_handle %in% profiles$handle
       )
+  }
+
+  # Check if network is empty after filtering
+  if (nrow(net) == 0) {
+    return(NULL)
   }
 
   # Create graph object
@@ -842,7 +889,10 @@ build_network <- function(
   keywords <- keywords |> paste0(collapse = "|")
 
   # Get initial net based on key actor
-  small_net <- init_net(key_actors, keywords, token)
+  init_result <- init_net(key_actors, keywords, token, refresh_tok)
+  small_net <- init_result$net
+  token <- init_result$token
+  refresh_tok <- init_result$refresh_tok
 
   # Expand the net
   expnet <- expand_net(

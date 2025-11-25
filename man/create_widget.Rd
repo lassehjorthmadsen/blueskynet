@@ -13,7 +13,7 @@ create_widget(net, profiles, prop = 1)
 \item{follows_handle}{Character. User being followed}
 }}
 
-\item{profiles}{Tibble. User profile information from \\code{\\link{get_profiles}}
+\item{profiles}{Tibble. User profile information from \code{\link{get_profiles}}
 containing handle, displayName, description and other profile details}
 
 \item{prop}{Numeric. Proportion of users to include in visualization (0-1).
@@ -21,11 +21,11 @@ Use smaller values for large networks to improve performance (default 1.0)}
 }
 \value{
 An interactive HTML widget (threejs object) that displays:
-\\itemize{
-\\item{Nodes representing users, colored by community}
-\\item{Edges representing follow relationships}
-\\item{Interactive controls for rotation, zoom, and exploration}
-\\item{Hover tooltips showing user information}
+\itemize{
+\item{Nodes representing users, colored by community}
+\item{Edges representing follow relationships}
+\item{Interactive controls for rotation, zoom, and exploration}
+\item{Hover tooltips showing user information}
 }
 }
 \description{
@@ -36,14 +36,14 @@ clusters, and understand relationship patterns in your social network.
 }
 \details{
 The visualization process includes:
-\\enumerate{
-\\item{Community detection using random walk algorithm}
-\\item{Color assignment based on community membership}
-\\item{Node labeling with user display names and descriptions}
-\\item{3D layout generation for optimal viewing}
+\enumerate{
+\item{Community detection using random walk algorithm}
+\item{Color assignment based on community membership}
+\item{Node labeling with user display names and descriptions}
+\item{3D layout generation for optimal viewing}
 }
 
-For large networks (1000+ users), consider using \\code{prop < 1} to sample
+For large networks (1000+ users), consider using \code{prop < 1} to sample
 a subset for better performance. The widget works best with networks of
 50-500 users for detailed exploration.
 }
@@ -99,7 +99,7 @@ focused_widget
 
 }
 \seealso{
-\\code{\\link{build_network}}, \\code{\\link{add_metrics}},
-\\code{\\link{trim_net}}
+\code{\link{build_network}}, \code{\link{add_metrics}},
+\code{\link{trim_net}}
 }
 \concept{network-visualization}

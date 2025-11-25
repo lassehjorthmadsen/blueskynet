@@ -7,7 +7,7 @@
 find_follow_record(follow_records, actor_did)
 }
 \arguments{
-\item{follow_records}{List. Output from \\code{\\link{get_all_follow_records}}
+\item{follow_records}{List. Output from \code{\link{get_all_follow_records}}
 containing all your follow record objects}
 
 \item{actor_did}{Character. The DID (decentralized identifier) of the user
@@ -16,10 +16,10 @@ you want to find the follow record for}
 \value{
 The complete follow record object if found, \\code{NULL} if the user
 is not in your follows. The record contains:
-\\describe{
-\\item{uri}{Character. Record URI containing the rkey needed for unfollowing}
-\\item{cid}{Character. Content identifier}
-\\item{value}{List. Record metadata including subject DID and creation time}
+\describe{
+\item{uri}{Character. Record URI containing the rkey needed for unfollowing}
+\item{cid}{Character. Content identifier}
+\item{value}{List. Record metadata including subject DID and creation time}
 }
 }
 \description{
@@ -92,8 +92,8 @@ for (did in inactive_users$did) {
 
 }
 \seealso{
-\\code{\\link{get_all_follow_records}}, \\code{\\link{unfollow_actor}},
-\\code{\\link{extract_follow_subjects}}
+\code{\link{get_all_follow_records}}, \code{\link{unfollow_actor}},
+\code{\link{extract_follow_subjects}}
 
 Other follow-management: 
 \code{\link{extract_follow_subjects}()},

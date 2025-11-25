@@ -7,7 +7,7 @@
 extract_follow_subjects(follow_records)
 }
 \arguments{
-\item{follow_records}{List. Output from \\code{\\link{get_all_follow_records}}
+\item{follow_records}{List. Output from \code{\link{get_all_follow_records}}
 containing complete follow record objects}
 }
 \value{
@@ -16,7 +16,7 @@ Each DID is a unique identifier like "did:plc:abc123xyz..."
 }
 \description{
 Extracts the DIDs (decentralized identifiers) of all users you are following
-from the complete follow records retrieved by \\code{\\link{get_all_follow_records}}.
+from the complete follow records retrieved by \code{\link{get_all_follow_records}}.
 This is useful for getting a simple list of who you follow for analysis or
 bulk operations without the full record metadata.
 }
@@ -62,8 +62,8 @@ for (i in seq_along(followed_dids)) {
 
 }
 \seealso{
-\\code{\\link{get_all_follow_records}}, \\code{\\link{find_follow_record}},
-\\code{\\link{get_profiles}}
+\code{\link{get_all_follow_records}}, \code{\link{find_follow_record}},
+\code{\link{get_profiles}}
 
 Other follow-management: 
 \code{\link{find_follow_record}()},

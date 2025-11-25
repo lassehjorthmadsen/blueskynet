@@ -14,18 +14,18 @@ trim_net(net, threshold)
 }}
 
 \item{threshold}{Numeric. Inclusion threshold for users:
-\\describe{
-\\item{>= 1}{Minimum number of followers within the network required}
-\\item{< 1}{Minimum proportion of network that must follow the user}
+\describe{
+\item{>= 1}{Minimum number of followers within the network required}
+\item{< 1}{Minimum proportion of network that must follow the user}
 }}
 }
 \value{
 Tibble. Cleaned network with the same structure as input but with:
-\\itemize{
-\\item{All duplicate edges removed}
-\\item{Invalid handles and NA values excluded}
-\\item{Users below follower threshold removed}
-\\item{Only users who both follow and are followed within the network}
+\itemize{
+\item{All duplicate edges removed}
+\item{Invalid handles and NA values excluded}
+\item{Users below follower threshold removed}
+\item{Only users who both follow and are followed within the network}
 }
 The resulting network forms a more cohesive community for analysis.
 }
@@ -37,12 +37,12 @@ visualizations and more meaningful community analysis.
 }
 \details{
 The trimming process works iteratively:
-\\enumerate{
-\\item{Remove duplicate connections and invalid/missing handles}
-\\item{Count followers for each user within the network}
-\\item{Remove users below the specified threshold}
-\\item{Keep only users who appear as both followers and followed}
-\\item{Repeat until the network stabilizes}
+\enumerate{
+\item{Remove duplicate connections and invalid/missing handles}
+\item{Count followers for each user within the network}
+\item{Remove users below the specified threshold}
+\item{Keep only users who appear as both followers and followed}
+\item{Repeat until the network stabilizes}
 }
 
 This creates a "core community" where every member has meaningful
@@ -105,8 +105,8 @@ proportional_trim <- trim_net(initial_net, threshold = 0.2)
 
 }
 \seealso{
-\\code{\\link{expand_net}}, \\code{\\link{build_network}},
-\\code{\\link{add_metrics}}
+\code{\link{expand_net}}, \code{\link{build_network}},
+\code{\link{add_metrics}}
 
 Other network-building: 
 \code{\link{build_network}()},

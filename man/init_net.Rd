@@ -4,7 +4,7 @@
 \alias{init_net}
 \title{Initialize a network from key actors}
 \usage{
-init_net(key_actors, keywords, token)
+init_net(key_actors, keywords, token, refresh_tok)
 }
 \arguments{
 \item{key_actors}{Character vector. Handles (e.g., "username.bsky.social") of
@@ -14,9 +14,19 @@ the central actors whose follows will form the initial network}
 descriptions to determine if they should be included in the network}
 
 \item{token}{Character. Authentication token from \code{\link{get_token}}}
+
+\item{refresh_tok}{Character. Refresh token from \code{\link{get_token}} for
+long-running operations. Token will be refreshed automatically during processing
+to prevent expiration with large numbers of key actors.}
 }
 \value{
-A tibble with network edges (follow relationships):
+A list containing the initial network results:
+\describe{
+\item{net}{Tibble. Network edges with follow relationships}
+\item{token}{Character. Updated access token (may have been refreshed)}
+\item{refresh_tok}{Character. Updated refresh token}
+}
+The net tibble contains:
 \describe{
 \item{actor_handle}{Character. Handle of the user doing the following}
 \item{follows_handle}{Character. Handle of the user being followed}
@@ -34,18 +44,18 @@ network that can later be expanded using \code{\link{expand_net}}.
 # Authenticate first
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 token <- auth$accessJwt
+refresh_tok <- auth$refreshJwt
 
 # Create initial network from science communicators
 key_scientists <- c("neilhimself.neilgaiman.com", "example.scientist.bsky.social")
 science_keywords <- c("scientist", "researcher", "academic", "PhD")
 
-initial_net <- init_net(key_scientists, science_keywords, token)
-print(paste("Initial network has", nrow(initial_net), "connections"))
+result <- init_net(key_scientists, science_keywords, token, refresh_tok)
+initial_net <- result$net
+token <- result$token  # Updated token
+refresh_tok <- result$refresh_tok  # Updated refresh token
 
-# Create network for journalists
-journalists <- c("reporter.bsky.social", "news.bsky.social")
-media_keywords <- c("journalist", "reporter", "news", "media")
-media_net <- init_net(journalists, media_keywords, token)
+print(paste("Initial network has", nrow(initial_net), "connections"))
 
 # Examine the network structure
 unique_actors <- length(unique(c(initial_net$actor_handle, initial_net$follows_handle)))

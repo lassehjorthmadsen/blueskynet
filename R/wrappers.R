@@ -1004,19 +1004,19 @@ get_all_follow_records <- function(my_did, token, max_retries = 3, retry_delay =
 #' Extract subject DIDs from follow records
 #'
 #' Extracts the DIDs (decentralized identifiers) of all users you are following
-#' from the complete follow records retrieved by \\code{\\link{get_all_follow_records}}.
+#' from the complete follow records retrieved by \code{\link{get_all_follow_records}}.
 #' This is useful for getting a simple list of who you follow for analysis or
 #' bulk operations without the full record metadata.
 #'
-#' @param follow_records List. Output from \\code{\\link{get_all_follow_records}}
+#' @param follow_records List. Output from \code{\link{get_all_follow_records}}
 #'   containing complete follow record objects
 #'
 #' @return Character vector of DIDs for all users you are following.
 #'   Each DID is a unique identifier like "did:plc:abc123xyz..."
 #'
 #' @family follow-management
-#' @seealso \\code{\\link{get_all_follow_records}}, \\code{\\link{find_follow_record}},
-#'   \\code{\\link{get_profiles}}
+#' @seealso \code{\link{get_all_follow_records}}, \code{\link{find_follow_record}},
+#'   \code{\link{get_profiles}}
 #'
 #' @examples
 #' \dontrun{
@@ -1078,22 +1078,22 @@ extract_follow_subjects <- function(follow_records) {
 #' for a given user. This is essential for unfollow operations since you need
 #' the record key (rkey) from the original follow record to delete it.
 #'
-#' @param follow_records List. Output from \\code{\\link{get_all_follow_records}}
+#' @param follow_records List. Output from \code{\link{get_all_follow_records}}
 #'   containing all your follow record objects
 #' @param actor_did Character. The DID (decentralized identifier) of the user
 #'   you want to find the follow record for
 #'
 #' @return The complete follow record object if found, \\code{NULL} if the user
 #'   is not in your follows. The record contains:
-#' \\describe{
-#'   \\item{uri}{Character. Record URI containing the rkey needed for unfollowing}
-#'   \\item{cid}{Character. Content identifier}
-#'   \\item{value}{List. Record metadata including subject DID and creation time}
+#' \describe{
+#'   \item{uri}{Character. Record URI containing the rkey needed for unfollowing}
+#'   \item{cid}{Character. Content identifier}
+#'   \item{value}{List. Record metadata including subject DID and creation time}
 #' }
 #'
 #' @family follow-management
-#' @seealso \\code{\\link{get_all_follow_records}}, \\code{\\link{unfollow_actor}},
-#'   \\code{\\link{extract_follow_subjects}}
+#' @seealso \code{\link{get_all_follow_records}}, \code{\link{unfollow_actor}},
+#'   \code{\link{extract_follow_subjects}}
 #'
 #' @examples
 #' \dontrun{

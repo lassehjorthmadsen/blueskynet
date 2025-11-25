@@ -7,7 +7,7 @@
 add_metrics(profiles, net)
 }
 \arguments{
-\item{profiles}{Tibble. User profile information from \\code{\\link{get_profiles}}
+\item{profiles}{Tibble. User profile information from \code{\link{get_profiles}}
 containing at least handle and other profile details}
 
 \item{net}{Tibble. Network edge list with follow relationships containing:
@@ -18,12 +18,12 @@ containing at least handle and other profile details}
 }
 \value{
 Tibble with original profile data enhanced with network metrics:
-\\describe{
-\\item{centrality}{Numeric. Betweenness centrality score (influence as bridge)}
-\\item{community}{Integer. Community assignment from cluster analysis}
-\\item{pageRank}{Numeric. PageRank score (influence based on follower quality)}
-\\item{insideFollowers}{Integer. Number of followers within this network}
-\\item{community_label}{Character. Descriptive label for the community}
+\describe{
+\item{centrality}{Numeric. Betweenness centrality score (influence as bridge)}
+\item{community}{Integer. Community assignment from cluster analysis}
+\item{pageRank}{Numeric. PageRank score (influence based on follower quality)}
+\item{insideFollowers}{Integer. Number of followers within this network}
+\item{community_label}{Character. Descriptive label for the community}
 }
 Plus all original profile columns (handle, displayName, description, etc.)
 }
@@ -35,12 +35,12 @@ social network.
 }
 \details{
 The function performs several network analysis computations:
-\\itemize{
-\\item{Betweenness centrality: Identifies users who act as bridges between communities}
-\\item{Community detection: Uses random walks to find densely connected groups}
-\\item{PageRank: Measures influence based on follower network quality}
-\\item{Inside followers: Counts followers within the analyzed network subset}
-\\item{Community labels: Generates descriptive labels using TF-IDF of user bios}
+\itemize{
+\item{Betweenness centrality: Identifies users who act as bridges between communities}
+\item{Community detection: Uses random walks to find densely connected groups}
+\item{PageRank: Measures influence based on follower network quality}
+\item{Inside followers: Counts followers within the analyzed network subset}
+\item{Community labels: Generates descriptive labels using TF-IDF of user bios}
 }
 }
 \examples{
@@ -102,8 +102,8 @@ head(influence_comparison, 10)
 
 }
 \seealso{
-\\code{\\link{build_network}}, \\code{\\link{com_labels}},
-\\code{\\link{create_widget}}
+\code{\link{build_network}}, \code{\link{com_labels}},
+\code{\link{create_widget}}
 
 Other network-analysis: 
 \code{\link{com_labels}()}

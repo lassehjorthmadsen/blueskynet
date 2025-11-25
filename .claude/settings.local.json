@@ -5,7 +5,8 @@
       "Bash(gh run list)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:github.com)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(Rscript:*)"
     ],
     "deny": [],
     "ask": []
