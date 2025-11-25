@@ -2,9 +2,9 @@
 
 Extracts the DIDs (decentralized identifiers) of all users you are
 following from the complete follow records retrieved by
-\code\linkget_all_follow_records. This is useful for getting a simple
-list of who you follow for analysis or bulk operations without the full
-record metadata.
+[`get_all_follow_records`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.md).
+This is useful for getting a simple list of who you follow for analysis
+or bulk operations without the full record metadata.
 
 ## Usage
 
@@ -16,8 +16,9 @@ extract_follow_subjects(follow_records)
 
 - follow_records:
 
-  List. Output from \code\linkget_all_follow_records containing complete
-  follow record objects
+  List. Output from
+  [`get_all_follow_records`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.md)
+  containing complete follow record objects
 
 ## Value
 
@@ -26,8 +27,9 @@ unique identifier like "did:plc:abc123xyz..."
 
 ## See also
 
-\code\linkget_all_follow_records, \code\linkfind_follow_record,
-\code\linkget_profiles
+[`get_all_follow_records`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.md),
+[`find_follow_record`](https://lassehjorthmadsen.github.io/blueskynet/reference/find_follow_record.md),
+[`get_profiles`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_profiles.md)
 
 Other follow-management:
 [`find_follow_record()`](https://lassehjorthmadsen.github.io/blueskynet/reference/find_follow_record.md),

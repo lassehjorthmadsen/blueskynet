@@ -15,8 +15,9 @@ find_follow_record(follow_records, actor_did)
 
 - follow_records:
 
-  List. Output from \code\linkget_all_follow_records containing all your
-  follow record objects
+  List. Output from
+  [`get_all_follow_records`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.md)
+  containing all your follow record objects
 
 - actor_did:
 
@@ -26,15 +27,25 @@ find_follow_record(follow_records, actor_did)
 ## Value
 
 The complete follow record object if found, \codeNULL if the user is not
-in your follows. The record contains: \describe \itemuriCharacter.
-Record URI containing the rkey needed for unfollowing \itemcidCharacter.
-Content identifier \itemvalueList. Record metadata including subject DID
-and creation time
+in your follows. The record contains:
+
+- uri:
+
+  Character. Record URI containing the rkey needed for unfollowing
+
+- cid:
+
+  Character. Content identifier
+
+- value:
+
+  List. Record metadata including subject DID and creation time
 
 ## See also
 
-\code\linkget_all_follow_records, \code\linkunfollow_actor,
-\code\linkextract_follow_subjects
+[`get_all_follow_records`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_all_follow_records.md),
+[`unfollow_actor`](https://lassehjorthmadsen.github.io/blueskynet/reference/unfollow_actor.md),
+[`extract_follow_subjects`](https://lassehjorthmadsen.github.io/blueskynet/reference/extract_follow_subjects.md)
 
 Other follow-management:
 [`extract_follow_subjects()`](https://lassehjorthmadsen.github.io/blueskynet/reference/extract_follow_subjects.md),

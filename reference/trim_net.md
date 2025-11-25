@@ -27,25 +27,43 @@ trim_net(net, threshold)
 
 - threshold:
 
-  Numeric. Inclusion threshold for users: \describe \item\>= 1Minimum
-  number of followers within the network required \item\< 1Minimum
-  proportion of network that must follow the user
+  Numeric. Inclusion threshold for users:
+
+  \>= 1
+
+  :   Minimum number of followers within the network required
+
+  \< 1
+
+  :   Minimum proportion of network that must follow the user
 
 ## Value
 
 Tibble. Cleaned network with the same structure as input but with:
-\itemize \itemAll duplicate edges removed \itemInvalid handles and NA
-values excluded \itemUsers below follower threshold removed \itemOnly
-users who both follow and are followed within the network The resulting
-network forms a more cohesive community for analysis.
+
+- All duplicate edges removed
+
+- Invalid handles and NA values excluded
+
+- Users below follower threshold removed
+
+- Only users who both follow and are followed within the network
+
+The resulting network forms a more cohesive community for analysis.
 
 ## Details
 
-The trimming process works iteratively: \enumerate \itemRemove duplicate
-connections and invalid/missing handles \itemCount followers for each
-user within the network \itemRemove users below the specified threshold
-\itemKeep only users who appear as both followers and followed
-\itemRepeat until the network stabilizes
+The trimming process works iteratively:
+
+1.  Remove duplicate connections and invalid/missing handles
+
+2.  Count followers for each user within the network
+
+3.  Remove users below the specified threshold
+
+4.  Keep only users who appear as both followers and followed
+
+5.  Repeat until the network stabilizes
 
 This creates a "core community" where every member has meaningful
 connections within the group, improving visualization quality and
@@ -53,7 +71,9 @@ analytical insights.
 
 ## See also
 
-\code\linkexpand_net, \code\linkbuild_network, \code\linkadd_metrics
+[`expand_net`](https://lassehjorthmadsen.github.io/blueskynet/reference/expand_net.md),
+[`build_network`](https://lassehjorthmadsen.github.io/blueskynet/reference/build_network.md),
+[`add_metrics`](https://lassehjorthmadsen.github.io/blueskynet/reference/add_metrics.md)
 
 Other network-building:
 [`build_network()`](https://lassehjorthmadsen.github.io/blueskynet/reference/build_network.md),

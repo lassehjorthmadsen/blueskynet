@@ -53,7 +53,7 @@ the record key (rkey) from the original follow record to delete it.</p>
 
 
 <dl><dt id="arg-follow-records">follow_records<a class="anchor" aria-label="anchor" href="#arg-follow-records"></a></dt>
-<dd><p>List. Output from \code\linkget_all_follow_records
+<dd><p>List. Output from <code><a href="get_all_follow_records.html">get_all_follow_records</a></code>
 containing all your follow record objects</p></dd>
 
 
@@ -65,16 +65,21 @@ you want to find the follow record for</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The complete follow record object if found, \codeNULL if the user
-is not in your follows. The record contains:
-\describe
-\itemuriCharacter. Record URI containing the rkey needed for unfollowing
-\itemcidCharacter. Content identifier
-\itemvalueList. Record metadata including subject DID and creation time</p>
-    </div>
+is not in your follows. The record contains:</p><dl><dt>uri</dt>
+<dd><p>Character. Record URI containing the rkey needed for unfollowing</p></dd>
+
+<dt>cid</dt>
+<dd><p>Character. Content identifier</p></dd>
+
+<dt>value</dt>
+<dd><p>List. Record metadata including subject DID and creation time</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>\code\linkget_all_follow_records, \code\linkunfollow_actor,
-\code\linkextract_follow_subjects</p>
+    <div class="dont-index"><p><code><a href="get_all_follow_records.html">get_all_follow_records</a></code>, <code><a href="unfollow_actor.html">unfollow_actor</a></code>,
+<code><a href="extract_follow_subjects.html">extract_follow_subjects</a></code></p>
 <p>Other follow-management:
 <code><a href="extract_follow_subjects.html">extract_follow_subjects()</a></code>,
 <code><a href="follow_actor.html">follow_actor()</a></code>,

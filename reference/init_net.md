@@ -8,7 +8,7 @@ forms the seed network that can later be expanded using
 ## Usage
 
 ``` r
-init_net(key_actors, keywords, token)
+init_net(key_actors, keywords, token, refresh_tok)
 ```
 
 ## Arguments
@@ -28,9 +28,31 @@ init_net(key_actors, keywords, token)
   Character. Authentication token from
   [`get_token`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.md)
 
+- refresh_tok:
+
+  Character. Refresh token from
+  [`get_token`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_token.md)
+  for long-running operations. Token will be refreshed automatically
+  during processing to prevent expiration with large numbers of key
+  actors.
+
 ## Value
 
-A tibble with network edges (follow relationships):
+A list containing the initial network results:
+
+- net:
+
+  Tibble. Network edges with follow relationships
+
+- token:
+
+  Character. Updated access token (may have been refreshed)
+
+- refresh_tok:
+
+  Character. Updated refresh token
+
+The net tibble contains:
 
 - actor_handle:
 
@@ -61,18 +83,18 @@ if (FALSE) { # \dontrun{
 # Authenticate first
 auth <- get_token("your.handle.bsky.social", "your-app-password")
 token <- auth$accessJwt
+refresh_tok <- auth$refreshJwt
 
 # Create initial network from science communicators
 key_scientists <- c("neilhimself.neilgaiman.com", "example.scientist.bsky.social")
 science_keywords <- c("scientist", "researcher", "academic", "PhD")
 
-initial_net <- init_net(key_scientists, science_keywords, token)
-print(paste("Initial network has", nrow(initial_net), "connections"))
+result <- init_net(key_scientists, science_keywords, token, refresh_tok)
+initial_net <- result$net
+token <- result$token  # Updated token
+refresh_tok <- result$refresh_tok  # Updated refresh token
 
-# Create network for journalists
-journalists <- c("reporter.bsky.social", "news.bsky.social")
-media_keywords <- c("journalist", "reporter", "news", "media")
-media_net <- init_net(journalists, media_keywords, token)
+print(paste("Initial network has", nrow(initial_net), "connections"))
 
 # Examine the network structure
 unique_actors <- length(unique(c(initial_net$actor_handle, initial_net$follows_handle)))

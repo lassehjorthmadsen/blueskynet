@@ -28,7 +28,8 @@ create_widget(net, profiles, prop = 1)
 
 - profiles:
 
-  Tibble. User profile information from \code\linkget_profiles
+  Tibble. User profile information from
+  [`get_profiles`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_profiles.md)
   containing handle, displayName, description and other profile details
 
 - prop:
@@ -38,26 +39,37 @@ create_widget(net, profiles, prop = 1)
 
 ## Value
 
-An interactive HTML widget (threejs object) that displays: \itemize
-\itemNodes representing users, colored by community \itemEdges
-representing follow relationships \itemInteractive controls for
-rotation, zoom, and exploration \itemHover tooltips showing user
-information
+An interactive HTML widget (threejs object) that displays:
+
+- Nodes representing users, colored by community
+
+- Edges representing follow relationships
+
+- Interactive controls for rotation, zoom, and exploration
+
+- Hover tooltips showing user information
 
 ## Details
 
-The visualization process includes: \enumerate \itemCommunity detection
-using random walk algorithm \itemColor assignment based on community
-membership \itemNode labeling with user display names and descriptions
-\item3D layout generation for optimal viewing
+The visualization process includes:
 
-For large networks (1000+ users), consider using \codeprop \< 1 to
-sample a subset for better performance. The widget works best with
-networks of 50-500 users for detailed exploration.
+1.  Community detection using random walk algorithm
+
+2.  Color assignment based on community membership
+
+3.  Node labeling with user display names and descriptions
+
+4.  3D layout generation for optimal viewing
+
+For large networks (1000+ users), consider using `prop < 1` to sample a
+subset for better performance. The widget works best with networks of
+50-500 users for detailed exploration.
 
 ## See also
 
-\code\linkbuild_network, \code\linkadd_metrics, \code\linktrim_net
+[`build_network`](https://lassehjorthmadsen.github.io/blueskynet/reference/build_network.md),
+[`add_metrics`](https://lassehjorthmadsen.github.io/blueskynet/reference/add_metrics.md),
+[`trim_net`](https://lassehjorthmadsen.github.io/blueskynet/reference/trim_net.md)
 
 ## Examples
 

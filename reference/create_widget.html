@@ -67,7 +67,7 @@ clusters, and understand relationship patterns in your social network.</p>
 
 
 <dt id="arg-profiles">profiles<a class="anchor" aria-label="anchor" href="#arg-profiles"></a></dt>
-<dd><p>Tibble. User profile information from \code\linkget_profiles
+<dd><p>Tibble. User profile information from <code><a href="get_profiles.html">get_profiles</a></code>
 containing handle, displayName, description and other profile details</p></dd>
 
 
@@ -78,29 +78,25 @@ Use smaller values for large networks to improve performance (default 1.0)</p></
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An interactive HTML widget (threejs object) that displays:
-\itemize
-\itemNodes representing users, colored by community
-\itemEdges representing follow relationships
-\itemInteractive controls for rotation, zoom, and exploration
-\itemHover tooltips showing user information</p>
-    </div>
+    <p>An interactive HTML widget (threejs object) that displays:</p><ul><li><p>Nodes representing users, colored by community</p></li>
+<li><p>Edges representing follow relationships</p></li>
+<li><p>Interactive controls for rotation, zoom, and exploration</p></li>
+<li><p>Hover tooltips showing user information</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The visualization process includes:
-\enumerate
-\itemCommunity detection using random walk algorithm
-\itemColor assignment based on community membership
-\itemNode labeling with user display names and descriptions
-\item3D layout generation for optimal viewing</p>
-<p>For large networks (1000+ users), consider using \codeprop &lt; 1 to sample
+    <p>The visualization process includes:</p><ol><li><p>Community detection using random walk algorithm</p></li>
+<li><p>Color assignment based on community membership</p></li>
+<li><p>Node labeling with user display names and descriptions</p></li>
+<li><p>3D layout generation for optimal viewing</p></li>
+</ol><p>For large networks (1000+ users), consider using <code>prop &lt; 1</code> to sample
 a subset for better performance. The widget works best with networks of
 50-500 users for detailed exploration.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>\code\linkbuild_network, \code\linkadd_metrics,
-\code\linktrim_net</p></div>
+    <div class="dont-index"><p><code><a href="build_network.html">build_network</a></code>, <code><a href="add_metrics.html">add_metrics</a></code>,
+<code><a href="trim_net.html">trim_net</a></code></p></div>
     </div>
 
     <div class="section level2">

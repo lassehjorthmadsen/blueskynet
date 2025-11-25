@@ -15,7 +15,8 @@ add_metrics(profiles, net)
 
 - profiles:
 
-  Tibble. User profile information from \code\linkget_profiles
+  Tibble. User profile information from
+  [`get_profiles`](https://lassehjorthmadsen.github.io/blueskynet/reference/get_profiles.md)
   containing at least handle and other profile details
 
 - net:
@@ -33,27 +34,52 @@ add_metrics(profiles, net)
 ## Value
 
 Tibble with original profile data enhanced with network metrics:
-\describe \itemcentralityNumeric. Betweenness centrality score
-(influence as bridge) \itemcommunityInteger. Community assignment from
-cluster analysis \itempageRankNumeric. PageRank score (influence based
-on follower quality) \iteminsideFollowersInteger. Number of followers
-within this network \itemcommunity_labelCharacter. Descriptive label for
-the community Plus all original profile columns (handle, displayName,
-description, etc.)
+
+- centrality:
+
+  Numeric. Betweenness centrality score (influence as bridge)
+
+- community:
+
+  Integer. Community assignment from cluster analysis
+
+- pageRank:
+
+  Numeric. PageRank score (influence based on follower quality)
+
+- insideFollowers:
+
+  Integer. Number of followers within this network
+
+- community_label:
+
+  Character. Descriptive label for the community
+
+Plus all original profile columns (handle, displayName, description,
+etc.)
 
 ## Details
 
-The function performs several network analysis computations: \itemize
-\itemBetweenness centrality: Identifies users who act as bridges between
-communities \itemCommunity detection: Uses random walks to find densely
-connected groups \itemPageRank: Measures influence based on follower
-network quality \itemInside followers: Counts followers within the
-analyzed network subset \itemCommunity labels: Generates descriptive
-labels using TF-IDF of user bios
+The function performs several network analysis computations:
+
+- Betweenness centrality: Identifies users who act as bridges between
+  communities
+
+- Community detection: Uses random walks to find densely connected
+  groups
+
+- PageRank: Measures influence based on follower network quality
+
+- Inside followers: Counts followers within the analyzed network subset
+
+- Community labels: Generates descriptive labels using TF-IDF of user
+  bios
 
 ## See also
 
-\code\linkbuild_network, \code\linkcom_labels, \code\linkcreate_widget
+[`build_network`](https://lassehjorthmadsen.github.io/blueskynet/reference/build_network.md),
+[`com_labels`](https://lassehjorthmadsen.github.io/blueskynet/reference/com_labels.md),
+[`create_widget`](https://lassehjorthmadsen.github.io/blueskynet/reference/create_widget.md)
 
 Other network-analysis:
 [`com_labels()`](https://lassehjorthmadsen.github.io/blueskynet/reference/com_labels.md)

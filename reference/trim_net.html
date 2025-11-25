@@ -67,40 +67,39 @@ visualizations and more meaningful community analysis.</p>
 
 
 <dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
-<dd><p>Numeric. Inclusion threshold for users:
-\describe
-\item&gt;= 1Minimum number of followers within the network required
-\item&lt; 1Minimum proportion of network that must follow the user</p></dd>
+<dd><p>Numeric. Inclusion threshold for users:</p><dl><dt>&gt;= 1</dt>
+<dd><p>Minimum number of followers within the network required</p></dd>
+
+<dt>&lt; 1</dt>
+<dd><p>Minimum proportion of network that must follow the user</p></dd>
+
+
+</dl></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Tibble. Cleaned network with the same structure as input but with:
-\itemize
-\itemAll duplicate edges removed
-\itemInvalid handles and NA values excluded
-\itemUsers below follower threshold removed
-\itemOnly users who both follow and are followed within the network
-
-The resulting network forms a more cohesive community for analysis.</p>
+    <p>Tibble. Cleaned network with the same structure as input but with:</p><ul><li><p>All duplicate edges removed</p></li>
+<li><p>Invalid handles and NA values excluded</p></li>
+<li><p>Users below follower threshold removed</p></li>
+<li><p>Only users who both follow and are followed within the network</p></li>
+</ul><p>The resulting network forms a more cohesive community for analysis.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The trimming process works iteratively:
-\enumerate
-\itemRemove duplicate connections and invalid/missing handles
-\itemCount followers for each user within the network
-\itemRemove users below the specified threshold
-\itemKeep only users who appear as both followers and followed
-\itemRepeat until the network stabilizes</p>
-<p>This creates a "core community" where every member has meaningful
+    <p>The trimming process works iteratively:</p><ol><li><p>Remove duplicate connections and invalid/missing handles</p></li>
+<li><p>Count followers for each user within the network</p></li>
+<li><p>Remove users below the specified threshold</p></li>
+<li><p>Keep only users who appear as both followers and followed</p></li>
+<li><p>Repeat until the network stabilizes</p></li>
+</ol><p>This creates a "core community" where every member has meaningful
 connections within the group, improving visualization quality and
 analytical insights.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>\code\linkexpand_net, \code\linkbuild_network,
-\code\linkadd_metrics</p>
+    <div class="dont-index"><p><code><a href="expand_net.html">expand_net</a></code>, <code><a href="build_network.html">build_network</a></code>,
+<code><a href="add_metrics.html">add_metrics</a></code></p>
 <p>Other network-building:
 <code><a href="build_network.html">build_network()</a></code>,
 <code><a href="expand_net.html">expand_net()</a></code>,

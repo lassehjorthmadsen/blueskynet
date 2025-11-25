@@ -56,7 +56,7 @@ social network.</p>
 
 
 <dl><dt id="arg-profiles">profiles<a class="anchor" aria-label="anchor" href="#arg-profiles"></a></dt>
-<dd><p>Tibble. User profile information from \code\linkget_profiles
+<dd><p>Tibble. User profile information from <code><a href="get_profiles.html">get_profiles</a></code>
 containing at least handle and other profile details</p></dd>
 
 
@@ -73,30 +73,36 @@ containing at least handle and other profile details</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Tibble with original profile data enhanced with network metrics:
-\describe
-\itemcentralityNumeric. Betweenness centrality score (influence as bridge)
-\itemcommunityInteger. Community assignment from cluster analysis
-\itempageRankNumeric. PageRank score (influence based on follower quality)
-\iteminsideFollowersInteger. Number of followers within this network
-\itemcommunity_labelCharacter. Descriptive label for the community
+    <p>Tibble with original profile data enhanced with network metrics:</p><dl><dt>centrality</dt>
+<dd><p>Numeric. Betweenness centrality score (influence as bridge)</p></dd>
 
-Plus all original profile columns (handle, displayName, description, etc.)</p>
+<dt>community</dt>
+<dd><p>Integer. Community assignment from cluster analysis</p></dd>
+
+<dt>pageRank</dt>
+<dd><p>Numeric. PageRank score (influence based on follower quality)</p></dd>
+
+<dt>insideFollowers</dt>
+<dd><p>Integer. Number of followers within this network</p></dd>
+
+<dt>community_label</dt>
+<dd><p>Character. Descriptive label for the community</p></dd>
+
+
+</dl><p>Plus all original profile columns (handle, displayName, description, etc.)</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function performs several network analysis computations:
-\itemize
-\itemBetweenness centrality: Identifies users who act as bridges between communities
-\itemCommunity detection: Uses random walks to find densely connected groups
-\itemPageRank: Measures influence based on follower network quality
-\itemInside followers: Counts followers within the analyzed network subset
-\itemCommunity labels: Generates descriptive labels using TF-IDF of user bios</p>
-    </div>
+    <p>The function performs several network analysis computations:</p><ul><li><p>Betweenness centrality: Identifies users who act as bridges between communities</p></li>
+<li><p>Community detection: Uses random walks to find densely connected groups</p></li>
+<li><p>PageRank: Measures influence based on follower network quality</p></li>
+<li><p>Inside followers: Counts followers within the analyzed network subset</p></li>
+<li><p>Community labels: Generates descriptive labels using TF-IDF of user bios</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>\code\linkbuild_network, \code\linkcom_labels,
-\code\linkcreate_widget</p>
+    <div class="dont-index"><p><code><a href="build_network.html">build_network</a></code>, <code><a href="com_labels.html">com_labels</a></code>,
+<code><a href="create_widget.html">create_widget</a></code></p>
 <p>Other network-analysis:
 <code><a href="com_labels.html">com_labels()</a></code></p></div>
     </div>
